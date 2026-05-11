@@ -89,20 +89,32 @@ def test_public_exceptions_reference_covers_public_exceptions() -> None:
         assert f"`{name}`" in exceptions_reference
 
 
+def markdown_links(path: Path) -> list[str]:
+    return re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text())
+
+
 def docs_index_markdown_links() -> list[str]:
-    docs_index = Path("docs/index.md")
-    links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", docs_index.read_text())
+    links = markdown_links(Path("docs/index.md"))
 
     assert links
     return links
 
 
+def is_external_or_page_anchor(link: str) -> bool:
+    return "://" in link or link.startswith("#")
+
+
+def local_link_path(source: Path, link: str) -> Path:
+    path_part = link.split("#", maxsplit=1)[0]
+    return source.parent / path_part
+
+
 def docs_index_local_links() -> set[Path]:
     docs_index = Path("docs/index.md")
     return {
-        docs_index.parent / link.split("#", maxsplit=1)[0]
+        local_link_path(docs_index, link)
         for link in docs_index_markdown_links()
-        if "://" not in link and not link.startswith("#")
+        if not is_external_or_page_anchor(link)
     }
 
 
@@ -201,3 +213,32 @@ def test_docs_index_local_markdown_fragment_links_resolve() -> None:
         assert fragment in markdown_heading_anchors(target), (
             f"missing Markdown anchor target: {link}"
         )
+
+
+def test_all_docs_local_markdown_links_resolve() -> None:
+    docs_files = sorted(Path("docs").rglob("*.md"))
+
+    assert docs_files
+    for docs_file in docs_files:
+        for link in markdown_links(docs_file):
+            if is_external_or_page_anchor(link):
+                continue
+            target = local_link_path(docs_file, link)
+            assert target.exists(), f"missing local docs link target: {docs_file}: {link}"
+
+
+def test_all_docs_local_markdown_fragment_links_resolve() -> None:
+    docs_files = sorted(Path("docs").rglob("*.md"))
+
+    assert docs_files
+    for docs_file in docs_files:
+        for link in markdown_links(docs_file):
+            if is_external_or_page_anchor(link) or "#" not in link:
+                continue
+            target = local_link_path(docs_file, link)
+            if target.suffix != ".md":
+                continue
+            _, fragment = link.split("#", maxsplit=1)
+            assert fragment in markdown_heading_anchors(target), (
+                f"missing Markdown anchor target: {docs_file}: {link}"
+            )
