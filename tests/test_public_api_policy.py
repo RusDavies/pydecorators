@@ -248,3 +248,14 @@ def test_all_docs_local_markdown_fragment_links_resolve() -> None:
             assert fragment in markdown_heading_anchors(target), (
                 f"missing Markdown anchor target: {docs_file}: {link}"
             )
+
+
+def test_root_docs_link_to_docs_index_where_appropriate() -> None:
+    root_docs_that_should_link_index = {
+        Path("README.md"),
+        Path("CONTRIBUTING.md"),
+        Path("RELEASE.md"),
+    }
+
+    for root_doc in root_docs_that_should_link_index:
+        assert "docs/index.md" in root_doc.read_text()
