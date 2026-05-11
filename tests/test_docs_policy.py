@@ -6,7 +6,9 @@ import pytest
 from tests.docs_policy_helpers import (
     docs_index_local_links,
     docs_index_markdown_links,
+    is_external_http_link,
     is_external_or_page_anchor,
+    is_valid_external_http_link,
     local_link_path,
     markdown_heading_anchor,
     markdown_heading_anchors,
@@ -129,6 +131,26 @@ def test_all_docs_local_markdown_fragment_links_resolve() -> None:
             assert fragment in markdown_heading_anchors(target), (
                 f"missing Markdown anchor target: {docs_file}: {link}"
             )
+
+
+def test_external_http_markdown_links_are_syntax_checked_without_fetching() -> None:
+    docs_files = markdown_policy_files()
+
+    assert docs_files
+    for docs_file in docs_files:
+        for link in markdown_links(docs_file):
+            if is_external_http_link(link):
+                assert is_valid_external_http_link(link), (
+                    f"invalid external HTTP(S) link syntax: {docs_file}: {link}"
+                )
+
+
+def test_external_http_link_helper_rejects_invalid_urls() -> None:
+    assert is_valid_external_http_link("https://example.com/docs")
+    assert is_valid_external_http_link("http://example.com/path?query=value#anchor")
+    assert not is_valid_external_http_link("https:///missing-host")
+    assert not is_valid_external_http_link("https://example.com/bad path")
+    assert not is_valid_external_http_link("ftp://example.com/file")
 
 
 def test_root_docs_link_to_docs_index_where_appropriate() -> None:

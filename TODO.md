@@ -344,7 +344,12 @@
 
 - [x] Add unit tests for Markdown helper edge cases if link parsing grows more sophisticated.
 - [ ] Consider supporting reference-style Markdown links if docs begin using them.
-- [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
+- [x] Decide whether external HTTP links should be syntax-checked or left unchecked.
+
+### Newly Implied External Link Policy Follow-Ups
+
+- [ ] Consider adding an opt-in external link checker for release/manual maintenance, separate from default CI.
+- [ ] Add allowlist or scheme policy if docs start using non-HTTP external links intentionally.
 - [x] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 
 ### Newly Implied Duplicate Anchor Handling Follow-Ups

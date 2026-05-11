@@ -1,6 +1,7 @@
 import ast
 import re
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 def public_example_functions(example_path: Path) -> set[str]:
@@ -32,6 +33,20 @@ def docs_index_markdown_links() -> list[str]:
 
 def is_external_or_page_anchor(link: str) -> bool:
     return "://" in link or link.startswith("#")
+
+
+def is_external_http_link(link: str) -> bool:
+    parsed = urlparse(link)
+    return parsed.scheme in {"http", "https"}
+
+
+def is_valid_external_http_link(link: str) -> bool:
+    parsed = urlparse(link)
+    if parsed.scheme not in {"http", "https"}:
+        return False
+    if not parsed.netloc:
+        return False
+    return not any(character.isspace() for character in link)
 
 
 def local_link_path(source: Path, link: str) -> Path:
