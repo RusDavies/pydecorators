@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Release checklist for repeatable package publishing.
 - Public API policy, contributor checklist, version consistency check, and executable docs examples.
 - `@deprecated` decorator with sync and async support.
 - Initial project packaging foundation.

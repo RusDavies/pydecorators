@@ -76,7 +76,7 @@
 
 ### Newly Implied Release Hardening Follow-Ups
 
-- [ ] Add a dedicated release checklist file before publishing `v0.1.0`.
+- [x] Add a dedicated release checklist file before publishing `v0.1.0`.
 
 ## 3. `@cache_result`
 
@@ -266,7 +266,13 @@
 - [ ] Add classifiers.
 - [ ] Add license file.
 - [ ] Add versioning strategy.
-- [ ] Add release checklist.
+- [x] Add release checklist.
+
+### Newly Implied Release Checklist Follow-Ups
+
+- [ ] Add clean-venv local wheel install smoke test script.
+- [ ] Add TestPyPI/PyPI publishing instructions once package credentials and repository location are finalized.
+- [ ] Add git tag naming convention for releases.
 - [ ] Build package locally.
 - [ ] Test install from local wheel.
 - [ ] Publish test release to TestPyPI.
