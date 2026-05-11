@@ -54,6 +54,24 @@ After adding a new example file:
 3. Add at least one assertion for each public top-level example function.
 4. Run the full verification gate.
 
+## Documentation policy tests
+
+Use the `docs_policy` pytest marker for tests that guard documentation maintenance rather than runtime behavior. Mark tests with `@pytest.mark.docs_policy` or a module-level `pytestmark = pytest.mark.docs_policy` when they check things like:
+
+- `docs/index.md` coverage and navigation rules
+- executable documentation example indexing, naming, loading, or assertion coverage
+- Markdown local-link or heading-anchor validation
+- root documentation link policy
+- release-checklist documentation maintenance rules
+
+Do not use `docs_policy` for normal decorator behavior, backend behavior, public API exports, or version checks unless the test is specifically about documentation upkeep.
+
+Run documentation policy checks with:
+
+```bash
+./scripts/docs-policy.sh
+```
+
 ## Root documentation links
 
 Root docs that help users or contributors navigate the project should link to `docs/index.md`. Today that means:
