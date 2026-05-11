@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Docs example execution coverage policy test.
 - Docs examples index coverage policy test.
 - Docs index coverage policy test for top-level documentation pages.
 - Docs index link validation policy test.
