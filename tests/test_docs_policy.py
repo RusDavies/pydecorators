@@ -215,3 +215,21 @@ def test_contributing_documents_docs_policy_marker_guidance() -> None:
         "./scripts/docs-policy.sh",
     ]:
         assert required in contributing
+
+
+def test_contributing_documents_docs_file_update_checklist() -> None:
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    assert "## Adding or changing documentation files" in contributing
+    for required in [
+        "new top-level `docs/*.md` pages",
+        "docs/index.md",
+        "docs/examples/",
+        "tests/test_docs_examples.py",
+        "pytest.mark.docs_policy",
+        "./scripts/docs-policy.sh",
+        "GOAL.md",
+        "PLAN.md",
+        "TODO.md",
+    ]:
+        assert required in contributing

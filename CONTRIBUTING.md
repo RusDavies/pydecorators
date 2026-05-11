@@ -54,6 +54,18 @@ After adding a new example file:
 3. Add at least one assertion for each public top-level example function.
 4. Run the full verification gate.
 
+## Adding or changing documentation files
+
+When adding or changing docs files, use this checklist before calling the slice done:
+
+1. Link new top-level `docs/*.md` pages from `docs/index.md`, unless the file is intentionally exempt and the docs policy test says why.
+2. Link new executable examples under `docs/examples/` from `docs/index.md`.
+3. Add or update assertions in `tests/test_docs_examples.py` for public top-level example functions.
+4. Add `pytest.mark.docs_policy` coverage when the change introduces a new documentation rule.
+5. Run `./scripts/docs-policy.sh` before the full verification gate.
+
+If a planning/backlog file such as `GOAL.md`, `PLAN.md`, or `TODO.md` becomes user-facing navigation, update the root documentation link policy at the same time.
+
 ## Documentation policy tests
 
 Use the `docs_policy` pytest marker for tests that guard documentation maintenance rather than runtime behavior. Mark tests with `@pytest.mark.docs_policy` or a module-level `pytestmark = pytest.mark.docs_policy` when they check things like:

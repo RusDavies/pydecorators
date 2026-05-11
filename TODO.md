@@ -332,7 +332,12 @@
 
 ### Newly Implied Docs Policy Marker Guidance Follow-Ups
 
-- [ ] Consider adding a short contributor checklist for updating docs policy tests when adding new docs files.
+- [x] Consider adding a short contributor checklist for updating docs policy tests when adding new docs files.
+
+### Newly Implied Docs File Checklist Follow-Ups
+
+- [ ] Consider adding PR-template checkboxes for docs index, docs examples, and docs policy marker updates if GitHub hosting becomes active.
+- [ ] Add a docs-policy exemption registry if intentionally unindexed docs files become common.
 - [ ] Consider moving Markdown policy helpers into `tests/docs_policy_helpers.py` if reuse grows.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
