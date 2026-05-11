@@ -1,3 +1,4 @@
+import inspect
 import re
 from pathlib import Path
 
@@ -20,3 +21,17 @@ def test_ci_matrix_includes_minimum_supported_python_version() -> None:
 
     assert 'requires-python = ">=3.11"' in pyproject
     assert '"3.11"' in workflow
+
+
+def test_public_exceptions_are_documented_in_public_api_notes() -> None:
+    public_api = Path("docs/PUBLIC_API.md").read_text()
+    public_exception_names = {
+        name
+        for name in useful_decorators.__all__
+        if inspect.isclass(getattr(useful_decorators, name))
+        and issubclass(getattr(useful_decorators, name), BaseException)
+    }
+
+    assert public_exception_names
+    for name in public_exception_names:
+        assert f"### `{name}`" in public_api
