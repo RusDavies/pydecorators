@@ -65,13 +65,17 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 
 `ConfigurationError` is raised when a decorator or backend receives invalid configuration, such as an unsupported async callable for `cache_result`, a non-positive TTL, or an invalid cache namespace. It inherits from `ValueError` and `UsefulDecoratorsError`.
 
+Example: `cache_result(namespace="   ")` raises `ConfigurationError` because namespaces must not be empty.
+
 ### `CacheInfo`
 
 `CacheInfo` is the immutable statistics object returned by planned `@cache_result` wrappers via `cache_info()`. It exposes `hits`, `misses`, `maxsize`, and `currsize`.
 
 ### `CacheKeyError`
 
-`CacheKeyError` is raised when planned `@cache_result` key generation cannot produce a hashable key. It inherits from both `TypeError` and `UsefulDecoratorsError`.
+`CacheKeyError` is raised when `@cache_result` key generation cannot produce a hashable key. It inherits from both `TypeError` and `UsefulDecoratorsError`.
+
+Example: calling a cached function with an unhashable list argument raises `CacheKeyError` unless a custom key function converts the arguments into a hashable key.
 
 ### `MemoryCacheBackend`
 
@@ -92,6 +96,8 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 ### `CacheSerializationError`
 
 `CacheSerializationError` wraps serializer failures so persistent/distributed backends can expose package-specific errors instead of raw serializer internals. It inherits from `UsefulDecoratorsError`.
+
+Example: `PickleCacheSerializer().dumps(...)` raises `CacheSerializationError` when a payload cannot be pickled.
 
 ### `CacheBackendClosedError`
 

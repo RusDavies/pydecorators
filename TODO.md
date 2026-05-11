@@ -245,8 +245,13 @@
 ### Newly Implied Public Exception Inheritance Follow-Ups
 
 - [ ] Add a structured public exception metadata table to docs.
-- [ ] Add doctested exception handling examples for public exception types.
-- [ ] Add short examples for `ConfigurationError`, `CacheKeyError`, and `CacheSerializationError`.
+- [x] Add doctested exception handling examples for public exception types.
+- [x] Add short examples for `ConfigurationError`, `CacheKeyError`, and `CacheSerializationError`.
+
+### Newly Implied Public Exception Examples Follow-Ups
+
+- [ ] Add public exception examples for reserved future decorators once implemented.
+- [ ] Add README link to public exception docs once centralized exception reference exists.
 - [ ] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
 - [ ] Document recommended cache file location/permissions for CLI and service use.
