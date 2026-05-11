@@ -30,7 +30,13 @@ Use this checklist before publishing `useful-decorators` releases. The goal is t
 
 ## Documentation maintenance
 
-Before publishing, treat docs as release artifacts, not garnish. Confirm:
+Before publishing, treat docs as release artifacts, not garnish. Run:
+
+```bash
+./scripts/docs-policy.sh
+```
+
+Then confirm:
 
 - `README.md`, `CONTRIBUTING.md`, and `RELEASE.md` still link to `docs/index.md`.
 - `docs/index.md` links every top-level page in `docs/` except itself.
