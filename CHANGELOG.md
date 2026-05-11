@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Contributor checklist for documentation file updates.
 - Contributor guidance for documentation policy test markers.
 - Pytest marker for documentation policy checks.
 - Dedicated documentation policy test module.
