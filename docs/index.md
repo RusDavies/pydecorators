@@ -26,3 +26,5 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`public_exception_examples.py`](examples/public_exception_examples.py)
 
 These examples are exercised by the test suite so documentation drift gets caught before it mutates into folklore.
+
+Executable example conventions are documented in [CONTRIBUTING.md](../CONTRIBUTING.md#executable-documentation-examples).

@@ -40,3 +40,16 @@ python -m build
 If a name is in `useful_decorators.__all__`, it is public. Public names need tests and documentation.
 
 If a helper is not meant for users, keep it in an underscore-prefixed module.
+
+## Executable documentation examples
+
+When adding runnable docs examples, put them under `docs/examples/` and use the naming pattern `<topic>_examples.py`, for example `deprecated_examples.py` or `disk_cache_backend_examples.py`.
+
+Keep example modules importable without side effects beyond defining small functions/classes. Public top-level example functions should be directly asserted in `tests/test_docs_examples.py`; if a file is intentionally not executable, document why and exempt it explicitly in the relevant policy test.
+
+After adding a new example file:
+
+1. Link it from `docs/index.md`.
+2. Load it through `load_docs_example(...)` in `tests/test_docs_examples.py`.
+3. Add at least one assertion for each public top-level example function.
+4. Run the full verification gate.

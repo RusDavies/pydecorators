@@ -96,7 +96,9 @@ def docs_index_local_links() -> set[Path]:
 
     assert links
     return {
-        docs_index.parent / link for link in links if "://" not in link and not link.startswith("#")
+        docs_index.parent / link.split("#", maxsplit=1)[0]
+        for link in links
+        if "://" not in link and not link.startswith("#")
     }
 
 
