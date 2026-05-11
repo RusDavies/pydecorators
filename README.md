@@ -72,7 +72,7 @@ def expensive_lookup(value: str) -> str:
 
 Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend.
 
-For a trusted local persistent cache, create one `DiskCacheBackend` and pass it to `@cache_result`:
+For a trusted local persistent cache, create one `DiskCacheBackend`, pass it to `@cache_result`, and close it when your script or service shuts down:
 
 ```python
 from pathlib import Path
@@ -89,7 +89,15 @@ backend = DiskCacheBackend(
 @cache_result(backend=backend, namespace="users")
 def load_user_display_name(user_id: str) -> str:
     return fetch_user_display_name(user_id)
+
+
+try:
+    print(load_user_display_name("user-123"))
+finally:
+    backend.close()
 ```
+
+For long-running applications, keep the backend for the application lifetime and close it from your normal shutdown hook.
 
 Disk backend design lives in `docs/disk_cache_backend.md`; implementation uses SQLite and the cache serializer interface. The default disk payload serializer uses pickle, so cache databases must be treated as trusted local files only — do not load cache DBs from untrusted sources or place them in world-writable directories.
 
