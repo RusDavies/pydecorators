@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `DiskCacheBackend` SQLite storage strategy design.
 - `CacheSerializer` protocol and `PickleCacheSerializer` default implementation.
 - `@cache_result` backend sharing semantics and `namespace=` isolation.
 - `CacheBackend` protocol and `backend=` parameter for `@cache_result`.
