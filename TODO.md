@@ -236,7 +236,12 @@
 ### Newly Implied Closed Error Public Docs Follow-Ups
 
 - [ ] Add a centralized public exceptions reference page.
-- [ ] Add tests that all public exceptions appear in public API docs.
+- [x] Add tests that all public exceptions appear in public API docs.
+
+### Newly Implied Public Exception Policy Follow-Ups
+
+- [ ] Add tests that public exception inheritance matches documented behavior.
+- [ ] Add short examples for `ConfigurationError`, `CacheKeyError`, and `CacheSerializationError`.
 - [ ] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
 - [ ] Document recommended cache file location/permissions for CLI and service use.

@@ -57,6 +57,14 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 
 ## Public API notes
 
+### `UsefulDecoratorsError`
+
+`UsefulDecoratorsError` is the base class for package-specific exceptions. Catch it when callers want to handle errors raised by this library without catching unrelated Python exceptions.
+
+### `ConfigurationError`
+
+`ConfigurationError` is raised when a decorator or backend receives invalid configuration, such as an unsupported async callable for `cache_result`, a non-positive TTL, or an invalid cache namespace. It inherits from `ValueError` and `UsefulDecoratorsError`.
+
 ### `CacheInfo`
 
 `CacheInfo` is the immutable statistics object returned by planned `@cache_result` wrappers via `cache_info()`. It exposes `hits`, `misses`, `maxsize`, and `currsize`.
@@ -109,3 +117,11 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 ### `DiskCacheBackend`
 
 `DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, and `info`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+
+### `RateLimitExceeded`
+
+`RateLimitExceeded` is reserved for rate-limiting decorators and is raised when a rate-limited call exceeds its configured allowance.
+
+### `FunctionTimedOut`
+
+`FunctionTimedOut` is reserved for timeout decorators and is raised when a decorated function exceeds its configured timeout. It inherits from `TimeoutError` and `UsefulDecoratorsError`.
