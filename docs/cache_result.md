@@ -178,3 +178,15 @@ The current implementation includes:
 - explicit async rejection
 
 TTL expiry and max-size eviction are still planned follow-up work.
+
+## Canonical argument binding decision
+
+Default key generation does not canonicalize equivalent call styles in `v0.1.0`. For example, `func(1, right=2)` and `func(left=1, right=2)` are treated as different cache keys.
+
+Reason: canonical binding requires `inspect.signature` work on every uncached call path or additional setup complexity. The first implementation keeps key generation simple and predictable. Users who need canonical behavior can provide a custom `key` function.
+
+A future release may add opt-in canonical key generation if real usage shows it is worth the complexity.
+
+## Lock behavior
+
+The sync implementation protects cache lookup, mutation, statistics, and eviction with a lock, but executes the wrapped function outside that lock. This avoids blocking unrelated cache misses while a slow wrapped function runs.
