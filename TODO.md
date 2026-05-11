@@ -298,7 +298,12 @@
 ### Newly Implied Root Docs Link Policy Follow-Ups
 
 - [ ] Decide whether `TODO.md` should be included in root Markdown link policy long-term or exempted as mutable backlog.
-- [ ] Add policy test that root documentation files mention `docs/index.md` where appropriate.
+- [x] Add policy test that root documentation files mention `docs/index.md` where appropriate.
+
+### Newly Implied Root Docs Index Mention Follow-Ups
+
+- [ ] Decide whether `GOAL.md` and `PLAN.md` should link to docs/index.md or remain project-planning docs.
+- [ ] Consider documenting which root docs are required to link the docs index.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.

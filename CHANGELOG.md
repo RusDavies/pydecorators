@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Root docs documentation-index mention policy test.
 - Root documentation local Markdown link validation.
 - All-docs local Markdown link and anchor validation.
 - Local Markdown anchor validation for docs index links.
