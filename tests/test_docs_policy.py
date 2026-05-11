@@ -200,3 +200,23 @@ def test_readme_links_to_core_docs_pages() -> None:
         "docs/disk_cache_backend.md",
     ]:
         assert required_link in readme
+
+
+def test_contributing_documents_docs_index_inclusion_rule() -> None:
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    assert "## Documentation index inclusion rule" in contributing
+    for required in [
+        "intended to help users or contributors",
+        "public API",
+        "per-decorator behavior docs",
+        "cache backend",
+        "executable documentation examples",
+        "release, contribution, or documentation-maintenance guidance",
+        "GOAL.md",
+        "PLAN.md",
+        "TODO.md",
+        "intentionally not indexed",
+        "docs_policy",
+    ]:
+        assert required in contributing

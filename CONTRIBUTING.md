@@ -66,6 +66,18 @@ When adding or changing docs files, use this checklist before calling the slice 
 
 If a planning/backlog file such as `GOAL.md`, `PLAN.md`, or `TODO.md` becomes user-facing navigation, update the root documentation link policy at the same time.
 
+## Documentation index inclusion rule
+
+Add a page to `docs/index.md` when it is intended to help users or contributors understand, use, extend, release, or maintain the package. In practice, that includes:
+
+- public API, compatibility, exception, or design policy pages
+- per-decorator behavior docs
+- cache backend, serializer, lifecycle, or trust-boundary docs
+- executable documentation examples under `docs/examples/`
+- release, contribution, or documentation-maintenance guidance linked from the docs flow
+
+Do not add raw planning/backlog files such as `GOAL.md`, `PLAN.md`, or `TODO.md` to the docs index unless they are deliberately promoted to user-facing documentation. If a docs file is intentionally not indexed, document the exemption in the relevant `docs_policy` test.
+
 ## Documentation policy tests
 
 Use the `docs_policy` pytest marker for tests that guard documentation maintenance rather than runtime behavior. Mark tests with `@pytest.mark.docs_policy` or a module-level `pytestmark = pytest.mark.docs_policy` when they check things like:
