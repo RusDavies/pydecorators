@@ -259,7 +259,12 @@
 
 ### Newly Implied Docs Example Execution Follow-Ups
 
-- [ ] Refactor docs example loading into a shared helper to reduce repetitive importlib boilerplate.
+- [x] Refactor docs example loading into a shared helper to reduce repetitive importlib boilerplate.
+
+### Newly Implied Docs Example Loader Refactor Follow-Ups
+
+- [ ] Consider parameterizing docs example execution tests by module/function once the example set grows.
+- [ ] Add a tiny helper for asserting expected docs example return values consistently.
 - [ ] Add policy test that each public example function has at least one assertion in docs example tests.
 - [ ] Add a naming convention note for executable docs examples.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
