@@ -14,6 +14,16 @@ def load_deprecated_examples() -> ModuleType:
     return module
 
 
+def load_disk_cache_examples() -> ModuleType:
+    example_path = Path("docs/examples/disk_cache_backend_examples.py")
+    spec = importlib.util.spec_from_file_location("disk_cache_backend_examples", example_path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_deprecated_documentation_examples_execute() -> None:
     examples = load_deprecated_examples()
 
@@ -22,3 +32,13 @@ def test_deprecated_documentation_examples_execute() -> None:
         assert examples.old_bare_function(1, 2) == 3
         assert examples.old_configured_function(1, 2) == 3
         assert examples.Client().fetch_old() == "old"
+
+
+def test_disk_cache_backend_documentation_example_executes(tmp_path: Path) -> None:
+    examples = load_disk_cache_examples()
+
+    first, second, calls = examples.disk_cache_example(tmp_path / "cache.sqlite3")
+
+    assert first == "User user-123"
+    assert second == "User user-123"
+    assert calls == 1
