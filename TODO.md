@@ -347,7 +347,12 @@
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [x] Consider centralizing Markdown link parsing helpers for docs policy tests.
-- [ ] Add docs contribution note explaining when a docs page should be added to the index.
+- [x] Add docs contribution note explaining when a docs page should be added to the index.
+
+### Newly Implied Docs Index Guidance Follow-Ups
+
+- [ ] Consider adding a docs-index section classifier policy if `docs/index.md` grows more categories.
+- [ ] Add an explicit docs-index exemption list if intentional unindexed docs appear.
 - [x] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.
 - [x] Add policy test ensuring README links to core docs pages.
