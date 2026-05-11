@@ -78,14 +78,25 @@ def test_public_exceptions_reference_covers_public_exceptions() -> None:
         assert f"`{name}`" in exceptions_reference
 
 
-def test_docs_index_links_resolve_to_existing_files() -> None:
+def docs_index_local_links() -> set[Path]:
     docs_index = Path("docs/index.md")
     text = docs_index.read_text()
     links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
 
     assert links
-    for link in links:
-        if "://" in link or link.startswith("#"):
-            continue
-        target = (docs_index.parent / link).resolve()
-        assert target.exists(), f"missing docs index target: {link}"
+    return {
+        docs_index.parent / link for link in links if "://" not in link and not link.startswith("#")
+    }
+
+
+def test_docs_index_links_resolve_to_existing_files() -> None:
+    for target in docs_index_local_links():
+        assert target.exists(), f"missing docs index target: {target}"
+
+
+def test_top_level_docs_markdown_files_are_linked_from_docs_index() -> None:
+    explicitly_exempt = {Path("docs/index.md")}
+    top_level_docs = {path for path in Path("docs").glob("*.md")}
+    linked_docs = {path for path in docs_index_local_links() if path.suffix == ".md"}
+
+    assert top_level_docs - explicitly_exempt <= linked_docs
