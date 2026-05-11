@@ -23,3 +23,7 @@ class CacheKeyError(TypeError, UsefulDecoratorsError):
 
 class CacheSerializationError(UsefulDecoratorsError):
     """Raised when cache serialization or deserialization fails."""
+
+
+class CacheBackendClosedError(UsefulDecoratorsError):
+    """Raised when a cache backend is used after it has been closed."""

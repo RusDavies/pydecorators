@@ -15,6 +15,7 @@ from useful_decorators.cache_result import (
 )
 from useful_decorators.deprecated import deprecated
 from useful_decorators.exceptions import (
+    CacheBackendClosedError,
     CacheKeyError,
     CacheSerializationError,
     ConfigurationError,
@@ -27,6 +28,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "CacheBackend",
+    "CacheBackendClosedError",
     "CacheInfo",
     "CacheKeyError",
     "CacheSerializationError",

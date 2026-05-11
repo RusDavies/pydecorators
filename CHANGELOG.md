@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `DiskCacheBackend` cache operations, persistence, TTL/LRU behavior, serializer mismatch handling, and closed-backend errors.
 - `DiskCacheBackend` key and payload serialization helpers.
 - `DiskCacheBackend` SQLite schema initialization and constructor tests.
 - `DiskCacheBackend` SQLite storage strategy design.

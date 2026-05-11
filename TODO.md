@@ -174,18 +174,24 @@
 
 ### Newly Implied Disk Schema Follow-Ups
 
-- [ ] Decide whether `DiskCacheBackend.close()` should make later operations raise a package-specific error.
+- [x] Decide whether `DiskCacheBackend.close()` should make later operations raise a package-specific error.
 - [x] Add context-manager support for `DiskCacheBackend`.
 - [x] Implement disk backend key serialization helpers.
 - [x] Implement disk backend payload serialization helpers.
 
 ### Newly Implied Disk Serialization Follow-Ups
 
-- [ ] Add disk backend serializer content-type mismatch handling.
+- [x] Add disk backend serializer content-type mismatch handling.
 - [x] Add tests for custom disk backend serializer.
-- [ ] Implement disk backend `get`, `set_value`, `set_exception`, `clear`, and `info`.
-- [ ] Add disk backend persistence tests across backend instances.
-- [ ] Add disk backend SQLite trust-boundary warning to README.
+- [x] Implement disk backend `get`, `set_value`, `set_exception`, `clear`, and `info`.
+- [x] Add disk backend persistence tests across backend instances.
+- [x] Add disk backend SQLite trust-boundary warning to README.
+
+### Newly Implied Disk Operations Follow-Ups
+
+- [ ] Add disk backend corrupt-row handling policy and tests.
+- [ ] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
+- [ ] Add reusable backend conformance tests for cached exception behavior, TTL, LRU, clear, and stats.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.
 - [ ] Add backend conformance test suite reusable by memory/disk/redis backends.
 
