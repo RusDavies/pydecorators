@@ -300,3 +300,34 @@ def test_disk_cache_backend_treats_corrupt_payload_as_miss(tmp_path: Path) -> No
         assert backend.info().currsize == 0
     finally:
         backend.close()
+
+
+def test_disk_cache_backend_configures_sqlite_operational_pragmas(tmp_path: Path) -> None:
+    db_path = tmp_path / "cache.sqlite3"
+    backend = DiskCacheBackend(db_path, busy_timeout_ms=7_500)
+    try:
+        assert backend.busy_timeout_ms == 7_500
+        assert backend.wal_enabled is True
+        busy_timeout = backend._connection.execute("PRAGMA busy_timeout").fetchone()[0]
+        journal_mode = backend._connection.execute("PRAGMA journal_mode").fetchone()[0]
+
+        assert busy_timeout == 7_500
+        assert journal_mode.lower() == "wal"
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_allows_disabling_wal(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", wal=False)
+    try:
+        journal_mode = backend._connection.execute("PRAGMA journal_mode").fetchone()[0]
+
+        assert backend.wal_enabled is False
+        assert journal_mode.lower() != "wal"
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_rejects_negative_busy_timeout(tmp_path: Path) -> None:
+    with pytest.raises(ConfigurationError, match="busy_timeout_ms must be zero or greater"):
+        DiskCacheBackend(tmp_path / "cache.sqlite3", busy_timeout_ms=-1)

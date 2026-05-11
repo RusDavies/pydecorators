@@ -195,7 +195,13 @@
 
 - [ ] Add optional diagnostics/log hook for disk backend dropped corrupt rows.
 - [ ] Add disk backend integrity-check/maintenance helper design.
-- [ ] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
+- [x] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
+
+### Newly Implied Disk SQLite Tuning Follow-Ups
+
+- [ ] Document disk backend concurrency limits and single-host expectations in README.
+- [ ] Add stress/smoke test for concurrent disk backend reads and writes.
+- [ ] Decide whether disk backend should expose cache vacuum/compaction maintenance.
 - [x] Add reusable backend conformance tests for cached exception behavior, TTL, LRU, clear, and stats.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.
 - [x] Add backend conformance test suite reusable by memory/disk/redis backends.

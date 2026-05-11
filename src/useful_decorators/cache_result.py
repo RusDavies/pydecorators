@@ -210,11 +210,7 @@ class MemoryCacheBackend:
 
 
 class DiskCacheBackend:
-    """SQLite-backed local persistent cache backend.
-
-    This first slice initializes the database schema. Cache operations are
-    implemented in later slices.
-    """
+    """SQLite-backed local persistent cache backend."""
 
     def __init__(
         self,
@@ -224,11 +220,15 @@ class DiskCacheBackend:
         maxsize: int | None = 128,
         serializer: CacheSerializer | None = None,
         clock: Clock | None = None,
+        busy_timeout_ms: int = 5_000,
+        wal: bool = True,
     ) -> None:
         if ttl is not None and ttl <= 0:
             raise ConfigurationError("ttl must be greater than zero when provided")
         if maxsize is not None and maxsize <= 0:
             raise ConfigurationError("maxsize must be greater than zero when provided")
+        if busy_timeout_ms < 0:
+            raise ConfigurationError("busy_timeout_ms must be zero or greater")
 
         self.path = Path(path)
         self._ttl = ttl
@@ -236,11 +236,36 @@ class DiskCacheBackend:
         self._key_serializer = PickleCacheSerializer()
         self._serializer = serializer or PickleCacheSerializer()
         self._clock = clock or monotonic
+        self._busy_timeout_ms = busy_timeout_ms
+        self._wal = wal
         self._lock = RLock()
         self._closed = False
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._connection = sqlite3.connect(self.path, check_same_thread=False)
+        self._connection = sqlite3.connect(
+            self.path,
+            check_same_thread=False,
+            timeout=busy_timeout_ms / 1000,
+        )
+        self._configure_connection()
         self._initialize_schema()
+
+    def _configure_connection(self) -> None:
+        with self._lock:
+            self._connection.execute(f"PRAGMA busy_timeout = {self._busy_timeout_ms}")
+            if self._wal:
+                self._connection.execute("PRAGMA journal_mode = WAL")
+
+    @property
+    def busy_timeout_ms(self) -> int:
+        """Return the SQLite busy timeout configured for this backend."""
+
+        return self._busy_timeout_ms
+
+    @property
+    def wal_enabled(self) -> bool:
+        """Return whether this backend requests SQLite WAL journal mode."""
+
+        return self._wal
 
     def __enter__(self) -> DiskCacheBackend:
         """Return this backend for context-manager usage."""
