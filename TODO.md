@@ -239,7 +239,12 @@
 
 ### Newly Implied Public Exceptions Reference Follow-Ups
 
-- [ ] Add a docs index page linking API, exceptions, cache, disk backend, and examples.
+- [x] Add a docs index page linking API, exceptions, cache, disk backend, and examples.
+
+### Newly Implied Docs Index Follow-Ups
+
+- [ ] Add policy test ensuring docs index links resolve to existing files.
+- [ ] Add release checklist item to update docs index when adding docs pages.
 - [ ] Add policy test ensuring README links to core docs pages.
 - [x] Add tests that all public exceptions appear in public API docs.
 
