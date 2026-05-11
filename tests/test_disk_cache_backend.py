@@ -331,3 +331,18 @@ def test_disk_cache_backend_allows_disabling_wal(tmp_path: Path) -> None:
 def test_disk_cache_backend_rejects_negative_busy_timeout(tmp_path: Path) -> None:
     with pytest.raises(ConfigurationError, match="busy_timeout_ms must be zero or greater"):
         DiskCacheBackend(tmp_path / "cache.sqlite3", busy_timeout_ms=-1)
+
+
+def test_decorator_bound_disk_backend_fails_after_context_manager_exit(tmp_path: Path) -> None:
+    from useful_decorators import CacheBackendClosedError, cache_result
+
+    with DiskCacheBackend(tmp_path / "cache.sqlite3") as backend:
+
+        @cache_result(backend=backend)
+        def add_one(value: int) -> int:
+            return value + 1
+
+        assert add_one(1) == 2
+
+    with pytest.raises(CacheBackendClosedError, match="cache backend is closed"):
+        add_one(1)
