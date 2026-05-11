@@ -165,20 +165,24 @@
 
 - [x] Decide whether serializer failures need a package-specific exception type.
 - [ ] Add JSON serializer design option for cross-language/simple-value caches.
-- [x] Document pickle trust-boundary warning in disk/Redis/database backend docs.
+- [x] Document pickle trust-boundary warning in disk/Redis backend docs.
 - [x] Design `DiskCacheBackend` storage strategy, likely SQLite.
 
 ### Newly Implied Disk Backend Follow-Ups
 
-- [ ] Implement `DiskCacheBackend` SQLite schema initialization.
+- [x] Implement `DiskCacheBackend` SQLite schema initialization.
+
+### Newly Implied Disk Schema Follow-Ups
+
+- [ ] Decide whether `DiskCacheBackend.close()` should make later operations raise a package-specific error.
+- [x] Add context-manager support for `DiskCacheBackend`.
 - [ ] Implement disk backend key serialization helpers.
 - [ ] Implement disk backend payload serialization helpers.
 - [ ] Implement disk backend `get`, `set_value`, `set_exception`, `clear`, and `info`.
 - [ ] Add disk backend persistence tests across backend instances.
 - [ ] Add disk backend SQLite trust-boundary warning to README.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.
-- [ ] Design `DatabaseCacheBackend` adapter boundary.
-- [ ] Add backend conformance test suite reusable by memory/disk/redis/database backends.
+- [ ] Add backend conformance test suite reusable by memory/disk/redis backends.
 
 ## 4. `@retry`
 

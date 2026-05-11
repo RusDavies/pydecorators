@@ -249,6 +249,6 @@ class CacheSerializer(Protocol):
     def loads(self, data: bytes) -> object: ...
 ```
 
-The default implementation is `PickleCacheSerializer`, which can round-trip ordinary Python objects for trusted caches. Pickle is unsafe for untrusted data, so disk/Redis/database backends must document trust boundaries clearly.
+The default implementation is `PickleCacheSerializer`, which can round-trip ordinary Python objects for trusted caches. Pickle is unsafe for untrusted data, so disk/Redis backends must document trust boundaries clearly.
 
 Serializer failures should raise `CacheSerializationError`. `PickleCacheSerializer` wraps pickle serialization and deserialization failures in that package-specific exception.

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import pickle
+import sqlite3
 from collections import OrderedDict
 from collections.abc import Callable, Hashable
+from contextlib import suppress
 from dataclasses import dataclass
+from pathlib import Path
 from threading import RLock
 from typing import Any, Protocol, cast, runtime_checkable
 
@@ -203,6 +206,119 @@ class MemoryCacheBackend:
         expired_keys = [key for key, entry in self._cache.items() if self._is_expired(entry)]
         for expired_key in expired_keys:
             self._cache.pop(expired_key, None)
+
+
+class DiskCacheBackend:
+    """SQLite-backed local persistent cache backend.
+
+    This first slice initializes the database schema. Cache operations are
+    implemented in later slices.
+    """
+
+    def __init__(
+        self,
+        path: str | Path,
+        *,
+        ttl: float | None = None,
+        maxsize: int | None = 128,
+        serializer: CacheSerializer | None = None,
+        clock: Clock | None = None,
+    ) -> None:
+        if ttl is not None and ttl <= 0:
+            raise ConfigurationError("ttl must be greater than zero when provided")
+        if maxsize is not None and maxsize <= 0:
+            raise ConfigurationError("maxsize must be greater than zero when provided")
+
+        self.path = Path(path)
+        self._ttl = ttl
+        self._maxsize = maxsize
+        self._serializer = serializer or PickleCacheSerializer()
+        self._clock = clock or monotonic
+        self._lock = RLock()
+        self._closed = False
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._connection = sqlite3.connect(self.path, check_same_thread=False)
+        self._initialize_schema()
+
+    def __enter__(self) -> DiskCacheBackend:
+        """Return this backend for context-manager usage."""
+
+        return self
+
+    def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
+        """Close the SQLite connection when leaving a context manager."""
+
+        self.close()
+
+    def __del__(self) -> None:
+        """Best-effort connection cleanup for forgotten backend instances."""
+
+        with suppress(Exception):
+            self.close()
+
+    def close(self) -> None:
+        """Close the underlying SQLite connection."""
+
+        with self._lock:
+            if not self._closed:
+                self._connection.close()
+                self._closed = True
+
+    def get(self, key: Hashable) -> _CacheEntry | None:
+        """Return a cached entry for *key*, or ``None`` for a miss."""
+
+        raise NotImplementedError("DiskCacheBackend.get is not implemented yet")
+
+    def set_value(self, key: Hashable, value: object) -> None:
+        """Store a successful cached value."""
+
+        raise NotImplementedError("DiskCacheBackend.set_value is not implemented yet")
+
+    def set_exception(self, key: Hashable, exception: BaseException) -> None:
+        """Store an exception payload for later re-raising."""
+
+        raise NotImplementedError("DiskCacheBackend.set_exception is not implemented yet")
+
+    def clear(self) -> None:
+        """Clear cached entries and reset statistics."""
+
+        raise NotImplementedError("DiskCacheBackend.clear is not implemented yet")
+
+    def info(self) -> CacheInfo:
+        """Return cache statistics."""
+
+        raise NotImplementedError("DiskCacheBackend.info is not implemented yet")
+
+    def _initialize_schema(self) -> None:
+        with self._lock, self._connection:
+            self._connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS cache_entries (
+                    key BLOB PRIMARY KEY,
+                    payload BLOB NOT NULL,
+                    is_exception INTEGER NOT NULL,
+                    expires_at REAL,
+                    last_accessed REAL NOT NULL,
+                    created_at REAL NOT NULL,
+                    serializer_content_type TEXT NOT NULL
+                )
+                """
+            )
+            self._connection.execute(
+                """
+                CREATE TABLE IF NOT EXISTS cache_stats (
+                    id INTEGER PRIMARY KEY CHECK (id = 1),
+                    hits INTEGER NOT NULL,
+                    misses INTEGER NOT NULL
+                )
+                """
+            )
+            self._connection.execute(
+                """
+                INSERT OR IGNORE INTO cache_stats (id, hits, misses)
+                VALUES (1, 0, 0)
+                """
+            )
 
 
 def _ensure_hashable(value: object) -> Hashable:
