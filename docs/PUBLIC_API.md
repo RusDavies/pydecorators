@@ -8,6 +8,7 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 
 Current public API:
 
+- `DiskCacheBackend`
 - `CacheSerializationError`
 - `PickleCacheSerializer`
 - `CacheSerializer`
@@ -82,3 +83,7 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 ### `CacheSerializationError`
 
 `CacheSerializationError` wraps serializer failures so persistent/distributed backends can expose package-specific errors instead of raw serializer internals.
+
+### `DiskCacheBackend`
+
+`DiskCacheBackend` is the planned SQLite-backed persistent cache backend. Current implementation initializes schema; cache operations are completed in follow-up slices.
