@@ -42,3 +42,18 @@ def scoped_disk_cache_example(cache_path: Path) -> tuple[str | None, int]:
         entry = backend.get("answer")
         info = backend.info()
         return (entry.payload if entry is not None else None), info.hits
+
+
+def closed_backend_error_example(cache_path: Path) -> str:
+    """Handle CacheBackendClosedError from a closed disk backend."""
+
+    from useful_decorators import CacheBackendClosedError
+
+    backend = DiskCacheBackend(cache_path)
+    backend.close()
+
+    try:
+        backend.info()
+    except CacheBackendClosedError:
+        return "closed"
+    return "open"
