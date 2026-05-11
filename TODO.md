@@ -189,7 +189,12 @@
 
 ### Newly Implied Disk Operations Follow-Ups
 
-- [ ] Add disk backend corrupt-row handling policy and tests.
+- [x] Add disk backend corrupt-row handling policy and tests.
+
+### Newly Implied Disk Corrupt-Row Follow-Ups
+
+- [ ] Add optional diagnostics/log hook for disk backend dropped corrupt rows.
+- [ ] Add disk backend integrity-check/maintenance helper design.
 - [ ] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
 - [x] Add reusable backend conformance tests for cached exception behavior, TTL, LRU, clear, and stats.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.

@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `DiskCacheBackend` treats corrupt disk cache payloads as misses and drops the bad row.
 - Reusable cache backend conformance tests for memory and disk backend behavior.
 - `DiskCacheBackend` cache operations, persistence, TTL/LRU behavior, serializer mismatch handling, and closed-backend errors.
 - `DiskCacheBackend` key and payload serialization helpers.
