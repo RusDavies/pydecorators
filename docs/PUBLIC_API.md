@@ -87,7 +87,24 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 
 ### `CacheBackendClosedError`
 
-`CacheBackendClosedError` is raised when a closeable cache backend such as `DiskCacheBackend` is used after `close()`.
+`CacheBackendClosedError` is raised when a closeable cache backend such as `DiskCacheBackend` is used after `close()`. It is a package-specific `UsefulDecoratorsError`, so callers can either handle this specific lifecycle mistake or catch package errors broadly.
+
+Example:
+
+```python
+from useful_decorators import CacheBackendClosedError, DiskCacheBackend
+
+backend = DiskCacheBackend(".cache/example.sqlite3")
+backend.close()
+
+try:
+    backend.info()
+except CacheBackendClosedError:
+    # Recreate the backend, skip cache use, or fix the application lifecycle.
+    ...
+```
+
+For decorator-bound disk backends, prefer keeping the backend alive for the whole decorated-function lifetime and closing it from script cleanup or application shutdown.
 
 ### `DiskCacheBackend`
 

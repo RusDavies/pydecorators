@@ -231,7 +231,12 @@
 
 ### Newly Implied Closed Backend README Follow-Ups
 
-- [ ] Add CacheBackendClosedError to public exception examples/docs.
+- [x] Add CacheBackendClosedError to public exception examples/docs.
+
+### Newly Implied Closed Error Public Docs Follow-Ups
+
+- [ ] Add a centralized public exceptions reference page.
+- [ ] Add tests that all public exceptions appear in public API docs.
 - [ ] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
 - [ ] Document recommended cache file location/permissions for CLI and service use.

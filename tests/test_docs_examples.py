@@ -53,3 +53,9 @@ def test_disk_cache_backend_context_manager_documentation_example_executes(
 
     assert value == "cached"
     assert hits == 1
+
+
+def test_cache_backend_closed_error_documentation_example_executes(tmp_path: Path) -> None:
+    examples = load_disk_cache_examples()
+
+    assert examples.closed_backend_error_example(tmp_path / "closed-cache.sqlite3") == "closed"
