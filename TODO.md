@@ -318,7 +318,12 @@
 
 - [ ] Consider adding a package-manager alias for the docs policy script if project tooling grows beyond plain Python scripts.
 - [ ] Add CI job split for documentation policy tests if CI runtime becomes noisy.
-- [ ] Consider splitting documentation policy tests out of `test_public_api_policy.py`.
+- [x] Consider splitting documentation policy tests out of `test_public_api_policy.py`.
+
+### Newly Implied Docs Policy Test Split Follow-Ups
+
+- [ ] Consider splitting public API exception policy tests into a dedicated exception policy module if they keep growing.
+- [ ] Consider adding pytest markers for documentation-policy tests.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.

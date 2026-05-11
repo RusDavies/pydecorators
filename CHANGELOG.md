@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Dedicated documentation policy test module.
 - Pre-release docs policy script.
 - Release documentation maintenance checklist section.
 - Root documentation index-linking policy documentation.
