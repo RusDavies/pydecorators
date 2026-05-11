@@ -18,6 +18,29 @@ USER_AGENT = "useful-decorators-link-checker/0.1"
 DEFAULT_IGNORE_FILE = ".external-links-ignore"
 
 
+def ignore_file_reason_errors(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+
+    errors: list[str] = []
+    previous_meaningful_line_was_comment = False
+    for line_number, raw_line in enumerate(path.read_text().splitlines(), start=1):
+        line = raw_line.strip()
+        if not line:
+            previous_meaningful_line_was_comment = False
+            continue
+        if line.startswith("#"):
+            previous_meaningful_line_was_comment = True
+            continue
+        if not previous_meaningful_line_was_comment:
+            errors.append(
+                f"{path}:{line_number}: ignore pattern must be preceded by a reason comment"
+            )
+        previous_meaningful_line_was_comment = False
+
+    return errors
+
+
 def load_ignore_patterns(path: Path) -> list[str]:
     if not path.exists():
         return []
@@ -166,6 +189,12 @@ def main() -> int:
     ignore_file = args.ignore_file
     if not ignore_file.is_absolute():
         ignore_file = root / ignore_file
+    ignore_reason_errors = ignore_file_reason_errors(ignore_file)
+    if ignore_reason_errors:
+        for error in ignore_reason_errors:
+            print(error, file=sys.stderr)
+        return 1
+
     ignore_patterns = load_ignore_patterns(ignore_file)
     failures: list[str] = []
     checked = 0

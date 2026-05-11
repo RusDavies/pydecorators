@@ -4,3 +4,4 @@
 # https://status.example.com/*
 #
 # Keep this file small and explain any real ignores in the commit that adds them.
+# Every real ignore pattern must be preceded by a reason comment.

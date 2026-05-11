@@ -390,7 +390,7 @@ def test_external_link_checker_syntax_only_honors_ignore_file(tmp_path: Path) ->
         "[ignored](https://ignored.example.com/bad path)\n[checked](https://example.com/docs)\n"
     )
     ignore_file = tmp_path / ".external-links-ignore"
-    ignore_file.write_text("https://ignored.example.com/*\n")
+    ignore_file.write_text("# Intentional unstable test URL.\nhttps://ignored.example.com/*\n")
 
     result = subprocess.run(
         [
@@ -416,7 +416,9 @@ def test_external_link_checker_verbose_mode_reports_ignored_links(tmp_path: Path
     (tmp_path / "README.md").write_text(
         "[ignored](https://ignored.example.com/docs)\n[checked](https://example.com/docs)\n"
     )
-    (tmp_path / ".external-links-ignore").write_text("https://ignored.example.com/*\n")
+    (tmp_path / ".external-links-ignore").write_text(
+        "# Intentional unstable test URL.\nhttps://ignored.example.com/*\n"
+    )
 
     result = subprocess.run(
         [
@@ -437,3 +439,46 @@ def test_external_link_checker_verbose_mode_reports_ignored_links(tmp_path: Path
     assert "ignored" in result.stdout
     assert "https://ignored.example.com/docs" in result.stdout
     assert "matched https://ignored.example.com/*" in result.stdout
+
+
+def test_external_link_checker_validates_ignore_pattern_reasons(tmp_path: Path) -> None:
+    checker = load_external_link_checker_module()
+    valid_ignore_file = tmp_path / "valid.ignore"
+    valid_ignore_file.write_text(
+        "# Vendor docs block automated HEAD/GET checks.\nhttps://vendor.example.com/*\n"
+    )
+    invalid_ignore_file = tmp_path / "invalid.ignore"
+    invalid_ignore_file.write_text("https://vendor.example.com/*\n")
+
+    assert checker.ignore_file_reason_errors(valid_ignore_file) == []
+    assert checker.ignore_file_reason_errors(tmp_path / "missing.ignore") == []
+    assert checker.ignore_file_reason_errors(invalid_ignore_file) == [
+        f"{invalid_ignore_file}:1: ignore pattern must be preceded by a reason comment"
+    ]
+
+
+def test_external_link_checker_fails_for_unexplained_ignore_pattern(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[ignored](https://ignored.example.com/docs)\n")
+    (tmp_path / ".external-links-ignore").write_text("https://ignored.example.com/*\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert "ignore pattern must be preceded by a reason comment" in result.stderr
