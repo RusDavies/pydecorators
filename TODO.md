@@ -118,10 +118,15 @@
 - [x] Add per-decorator docs.
 ### Newly Implied `@cache_result` Sync-Core Follow-Ups
 
-- [ ] Add tests for `cache_exceptions=True`.
-- [ ] Add tests proving wrapped function execution happens outside the cache lock.
-- [ ] Add tests for positional-vs-keyword equivalent calls if canonical argument binding is desired.
-- [ ] Decide whether default key generation should canonicalize calls using `inspect.signature`.
+- [x] Add tests for `cache_exceptions=True`.
+- [x] Add tests proving wrapped function execution happens outside the cache lock.
+- [x] Add tests for positional-vs-keyword equivalent calls if canonical argument binding is desired.
+- [x] Decide whether default key generation should canonicalize calls using `inspect.signature`.
+
+### Newly Implied `@cache_result` Hardening Follow-Ups
+
+- [ ] Add optional canonical key generation design note if users request call-style equivalence.
+- [ ] Add race-condition policy note for duplicate concurrent misses on the same key.
 
 ## 4. `@retry`
 
