@@ -221,7 +221,12 @@
 
 ### Newly Implied Disk Context-Manager Docs Follow-Ups
 
-- [ ] Add test proving decorator-bound DiskCacheBackend fails after context-manager exit.
+- [x] Add test proving decorator-bound DiskCacheBackend fails after context-manager exit.
+
+### Newly Implied Closed Backend Regression Follow-Ups
+
+- [ ] Add a clearer README warning that context-managed disk backends are not for decorator-bound long-lived functions.
+- [ ] Consider whether `cache_result` should validate closeable backends at decoration time when possible.
 - [ ] Document CacheBackendClosedError in README cache section.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
 - [ ] Document recommended cache file location/permissions for CLI and service use.
