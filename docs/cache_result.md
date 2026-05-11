@@ -216,3 +216,23 @@ Future backends should follow the same separation of responsibilities: the decor
 `@cache_result` accepts `backend=`. When omitted, the decorator creates a `MemoryCacheBackend` from `ttl`, `maxsize`, and `clock`.
 
 When a backend is provided, the backend owns storage policy. The decorator still owns key generation, metadata preservation, exception-caching decisions, and sync/async rejection. Backend instances are intentionally reusable, but callers should usually provide one backend per decorated function unless they deliberately want shared storage.
+
+## Backend sharing and namespace behavior
+
+Backend instances may be shared deliberately across decorated functions. Shared backends share storage, statistics, and clear behavior. Without a namespace, two decorated functions that produce the same generated key will read/write the same backend entry.
+
+Use `namespace=` when sharing a backend but keeping decorated functions isolated:
+
+```python
+backend = MemoryCacheBackend()
+
+@cache_result(backend=backend, namespace="users")
+def get_user(user_id: str) -> str: ...
+
+@cache_result(backend=backend, namespace="teams")
+def get_team(team_id: str) -> str: ...
+```
+
+The namespace participates in default key generation. Custom `key` functions remain fully caller-controlled: `namespace=` is not automatically added when a custom key function is supplied. Include namespace-like separation inside the custom key function if needed.
+
+Calling `cache_clear()` on a wrapper clears the whole backend instance. Calling `cache_info()` reports statistics for the whole backend instance. If multiple wrappers share one backend, they also share clear/statistics scope.

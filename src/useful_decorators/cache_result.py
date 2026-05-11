@@ -166,9 +166,16 @@ def _ensure_hashable(value: object) -> Hashable:
 
 
 def _default_cache_key(
-    args: tuple[object, ...], kwargs: dict[str, object], *, typed: bool
+    args: tuple[object, ...],
+    kwargs: dict[str, object],
+    *,
+    typed: bool,
+    namespace: str | None = None,
 ) -> Hashable:
-    key_parts: tuple[object, ...] = args
+    key_parts: tuple[object, ...] = ()
+    if namespace is not None:
+        key_parts += (namespace,)
+    key_parts += args
     if kwargs:
         key_parts += (_KW_MARKER,)
         key_parts += tuple(sorted(kwargs.items()))
@@ -189,12 +196,16 @@ def cache_result(
     cache_exceptions: bool = False,
     clock: Clock | None = None,
     backend: CacheBackend | None = None,
+    namespace: str | None = None,
 ) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """Cache results from a synchronous function using a configurable backend.
 
     Async callables are intentionally rejected for ``v0.1.0`` until async cache
     semantics are designed separately.
     """
+
+    if namespace is not None and not namespace.strip():
+        raise ConfigurationError("namespace must not be empty")
 
     cache_backend = backend or MemoryCacheBackend(ttl=ttl, maxsize=maxsize, clock=clock)
 
@@ -205,7 +216,7 @@ def cache_result(
         def make_key(args: tuple[object, ...], kwargs: dict[str, object]) -> Hashable:
             if key is not None:
                 return _ensure_hashable(key(*args, **kwargs))
-            return _default_cache_key(args, kwargs, typed=typed)
+            return _default_cache_key(args, kwargs, typed=typed, namespace=namespace)
 
         def cache_info() -> CacheInfo:
             return cache_backend.info()

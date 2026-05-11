@@ -3,7 +3,7 @@ from typing import Any, cast
 
 import pytest
 
-from useful_decorators import CacheInfo, cache_result
+from useful_decorators import CacheInfo, MemoryCacheBackend, cache_result
 from useful_decorators.cache_result import _CacheEntry
 from useful_decorators.exceptions import CacheKeyError, ConfigurationError
 
@@ -412,3 +412,71 @@ def test_cache_result_accepts_custom_backend() -> None:
 
     clear_cache(value)
     assert backend.cleared
+
+
+def test_shared_backend_shares_entries_for_identical_generated_keys() -> None:
+    backend = MemoryCacheBackend()
+    first_calls = 0
+    second_calls = 0
+
+    @cache_result(backend=backend)
+    def first(value: int) -> str:
+        nonlocal first_calls
+        first_calls += 1
+        return f"first:{value}"
+
+    @cache_result(backend=backend)
+    def second(value: int) -> str:
+        nonlocal second_calls
+        second_calls += 1
+        return f"second:{value}"
+
+    assert first(1) == "first:1"
+    assert second(1) == "first:1"
+    assert first_calls == 1
+    assert second_calls == 0
+
+
+def test_namespace_isolates_shared_backend_entries() -> None:
+    backend = MemoryCacheBackend()
+    first_calls = 0
+    second_calls = 0
+
+    @cache_result(backend=backend, namespace="first")
+    def first(value: int) -> str:
+        nonlocal first_calls
+        first_calls += 1
+        return f"first:{value}"
+
+    @cache_result(backend=backend, namespace="second")
+    def second(value: int) -> str:
+        nonlocal second_calls
+        second_calls += 1
+        return f"second:{value}"
+
+    assert first(1) == "first:1"
+    assert second(1) == "second:1"
+    assert first(1) == "first:1"
+    assert second(1) == "second:1"
+    assert first_calls == 1
+    assert second_calls == 1
+
+
+def test_cache_result_rejects_empty_namespace() -> None:
+    with pytest.raises(ConfigurationError, match="namespace must not be empty"):
+        cache_result(namespace=" ")
+
+
+def test_custom_key_function_controls_namespace_separation() -> None:
+    backend = MemoryCacheBackend()
+    calls = 0
+
+    @cache_result(backend=backend, namespace="ignored", key=lambda value: value)
+    def value(number: int) -> str:
+        nonlocal calls
+        calls += 1
+        return f"value:{number}"
+
+    assert value(1) == "value:1"
+    assert value(1) == "value:1"
+    assert calls == 1
