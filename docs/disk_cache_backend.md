@@ -160,3 +160,14 @@ Docs for `DiskCacheBackend` must warn:
 4. Add reusable backend conformance tests and run them against `MemoryCacheBackend` and `DiskCacheBackend`.
 5. Add disk-specific tests for persistence across backend instances.
 6. Add docs and README example.
+
+## Implemented serialization helpers
+
+`DiskCacheBackend` now has internal helpers for key and payload serialization:
+
+- `_serialize_key(key)` uses `PickleCacheSerializer` for generated Python cache keys.
+- `_serialize_payload(value)` uses the configured payload serializer.
+- `_deserialize_payload(data)` uses the configured payload serializer.
+- `serializer_content_type` exposes the configured payload serializer content type for row metadata.
+
+The first implementation stores serializer content type but does not yet enforce mismatch handling on read; that is tracked as follow-up work.

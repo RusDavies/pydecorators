@@ -53,3 +53,66 @@ def test_disk_cache_backend_supports_context_manager(tmp_path: Path) -> None:
         assert backend.path == db_path
 
     assert db_path.exists()
+
+
+def test_disk_cache_backend_serializes_keys(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
+    try:
+        key = ("namespace", "value", 1)
+        serialized = backend._serialize_key(key)
+
+        assert isinstance(serialized, bytes)
+        assert serialized == backend._serialize_key(key)
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_serializes_payloads_with_configured_serializer(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
+    try:
+        payload = {"value": [1, 2, 3]}
+        serialized = backend._serialize_payload(payload)
+
+        assert isinstance(serialized, bytes)
+        assert backend._deserialize_payload(serialized) == payload
+        assert backend.serializer_content_type == "application/python-pickle"
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_wraps_payload_serialization_errors(tmp_path: Path) -> None:
+    from useful_decorators import CacheSerializationError
+
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
+    try:
+        with pytest.raises(CacheSerializationError, match="failed to serialize cache value"):
+            backend._serialize_payload(lambda value: value)
+    finally:
+        backend.close()
+
+
+class JsonLikeSerializer:
+    content_type = "application/x-test-json-like"
+
+    def dumps(self, value: object) -> bytes:
+        import json
+
+        return json.dumps(value).encode("utf-8")
+
+    def loads(self, data: bytes) -> object:
+        import json
+
+        return json.loads(data.decode("utf-8"))
+
+
+def test_disk_cache_backend_uses_custom_payload_serializer(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", serializer=JsonLikeSerializer())
+    try:
+        payload = {"value": [1, 2, 3]}
+        serialized = backend._serialize_payload(payload)
+
+        assert serialized == b'{"value": [1, 2, 3]}'
+        assert backend._deserialize_payload(serialized) == payload
+        assert backend.serializer_content_type == "application/x-test-json-like"
+    finally:
+        backend.close()

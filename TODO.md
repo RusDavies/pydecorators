@@ -176,8 +176,13 @@
 
 - [ ] Decide whether `DiskCacheBackend.close()` should make later operations raise a package-specific error.
 - [x] Add context-manager support for `DiskCacheBackend`.
-- [ ] Implement disk backend key serialization helpers.
-- [ ] Implement disk backend payload serialization helpers.
+- [x] Implement disk backend key serialization helpers.
+- [x] Implement disk backend payload serialization helpers.
+
+### Newly Implied Disk Serialization Follow-Ups
+
+- [ ] Add disk backend serializer content-type mismatch handling.
+- [x] Add tests for custom disk backend serializer.
 - [ ] Implement disk backend `get`, `set_value`, `set_exception`, `clear`, and `info`.
 - [ ] Add disk backend persistence tests across backend instances.
 - [ ] Add disk backend SQLite trust-boundary warning to README.
