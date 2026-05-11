@@ -271,7 +271,12 @@
 
 - [ ] Extend docs example assertion policy if examples add public classes with public methods.
 - [ ] Consider AST-based assertion detection if string matching becomes too loose.
-- [ ] Add a naming convention note for executable docs examples.
+- [x] Add a naming convention note for executable docs examples.
+
+### Newly Implied Docs Example Naming Follow-Ups
+
+- [ ] Add policy test that executable docs example filenames follow `<topic>_examples.py` except explicit package markers.
+- [ ] Add policy test that docs/index.md links to the executable example conventions section.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [ ] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.
