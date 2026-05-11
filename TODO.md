@@ -191,9 +191,15 @@
 
 - [ ] Add disk backend corrupt-row handling policy and tests.
 - [ ] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
-- [ ] Add reusable backend conformance tests for cached exception behavior, TTL, LRU, clear, and stats.
+- [x] Add reusable backend conformance tests for cached exception behavior, TTL, LRU, clear, and stats.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.
-- [ ] Add backend conformance test suite reusable by memory/disk/redis backends.
+- [x] Add backend conformance test suite reusable by memory/disk/redis backends.
+
+### Newly Implied Backend Conformance Follow-Ups
+
+- [ ] Document backend conformance expectations for future backend contributors.
+- [ ] Add Redis backend to conformance suite when Redis backend exists.
+- [ ] Reduce duplicate backend behavior tests now covered by the conformance suite.
 
 ## 4. `@retry`
 
