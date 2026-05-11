@@ -24,6 +24,7 @@ Use this checklist before publishing `useful-decorators` releases. The goal is t
 - [ ] Confirm README examples still match implemented behavior.
 - [ ] Confirm per-decorator docs are current.
 - [ ] Confirm executable docs examples pass.
+- [ ] Confirm `docs/index.md` links current documentation pages.
 - [ ] Confirm public API stability notes are accurate.
 - [ ] Add migration notes for breaking changes, if any.
 

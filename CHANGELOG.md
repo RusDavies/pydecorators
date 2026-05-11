@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Docs index link validation policy test.
 - Documentation index page linking core API, exception, cache, backend, and example docs.
 - Centralized public exceptions reference page.
 - Public exception executable examples for configuration, key, and serialization errors.

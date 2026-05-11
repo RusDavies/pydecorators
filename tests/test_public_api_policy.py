@@ -76,3 +76,16 @@ def test_public_exceptions_reference_covers_public_exceptions() -> None:
     assert "docs/examples/public_exception_examples.py" in exceptions_reference
     for name in public_exception_names:
         assert f"`{name}`" in exceptions_reference
+
+
+def test_docs_index_links_resolve_to_existing_files() -> None:
+    docs_index = Path("docs/index.md")
+    text = docs_index.read_text()
+    links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+
+    assert links
+    for link in links:
+        if "://" in link or link.startswith("#"):
+            continue
+        target = (docs_index.parent / link).resolve()
+        assert target.exists(), f"missing docs index target: {link}"

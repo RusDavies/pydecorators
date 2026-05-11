@@ -243,8 +243,13 @@
 
 ### Newly Implied Docs Index Follow-Ups
 
-- [ ] Add policy test ensuring docs index links resolve to existing files.
-- [ ] Add release checklist item to update docs index when adding docs pages.
+- [x] Add policy test ensuring docs index links resolve to existing files.
+
+### Newly Implied Docs Link Policy Follow-Ups
+
+- [ ] Add policy test that every top-level docs markdown file is linked from docs index or explicitly exempted.
+- [ ] Add policy test checking docs links outside docs/index.md.
+- [x] Add release checklist item to update docs index when adding docs pages.
 - [ ] Add policy test ensuring README links to core docs pages.
 - [x] Add tests that all public exceptions appear in public API docs.
 
