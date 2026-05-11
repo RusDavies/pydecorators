@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Verbose reporting for checked and ignored external documentation links.
 - Ignore-file support for the optional external documentation link checker.
 - Retry/backoff support for the optional external documentation link checker.
 - Opt-in external documentation link checker.

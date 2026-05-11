@@ -363,7 +363,12 @@
 ### Newly Implied External Link Ignore Follow-Ups
 
 - [ ] Consider requiring comments/reasons for non-comment patterns in `.external-links-ignore` if the ignore list grows.
-- [ ] Consider reporting ignored external links in verbose mode during release checks.
+- [x] Consider reporting ignored external links in verbose mode during release checks.
+
+### Newly Implied External Link Verbose Follow-Ups
+
+- [ ] Consider reporting successful checked links only in verbose mode once the checker scans more external links.
+- [ ] Consider adding quiet JSON output if release automation starts consuming external link checker results.
 - [ ] Add allowlist or scheme policy if docs start using non-HTTP external links intentionally.
 - [x] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 
