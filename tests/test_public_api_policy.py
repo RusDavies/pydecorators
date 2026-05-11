@@ -93,6 +93,12 @@ def markdown_links(path: Path) -> list[str]:
     return re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text())
 
 
+def markdown_policy_files() -> list[Path]:
+    root_docs = sorted(Path(".").glob("*.md"))
+    docs_files = sorted(Path("docs").rglob("*.md"))
+    return root_docs + docs_files
+
+
 def docs_index_markdown_links() -> list[str]:
     links = markdown_links(Path("docs/index.md"))
 
@@ -216,7 +222,7 @@ def test_docs_index_local_markdown_fragment_links_resolve() -> None:
 
 
 def test_all_docs_local_markdown_links_resolve() -> None:
-    docs_files = sorted(Path("docs").rglob("*.md"))
+    docs_files = markdown_policy_files()
 
     assert docs_files
     for docs_file in docs_files:
@@ -228,7 +234,7 @@ def test_all_docs_local_markdown_links_resolve() -> None:
 
 
 def test_all_docs_local_markdown_fragment_links_resolve() -> None:
-    docs_files = sorted(Path("docs").rglob("*.md"))
+    docs_files = markdown_policy_files()
 
     assert docs_files
     for docs_file in docs_files:

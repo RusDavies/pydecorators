@@ -293,7 +293,12 @@
 
 ### Newly Implied All-Docs Link Policy Follow-Ups
 
-- [ ] Extend local Markdown link validation to README, CONTRIBUTING, RELEASE, and other root docs.
+- [x] Extend local Markdown link validation to README, CONTRIBUTING, RELEASE, and other root docs.
+
+### Newly Implied Root Docs Link Policy Follow-Ups
+
+- [ ] Decide whether `TODO.md` should be included in root Markdown link policy long-term or exempted as mutable backlog.
+- [ ] Add policy test that root documentation files mention `docs/index.md` where appropriate.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.
