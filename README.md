@@ -67,3 +67,5 @@ from useful_decorators import cache_result
 def expensive_lookup(value: str) -> str:
     return value.upper()
 ```
+
+`@cache_result` currently uses `MemoryCacheBackend` by default. Future backend work is planned for disk, Redis, and database storage.

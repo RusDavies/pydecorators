@@ -204,3 +204,9 @@ When `maxsize` is exceeded, the least-recently-used entry is evicted. Cache hits
 `@cache_result` does not coalesce duplicate concurrent misses in `v0.1.0`. If two threads miss the same key at the same time, both may execute the wrapped function, and the later result may overwrite the earlier cached result.
 
 This keeps lock scope small and avoids holding the cache lock while user code runs. Request coalescing can be designed later if users need it.
+
+## Backend direction
+
+The current in-process cache storage has been refactored into `MemoryCacheBackend`. The decorator still defaults to memory storage and remains backward compatible.
+
+Future backends should follow the same separation of responsibilities: the decorator handles call wrapping and key generation; the backend handles storage, expiry, eviction, clearing, and statistics.
