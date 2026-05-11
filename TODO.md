@@ -358,7 +358,12 @@
 
 - [ ] Consider reporting per-attempt retry details in verbose mode if manual release checks become hard to diagnose.
 - [ ] Consider capping maximum retry backoff if higher retry counts are introduced.
-- [ ] Add external link checker allowlist/ignore file if intentionally unstable third-party URLs appear.
+- [x] Add external link checker allowlist/ignore file if intentionally unstable third-party URLs appear.
+
+### Newly Implied External Link Ignore Follow-Ups
+
+- [ ] Consider requiring comments/reasons for non-comment patterns in `.external-links-ignore` if the ignore list grows.
+- [ ] Consider reporting ignored external links in verbose mode during release checks.
 - [ ] Add allowlist or scheme policy if docs start using non-HTTP external links intentionally.
 - [x] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 

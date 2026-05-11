@@ -42,6 +42,8 @@ The script runs tests marked with the `docs_policy` pytest marker. External link
 ./scripts/check_external_links.py
 ```
 
+The checker uses `.external-links-ignore` for intentionally skipped third-party URLs. Keep ignores rare, specific, and documented in the commit that adds them.
+
 The checker retries transient failures by default. If a release check is noisy, adjust retry behavior explicitly rather than adding it to default CI:
 
 ```bash

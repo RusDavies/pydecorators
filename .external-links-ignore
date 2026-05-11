@@ -1,0 +1,6 @@
+# External HTTP(S) links intentionally skipped by scripts/check_external_links.py.
+#
+# Use one fnmatch-style URL pattern per line, for example:
+# https://status.example.com/*
+#
+# Keep this file small and explain any real ignores in the commit that adds them.
