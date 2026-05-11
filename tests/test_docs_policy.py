@@ -8,6 +8,7 @@ from tests.docs_policy_helpers import (
     docs_index_markdown_links,
     is_external_or_page_anchor,
     local_link_path,
+    markdown_heading_anchor,
     markdown_heading_anchors,
     markdown_links,
     markdown_policy_files,
@@ -220,3 +221,22 @@ def test_contributing_documents_docs_index_inclusion_rule() -> None:
         "docs_policy",
     ]:
         assert required in contributing
+
+
+def test_markdown_heading_anchor_helper_matches_expected_slug_shape() -> None:
+    assert markdown_heading_anchor("Cache Backend: WAL & Busy Timeout!") == (
+        "cache-backend-wal-busy-timeout"
+    )
+
+
+def test_markdown_heading_anchors_include_duplicate_heading_suffixes(tmp_path: Path) -> None:
+    markdown_file = tmp_path / "duplicate-headings.md"
+    markdown_file.write_text("# Examples\n## Details\n## Examples\n### Examples\n## Details\n")
+
+    assert markdown_heading_anchors(markdown_file) == {
+        "examples",
+        "details",
+        "examples-1",
+        "examples-2",
+        "details-1",
+    }

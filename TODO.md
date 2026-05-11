@@ -342,10 +342,15 @@
 
 ### Newly Implied Docs Policy Helpers Follow-Ups
 
-- [ ] Add unit tests for Markdown helper edge cases if link parsing grows more sophisticated.
+- [x] Add unit tests for Markdown helper edge cases if link parsing grows more sophisticated.
 - [ ] Consider supporting reference-style Markdown links if docs begin using them.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
-- [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
+- [x] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
+
+### Newly Implied Duplicate Anchor Handling Follow-Ups
+
+- [ ] Consider documenting Markdown anchor compatibility assumptions if linking rules become user-facing.
+- [ ] Add helper coverage for non-ASCII headings if docs start using them.
 - [x] Consider centralizing Markdown link parsing helpers for docs policy tests.
 - [x] Add docs contribution note explaining when a docs page should be added to the index.
 
