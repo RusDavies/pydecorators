@@ -482,3 +482,54 @@ def test_external_link_checker_fails_for_unexplained_ignore_pattern(
 
     assert result.returncode == 1
     assert "ignore pattern must be preceded by a reason comment" in result.stderr
+
+
+def test_external_link_checker_validates_ignore_pattern_url_shape(tmp_path: Path) -> None:
+    checker = load_external_link_checker_module()
+    invalid_ignore_file = tmp_path / "invalid-shape.ignore"
+    invalid_ignore_file.write_text(
+        "# Missing host.\n"
+        "https:///missing-host/*\n"
+        "# Unsupported scheme.\n"
+        "ftp://example.com/*\n"
+        "# Whitespace is not allowed.\n"
+        "https://example.com/bad path/*\n"
+    )
+
+    assert checker.is_valid_external_http_pattern("https://example.com/*")
+    assert checker.is_valid_external_http_pattern("http://example.com/path*")
+    assert not checker.is_valid_external_http_pattern("https:///missing-host/*")
+    assert not checker.is_valid_external_http_pattern("ftp://example.com/*")
+    assert not checker.is_valid_external_http_pattern("https://example.com/bad path/*")
+    assert checker.ignore_file_errors(invalid_ignore_file) == [
+        f"{invalid_ignore_file}:2: ignore pattern must be an HTTP(S) URL pattern",
+        f"{invalid_ignore_file}:4: ignore pattern must be an HTTP(S) URL pattern",
+        f"{invalid_ignore_file}:6: ignore pattern must be an HTTP(S) URL pattern",
+    ]
+
+
+def test_external_link_checker_fails_for_invalid_ignore_pattern_shape(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[checked](https://example.com/docs)\n")
+    (tmp_path / ".external-links-ignore").write_text("# Unsupported scheme.\nftp://example.com/*\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert "ignore pattern must be an HTTP(S) URL pattern" in result.stderr

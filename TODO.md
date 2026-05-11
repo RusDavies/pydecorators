@@ -366,7 +366,12 @@
 
 ### Newly Implied External Link Ignore Reason Follow-Ups
 
-- [ ] Consider validating `.external-links-ignore` patterns have HTTP(S) URL shape if real ignores are added.
+- [x] Consider validating `.external-links-ignore` patterns have HTTP(S) URL shape if real ignores are added.
+
+### Newly Implied External Link Ignore Pattern Follow-Ups
+
+- [ ] Consider validating that external link ignore patterns match at least one current docs link if the ignore file gets real entries.
+- [ ] Consider documenting wildcard semantics for `.external-links-ignore` in a dedicated maintenance doc if the checker grows further.
 - [ ] Consider adding expiration dates for ignored external links if the ignore list grows.
 - [x] Consider reporting ignored external links in verbose mode during release checks.
 
