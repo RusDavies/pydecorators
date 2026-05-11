@@ -301,13 +301,22 @@ class DiskCacheBackend:
                     self._record_miss()
                     return None
 
+                try:
+                    deserialized_payload = self._deserialize_payload(payload)
+                except CacheSerializationError:
+                    self._connection.execute(
+                        "DELETE FROM cache_entries WHERE key = ?", (serialized_key,)
+                    )
+                    self._record_miss()
+                    return None
+
                 self._connection.execute(
                     "UPDATE cache_entries SET last_accessed = ? WHERE key = ?",
                     (now, serialized_key),
                 )
                 self._record_hit()
                 return _CacheEntry(
-                    self._deserialize_payload(payload),
+                    deserialized_payload,
                     expires_at=expires_at,
                     is_exception=bool(is_exception),
                 )

@@ -272,3 +272,31 @@ def test_cache_result_works_with_disk_cache_backend(tmp_path: Path) -> None:
         assert add_one.cache_info().hits == 1  # type: ignore[attr-defined]
     finally:
         backend.close()
+
+
+def test_disk_cache_backend_treats_corrupt_payload_as_miss(tmp_path: Path) -> None:
+    db_path = tmp_path / "cache.sqlite3"
+    backend = DiskCacheBackend(db_path)
+    serialized_key = backend._serialize_key("key")
+    backend.close()
+
+    with closing(sqlite3.connect(db_path)) as connection:
+        connection.execute(
+            """
+            INSERT INTO cache_entries (
+                key, payload, is_exception, expires_at, last_accessed, created_at,
+                serializer_content_type
+            )
+            VALUES (?, ?, 0, NULL, 100, 100, ?)
+            """,
+            (serialized_key, b"not a pickle payload", "application/python-pickle"),
+        )
+
+    backend = DiskCacheBackend(db_path)
+    try:
+        assert backend.get("key") is None
+        assert backend.info().misses == 1
+        assert backend.info().hits == 0
+        assert backend.info().currsize == 0
+    finally:
+        backend.close()

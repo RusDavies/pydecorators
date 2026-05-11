@@ -183,3 +183,9 @@ The implementation stores serializer content type with each row. If a later back
 - `info()` prunes expired rows and reports `CacheInfo`.
 
 Operations after `close()` raise `CacheBackendClosedError`.
+
+## Corrupt row handling
+
+If a row has a matching serializer content type but the payload cannot be deserialized, `DiskCacheBackend.get()` treats it as a cache miss, deletes the bad row, records a miss, and returns `None`. Cache corruption should not break callers by default; the wrapped function can recompute the value and replace the row.
+
+This policy is intentionally conservative for cache data: caches are disposable, but user calls should not fail just because the shoebox contains haunted bytes.
