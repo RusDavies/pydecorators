@@ -159,7 +159,13 @@
 ### Newly Implied Backend Namespace Follow-Ups
 
 - [x] Add test showing custom `key` functions remain responsible for namespace separation.
-- [ ] Decide serializer interface for persistent/distributed backends.
+- [x] Decide serializer interface for persistent/distributed backends.
+
+### Newly Implied Serializer Follow-Ups
+
+- [x] Decide whether serializer failures need a package-specific exception type.
+- [ ] Add JSON serializer design option for cross-language/simple-value caches.
+- [ ] Document pickle trust-boundary warning in disk/Redis/database backend docs.
 - [ ] Design `DiskCacheBackend` storage strategy, likely SQLite.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.
 - [ ] Design `DatabaseCacheBackend` adapter boundary.
