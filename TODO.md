@@ -147,9 +147,18 @@
 
 ### Newly Implied Backend Interface Follow-Ups
 
-- [ ] Document whether backend instances should be shared across decorated functions.
-- [ ] Add tests for deliberately shared backend instances across multiple decorated functions.
-- [ ] Decide whether backend implementations should receive namespace/prefix support.
+- [x] Document whether backend instances should be shared across decorated functions.
+- [x] Add tests for deliberately shared backend instances across multiple decorated functions.
+- [x] Decide whether backend implementations should receive namespace/prefix support.
+
+### Newly Implied Backend Semantics Follow-Ups
+
+- [x] Decide whether custom `key` functions should receive namespace automatically or remain fully caller-controlled.
+- [x] Add docs warning that sharing a backend also shares `cache_clear()` and `cache_info()` scope.
+
+### Newly Implied Backend Namespace Follow-Ups
+
+- [x] Add test showing custom `key` functions remain responsible for namespace separation.
 - [ ] Decide serializer interface for persistent/distributed backends.
 - [ ] Design `DiskCacheBackend` storage strategy, likely SQLite.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.

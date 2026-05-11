@@ -69,3 +69,5 @@ def expensive_lookup(value: str) -> str:
 ```
 
 `@cache_result` currently uses `MemoryCacheBackend` by default. Future backend work is planned for disk, Redis, and database storage.
+
+Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend.
