@@ -57,6 +57,8 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 
 ## Public API notes
 
+See `docs/exceptions.md` for a centralized public exception reference.
+
 ### `UsefulDecoratorsError`
 
 `UsefulDecoratorsError` is the base class for package-specific exceptions. Catch it when callers want to handle errors raised by this library without catching unrelated Python exceptions.
