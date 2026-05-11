@@ -1,4 +1,6 @@
-from useful_decorators import CacheInfo, CacheKeyError, MemoryCacheBackend
+import pytest
+
+from useful_decorators import CacheInfo, CacheKeyError, MemoryCacheBackend, PickleCacheSerializer
 from useful_decorators.cache_result import _CacheEntry
 from useful_decorators.exceptions import UsefulDecoratorsError
 
@@ -64,3 +66,35 @@ def test_memory_cache_backend_implements_cache_backend_protocol() -> None:
     from useful_decorators import CacheBackend
 
     assert isinstance(MemoryCacheBackend(), CacheBackend)
+
+
+def test_pickle_cache_serializer_round_trips_python_objects() -> None:
+    serializer = PickleCacheSerializer()
+    payload = {"numbers": [1, 2, 3], "nested": {"ok": True}}
+
+    assert serializer.loads(serializer.dumps(payload)) == payload
+    assert serializer.content_type == "application/python-pickle"
+
+
+def test_pickle_cache_serializer_implements_serializer_protocol() -> None:
+    from useful_decorators import CacheSerializer
+
+    assert isinstance(PickleCacheSerializer(), CacheSerializer)
+
+
+def test_pickle_cache_serializer_wraps_serialization_failures() -> None:
+    from useful_decorators import CacheSerializationError
+
+    serializer = PickleCacheSerializer()
+
+    with pytest.raises(CacheSerializationError, match="failed to serialize cache value"):
+        serializer.dumps(lambda value: value)
+
+
+def test_pickle_cache_serializer_wraps_deserialization_failures() -> None:
+    from useful_decorators import CacheSerializationError
+
+    serializer = PickleCacheSerializer()
+
+    with pytest.raises(CacheSerializationError, match="failed to deserialize cache value"):
+        serializer.loads(b"not pickle")

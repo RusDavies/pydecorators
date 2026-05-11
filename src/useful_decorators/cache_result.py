@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pickle
 from collections import OrderedDict
 from collections.abc import Callable, Hashable
 from dataclasses import dataclass
@@ -10,7 +11,11 @@ from typing import Any, Protocol, cast, runtime_checkable
 
 from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
 from useful_decorators._typing import Clock, P, R
-from useful_decorators.exceptions import CacheKeyError, ConfigurationError
+from useful_decorators.exceptions import (
+    CacheKeyError,
+    CacheSerializationError,
+    ConfigurationError,
+)
 
 _KW_MARKER = object()
 _TYPE_MARKER = object()
@@ -53,6 +58,49 @@ class CacheBackend(Protocol):
 
     def info(self) -> CacheInfo:
         """Return cache statistics."""
+
+
+@runtime_checkable
+class CacheSerializer(Protocol):
+    """Protocol for serializing cache payloads for persistent backends."""
+
+    content_type: str
+
+    def dumps(self, value: object) -> bytes:
+        """Serialize *value* to bytes."""
+
+    def loads(self, data: bytes) -> object:
+        """Deserialize bytes back to a Python object."""
+
+
+class PickleCacheSerializer:
+    """Default serializer for Python-object cache payloads.
+
+    Pickle is convenient for local trusted caches, but it is not safe for
+    untrusted data. Persistent/distributed backends must document that warning
+    loudly enough that even a hurried monkey notices.
+    """
+
+    content_type = "application/python-pickle"
+
+    def __init__(self, *, protocol: int = pickle.HIGHEST_PROTOCOL) -> None:
+        self._protocol = protocol
+
+    def dumps(self, value: object) -> bytes:
+        """Serialize *value* with pickle."""
+
+        try:
+            return pickle.dumps(value, protocol=self._protocol)
+        except Exception as exc:
+            raise CacheSerializationError("failed to serialize cache value") from exc
+
+    def loads(self, data: bytes) -> object:
+        """Deserialize pickle bytes."""
+
+        try:
+            return pickle.loads(data)
+        except Exception as exc:
+            raise CacheSerializationError("failed to deserialize cache value") from exc
 
 
 class MemoryCacheBackend:

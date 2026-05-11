@@ -19,3 +19,7 @@ class FunctionTimedOut(TimeoutError, UsefulDecoratorsError):
 
 class CacheKeyError(TypeError, UsefulDecoratorsError):
     """Raised when ``@cache_result`` cannot build a hashable cache key."""
+
+
+class CacheSerializationError(UsefulDecoratorsError):
+    """Raised when cache serialization or deserialization fails."""

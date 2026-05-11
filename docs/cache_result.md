@@ -236,3 +236,19 @@ def get_team(team_id: str) -> str: ...
 The namespace participates in default key generation. Custom `key` functions remain fully caller-controlled: `namespace=` is not automatically added when a custom key function is supplied. Include namespace-like separation inside the custom key function if needed.
 
 Calling `cache_clear()` on a wrapper clears the whole backend instance. Calling `cache_info()` reports statistics for the whole backend instance. If multiple wrappers share one backend, they also share clear/statistics scope.
+
+## Serializer interface
+
+Persistent and distributed backends should use the `CacheSerializer` protocol rather than hard-coding a serialization format.
+
+```python
+class CacheSerializer(Protocol):
+    content_type: str
+
+    def dumps(self, value: object) -> bytes: ...
+    def loads(self, data: bytes) -> object: ...
+```
+
+The default implementation is `PickleCacheSerializer`, which can round-trip ordinary Python objects for trusted caches. Pickle is unsafe for untrusted data, so disk/Redis/database backends must document trust boundaries clearly.
+
+Serializer failures should raise `CacheSerializationError`. `PickleCacheSerializer` wraps pickle serialization and deserialization failures in that package-specific exception.

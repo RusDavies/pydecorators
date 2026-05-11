@@ -8,6 +8,9 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 
 Current public API:
 
+- `CacheSerializationError`
+- `PickleCacheSerializer`
+- `CacheSerializer`
 - `CacheBackend`
 - `MemoryCacheBackend`
 - `cache_result`
@@ -67,3 +70,15 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 ### `CacheBackend`
 
 `CacheBackend` is the protocol implemented by cache storage backends. It defines `get`, `set_value`, `set_exception`, `clear`, and `info`. Custom backends can implement this protocol and be passed to `@cache_result(backend=...)`.
+
+### `CacheSerializer`
+
+`CacheSerializer` is the protocol for persistent or distributed cache payload serialization. It defines `content_type`, `dumps`, and `loads`.
+
+### `PickleCacheSerializer`
+
+`PickleCacheSerializer` is the default Python-object serializer intended for trusted local caches. Pickle data must not be loaded from untrusted sources.
+
+### `CacheSerializationError`
+
+`CacheSerializationError` wraps serializer failures so persistent/distributed backends can expose package-specific errors instead of raw serializer internals.
