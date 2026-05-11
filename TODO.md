@@ -58,11 +58,16 @@
 
 ### Newly Implied `@deprecated` Follow-Ups
 
-- [ ] Add stacklevel behavior tests that verify warnings point at caller code.
-- [ ] Add class/method deprecation examples.
-- [ ] Decide whether deprecating classes should be supported explicitly.
-- [ ] Add documentation for warning filters and why `DeprecationWarning` may be hidden by default.
-- [ ] Add type-checking examples for decorators used bare and configured.
+- [x] Add stacklevel behavior tests that verify warnings point at caller code.
+- [x] Add class/method deprecation examples.
+- [x] Decide whether deprecating classes should be supported explicitly.
+- [x] Add documentation for warning filters and why `DeprecationWarning` may be hidden by default.
+- [x] Add type-checking examples for decorators used bare and configured.
+
+### Newly Implied Documentation Follow-Ups
+
+- [ ] Add executable documentation examples or doctest-style validation.
+- [ ] Add a public API stability policy before first release.
 
 ## 3. `@cache_result`
 
