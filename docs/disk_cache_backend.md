@@ -36,6 +36,8 @@ class DiskCacheBackend:
         maxsize: int | None = 128,
         serializer: CacheSerializer | None = None,
         clock: Clock | None = None,
+        busy_timeout_ms: int = 5_000,
+        wal: bool = True,
     ) -> None: ...
 ```
 
@@ -44,6 +46,8 @@ class DiskCacheBackend:
 - `maxsize`: optional maximum entry count.
 - `serializer`: payload serializer; defaults to `PickleCacheSerializer`.
 - `clock`: injectable monotonic-ish clock for deterministic tests.
+- `busy_timeout_ms`: SQLite busy timeout in milliseconds; defaults to `5000`.
+- `wal`: whether to request SQLite WAL journal mode; defaults to `True`.
 
 ## SQLite schema
 
@@ -189,3 +193,13 @@ Operations after `close()` raise `CacheBackendClosedError`.
 If a row has a matching serializer content type but the payload cannot be deserialized, `DiskCacheBackend.get()` treats it as a cache miss, deletes the bad row, records a miss, and returns `None`. Cache corruption should not break callers by default; the wrapped function can recompute the value and replace the row.
 
 This policy is intentionally conservative for cache data: caches are disposable, but user calls should not fail just because the shoebox contains haunted bytes.
+
+## SQLite operational tuning
+
+`DiskCacheBackend` configures SQLite for local cache ergonomics:
+
+- `PRAGMA busy_timeout = 5000` by default, also mirrored through the SQLite connection timeout.
+- `PRAGMA journal_mode = WAL` by default for better local read/write behavior.
+- `wal=False` is available for environments where WAL sidecar files are undesirable.
+
+This remains a single-host local cache. SQLite handles its normal file locking, but this backend is not a distributed cache and does not promise cross-host filesystem semantics.

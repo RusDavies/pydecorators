@@ -264,3 +264,5 @@ Disk payloads use the configured `CacheSerializer`; the default is `PickleCacheS
 The test suite includes a reusable backend conformance suite that currently runs against `MemoryCacheBackend` and `DiskCacheBackend`. It checks shared `CacheBackend` behavior for hit/miss statistics, clear semantics, cached exceptions, TTL expiry, LRU eviction, and replacement of existing entries. Future backends should join this suite before being considered compatible.
 
 Malformed disk rows are treated as misses: the disk backend deletes rows whose payload cannot be deserialized, records a miss, and lets the wrapped function recompute the value.
+
+The disk backend requests SQLite WAL mode and a 5000 ms busy timeout by default. These settings are intended for local single-host cache ergonomics, not distributed cache semantics.
