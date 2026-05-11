@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Public exception executable examples for configuration, key, and serialization errors.
 - Public exception inheritance documentation policy test.
 - Public exception docs policy test.
 - `CacheBackendClosedError` public docs and executable example coverage.

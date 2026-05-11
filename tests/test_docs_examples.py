@@ -24,6 +24,16 @@ def load_disk_cache_examples() -> ModuleType:
     return module
 
 
+def load_public_exception_examples() -> ModuleType:
+    example_path = Path("docs/examples/public_exception_examples.py")
+    spec = importlib.util.spec_from_file_location("public_exception_examples", example_path)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def test_deprecated_documentation_examples_execute() -> None:
     examples = load_deprecated_examples()
 
@@ -59,3 +69,11 @@ def test_cache_backend_closed_error_documentation_example_executes(tmp_path: Pat
     examples = load_disk_cache_examples()
 
     assert examples.closed_backend_error_example(tmp_path / "closed-cache.sqlite3") == "closed"
+
+
+def test_public_exception_documentation_examples_execute() -> None:
+    examples = load_public_exception_examples()
+
+    assert examples.configuration_error_example() == "invalid configuration"
+    assert examples.cache_key_error_example() == "unhashable key"
+    assert examples.cache_serialization_error_example() == "serialization failed"
