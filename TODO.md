@@ -199,7 +199,12 @@
 
 ### Newly Implied Disk SQLite Tuning Follow-Ups
 
-- [ ] Document disk backend concurrency limits and single-host expectations in README.
+- [x] Document disk backend concurrency limits and single-host expectations in README.
+
+### Newly Implied Disk Concurrency Docs Follow-Ups
+
+- [ ] Add explicit DiskCacheBackend usage example to README.
+- [ ] Document recommended cache file location/permissions for CLI and service use.
 - [ ] Add stress/smoke test for concurrent disk backend reads and writes.
 - [ ] Decide whether disk backend should expose cache vacuum/compaction maintenance.
 - [x] Add reusable backend conformance tests for cached exception behavior, TTL, LRU, clear, and stats.

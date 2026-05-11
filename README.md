@@ -68,8 +68,10 @@ def expensive_lookup(value: str) -> str:
     return value.upper()
 ```
 
-`@cache_result` currently uses `MemoryCacheBackend` by default. Future backend work is planned for disk and Redis storage.
+`@cache_result` uses `MemoryCacheBackend` by default and also includes `DiskCacheBackend` for trusted local persistent caches. Future backend work is planned for Redis storage.
 
 Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend.
 
-Disk backend design lives in `docs/disk_cache_backend.md`; planned implementation uses SQLite and the cache serializer interface.
+Disk backend design lives in `docs/disk_cache_backend.md`; implementation uses SQLite and the cache serializer interface. The default disk payload serializer uses pickle, so cache databases must be treated as trusted local files only — do not load cache DBs from untrusted sources or place them in world-writable directories.
+
+`DiskCacheBackend` is intended for single-host local caching. It uses normal SQLite file locking, requests WAL mode by default, and configures a 5000 ms busy timeout to reduce transient `database is locked` failures. Those settings improve local reader/writer behavior, but they do not make it a distributed cache and they do not promise safe cross-host semantics on shared/network filesystems. If multiple processes use the same cache file, expect normal SQLite contention behavior and keep cached values disposable.
