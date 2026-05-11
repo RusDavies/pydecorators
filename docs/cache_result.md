@@ -266,3 +266,5 @@ The test suite includes a reusable backend conformance suite that currently runs
 Malformed disk rows are treated as misses: the disk backend deletes rows whose payload cannot be deserialized, records a miss, and lets the wrapped function recompute the value.
 
 The disk backend requests SQLite WAL mode and a 5000 ms busy timeout by default. These settings are intended for local single-host cache ergonomics, not distributed cache semantics.
+
+Decorator-bound disk backends should outlive calls to the decorated function. For scripts, close the backend in a `finally` block after use; for services, close it from the normal application shutdown hook.

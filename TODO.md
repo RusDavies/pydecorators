@@ -208,7 +208,12 @@
 ### Newly Implied Disk README Example Follow-Ups
 
 - [ ] Add executable docs example coverage for DiskCacheBackend usage.
-- [ ] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
+- [x] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
+
+### Newly Implied Disk Lifecycle Docs Follow-Ups
+
+- [ ] Add context-manager DiskCacheBackend example for short scoped cache use.
+- [ ] Add note that decorator-bound disk backends should outlive decorated function use.
 - [ ] Document recommended cache file location/permissions for CLI and service use.
 - [ ] Add stress/smoke test for concurrent disk backend reads and writes.
 - [ ] Decide whether disk backend should expose cache vacuum/compaction maintenance.
