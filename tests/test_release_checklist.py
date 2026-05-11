@@ -61,7 +61,10 @@ def test_release_checklist_documents_optional_external_link_checker() -> None:
 
     assert "./scripts/check_external_links.py" in release_text
     assert "./scripts/check_external_links.py --syntax-only" in release_text
+    assert "--retries 4 --backoff 1.0" in release_text
     assert script.exists()
     script_text = script.read_text()
     assert "urlopen" in script_text
     assert "--syntax-only" in script_text
+    assert "--retries" in script_text
+    assert "--backoff" in script_text

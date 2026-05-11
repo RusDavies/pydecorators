@@ -42,6 +42,12 @@ The script runs tests marked with the `docs_policy` pytest marker. External link
 ./scripts/check_external_links.py
 ```
 
+The checker retries transient failures by default. If a release check is noisy, adjust retry behavior explicitly rather than adding it to default CI:
+
+```bash
+./scripts/check_external_links.py --retries 4 --backoff 1.0
+```
+
 For a no-network local preview of the same link set, run:
 
 ```bash
