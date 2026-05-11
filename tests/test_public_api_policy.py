@@ -117,8 +117,8 @@ def test_docs_examples_are_exercised_by_docs_example_tests() -> None:
     example_files = {path for path in Path("docs/examples").glob("*.py")}
     docs_example_tests = Path("tests/test_docs_examples.py").read_text()
     exercised_examples = {
-        Path(match)
-        for match in re.findall(r"Path\(\"(docs/examples/[^\"]+\.py)\"\)", docs_example_tests)
+        Path("docs/examples") / f"{module_name}.py"
+        for module_name in re.findall(r"load_docs_example\(\"([^\"]+)\"\)", docs_example_tests)
     }
 
     assert example_files - explicitly_exempt == exercised_examples
