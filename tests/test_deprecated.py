@@ -93,3 +93,38 @@ def test_deprecated_rejects_invalid_configuration(kwargs: dict[str, object], mat
 def test_deprecated_rejects_non_warning_category() -> None:
     with pytest.raises(ConfigurationError, match="category must be a Warning subclass"):
         deprecated(category=Exception)  # type: ignore[arg-type]
+
+
+def test_deprecated_stacklevel_points_at_caller_code() -> None:
+    @deprecated(stacklevel=2)
+    def old_function() -> str:
+        return "ok"
+
+    with pytest.warns(DeprecationWarning) as warnings_record:
+        call_line = __import__("inspect").currentframe().f_lineno + 1
+        old_function()
+
+    warning = warnings_record[0]
+    assert warning.filename == __file__
+    assert warning.lineno == call_line
+
+
+def test_deprecated_supports_instance_methods() -> None:
+    class Client:
+        @deprecated(replacement="Client.fetch_new")
+        def fetch_old(self) -> str:
+            return "old"
+
+    with pytest.warns(DeprecationWarning, match="Use Client.fetch_new instead"):
+        assert Client().fetch_old() == "old"
+
+
+def test_deprecated_supports_class_methods_when_decorator_is_inside_classmethod() -> None:
+    class Client:
+        @classmethod
+        @deprecated(replacement="Client.fetch_new")
+        def fetch_old(cls) -> str:
+            return cls.__name__
+
+    with pytest.warns(DeprecationWarning, match="Use Client.fetch_new instead"):
+        assert Client.fetch_old() == "Client"

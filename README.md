@@ -30,6 +30,8 @@ def old_function() -> str:
 
 Pre-alpha. The project foundation exists and `@deprecated` is implemented.
 
+Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
+
 ## Development
 
 ```bash
