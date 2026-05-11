@@ -199,3 +199,19 @@ def test_contributing_documents_root_docs_index_link_policy() -> None:
     )
     for required_root_doc in ("README.md", "CONTRIBUTING.md", "RELEASE.md"):
         assert f"- `{required_root_doc}`" in contributing
+
+
+def test_contributing_documents_docs_policy_marker_guidance() -> None:
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    assert "## Documentation policy tests" in contributing
+    assert "`docs_policy` pytest marker" in contributing
+    for required in [
+        "docs/index.md",
+        "executable documentation example",
+        "Markdown local-link",
+        "root documentation link policy",
+        "release-checklist documentation maintenance",
+        "./scripts/docs-policy.sh",
+    ]:
+        assert required in contributing

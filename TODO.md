@@ -328,7 +328,12 @@
 ### Newly Implied Docs Policy Marker Follow-Ups
 
 - [ ] Consider adding a CI job that runs `pytest -m docs_policy` directly.
-- [ ] Add contributor guidance for when new tests should use the `docs_policy` marker.
+- [x] Add contributor guidance for when new tests should use the `docs_policy` marker.
+
+### Newly Implied Docs Policy Marker Guidance Follow-Ups
+
+- [ ] Consider adding a short contributor checklist for updating docs policy tests when adding new docs files.
+- [ ] Consider moving Markdown policy helpers into `tests/docs_policy_helpers.py` if reuse grows.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.
