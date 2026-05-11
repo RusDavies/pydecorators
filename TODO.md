@@ -225,9 +225,14 @@
 
 ### Newly Implied Closed Backend Regression Follow-Ups
 
-- [ ] Add a clearer README warning that context-managed disk backends are not for decorator-bound long-lived functions.
+- [x] Add a clearer README warning that context-managed disk backends are not for decorator-bound long-lived functions.
 - [ ] Consider whether `cache_result` should validate closeable backends at decoration time when possible.
-- [ ] Document CacheBackendClosedError in README cache section.
+- [x] Document CacheBackendClosedError in README cache section.
+
+### Newly Implied Closed Backend README Follow-Ups
+
+- [ ] Add CacheBackendClosedError to public exception examples/docs.
+- [ ] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
 - [ ] Document recommended cache file location/permissions for CLI and service use.
 - [ ] Add stress/smoke test for concurrent disk backend reads and writes.

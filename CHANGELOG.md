@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `CacheBackendClosedError` README warning for context-managed decorator-bound disk backends.
 - Regression coverage for decorator-bound closed `DiskCacheBackend` usage.
 - `DiskCacheBackend` context-manager documentation example and executable coverage.
 - Executable `DiskCacheBackend` documentation example coverage.
