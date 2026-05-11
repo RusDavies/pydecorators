@@ -62,3 +62,17 @@ def test_public_exception_inheritance_matches_documentation() -> None:
     for exception_type, expected_phrase in inheritance_phrases.items():
         note = public_api_note_for(exception_type.__name__)
         assert expected_phrase in note
+
+
+def test_public_exceptions_reference_covers_public_exceptions() -> None:
+    exceptions_reference = Path("docs/exceptions.md").read_text()
+    public_exception_names = {
+        name
+        for name in useful_decorators.__all__
+        if inspect.isclass(getattr(useful_decorators, name))
+        and issubclass(getattr(useful_decorators, name), BaseException)
+    }
+
+    assert "docs/examples/public_exception_examples.py" in exceptions_reference
+    for name in public_exception_names:
+        assert f"`{name}`" in exceptions_reference
