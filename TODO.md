@@ -16,17 +16,25 @@
 
 ## 1. API Design Backlog
 
-- [ ] Define public decorator naming conventions.
-- [ ] Decide whether decorators support both bare and configured usage.
+- [x] Define public decorator naming conventions.
+- [x] Decide whether decorators support both bare and configured usage.
   - Example: `@deprecated` and `@deprecated("use x instead")`.
-- [ ] Define shared typing helpers using `ParamSpec` and `TypeVar`.
-- [ ] Define shared sync/async detection utility.
-- [ ] Define shared monotonic clock utility for testability.
-- [ ] Define shared sleep utility for sync and async paths.
-- [ ] Define base exceptions.
-- [ ] Define configuration validation pattern.
-- [ ] Ensure all decorators preserve wrapped function metadata.
-- [ ] Ensure all decorators expose clear docstrings.
+- [x] Define shared typing helpers using `ParamSpec` and `TypeVar`.
+- [x] Define shared sync/async detection utility.
+- [x] Define shared monotonic clock utility for testability.
+- [x] Define shared sleep utility for sync and async paths.
+- [x] Define base exceptions.
+- [x] Define configuration validation pattern.
+- [x] Ensure all decorators preserve wrapped function metadata.
+- [x] Ensure all decorators expose clear docstrings.
+
+### Newly Implied API Design Follow-Ups
+
+- [ ] Add tests that every public decorator is listed in `__all__`.
+- [ ] Add documentation policy for what counts as public API.
+- [ ] Add version consistency check between `pyproject.toml` and `useful_decorators.__version__`.
+- [ ] Decide whether internal helpers should use protocols for callable clock/sleep injection.
+- [ ] Add contributor guidance for adding a new decorator end-to-end.
 
 ## 2. `@deprecated`
 
