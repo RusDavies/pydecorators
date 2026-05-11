@@ -251,7 +251,12 @@
 
 ### Newly Implied Docs Coverage Policy Follow-Ups
 
-- [ ] Add policy test that docs examples listed in docs index match `docs/examples/*.py`.
+- [x] Add policy test that docs examples listed in docs index match `docs/examples/*.py`.
+
+### Newly Implied Docs Examples Coverage Follow-Ups
+
+- [ ] Add policy test that each docs example file is executed by `tests/test_docs_examples.py` unless explicitly exempted.
+- [ ] Add a naming convention note for executable docs examples.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [ ] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.

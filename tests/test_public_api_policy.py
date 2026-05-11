@@ -100,3 +100,13 @@ def test_top_level_docs_markdown_files_are_linked_from_docs_index() -> None:
     linked_docs = {path for path in docs_index_local_links() if path.suffix == ".md"}
 
     assert top_level_docs - explicitly_exempt <= linked_docs
+
+
+def test_docs_examples_are_listed_from_docs_index() -> None:
+    explicitly_exempt = {Path("docs/examples/__init__.py")}
+    example_files = {path for path in Path("docs/examples").glob("*.py")}
+    linked_examples = {
+        path for path in docs_index_local_links() if path.parent == Path("docs/examples")
+    }
+
+    assert example_files - explicitly_exempt == linked_examples
