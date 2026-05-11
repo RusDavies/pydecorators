@@ -28,6 +28,17 @@ Use this checklist before publishing `useful-decorators` releases. The goal is t
 - [ ] Confirm public API stability notes are accurate.
 - [ ] Add migration notes for breaking changes, if any.
 
+## Documentation maintenance
+
+Before publishing, treat docs as release artifacts, not garnish. Confirm:
+
+- `README.md`, `CONTRIBUTING.md`, and `RELEASE.md` still link to `docs/index.md`.
+- `docs/index.md` links every top-level page in `docs/` except itself.
+- `docs/index.md` lists every executable example in `docs/examples/` except package markers.
+- Executable examples are loaded and asserted by `tests/test_docs_examples.py`.
+- Local Markdown links and heading anchors pass the docs policy tests.
+- Planning/backlog docs such as `GOAL.md`, `PLAN.md`, and `TODO.md` remain planning docs unless deliberately promoted to user-facing navigation.
+
 ## Quality gates
 
 Run the full local verification gate:
