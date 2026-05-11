@@ -247,7 +247,12 @@
 
 ### Newly Implied Docs Link Policy Follow-Ups
 
-- [ ] Add policy test that every top-level docs markdown file is linked from docs index or explicitly exempted.
+- [x] Add policy test that every top-level docs markdown file is linked from docs index or explicitly exempted.
+
+### Newly Implied Docs Coverage Policy Follow-Ups
+
+- [ ] Add policy test that docs examples listed in docs index match `docs/examples/*.py`.
+- [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [ ] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.
 - [ ] Add policy test ensuring README links to core docs pages.
