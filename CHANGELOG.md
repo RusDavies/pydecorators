@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Sync-core `@cache_result` implementation with key generation, stats, clear, and async rejection.
 - `CacheInfo` and `CacheKeyError` support types for planned `@cache_result`.
 - `@cache_result` API design and implementation strategy.
 - Release checklist for repeatable package publishing.

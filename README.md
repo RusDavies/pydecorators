@@ -9,7 +9,7 @@ The goal is to provide small, typed, well-tested decorators that work in scripts
 The initial `v0.1.0` scope is:
 
 - `@deprecated` — implemented
-- `@cache_result` — designed
+- `@cache_result` — sync core implemented
 - `@retry`
 - `@rate_limit`
 - `@timeout`
@@ -56,3 +56,14 @@ See `RELEASE.md` for the release checklist.
 ## Decorator design docs
 
 See `docs/cache_result.md` for the planned cache decorator design.
+
+### Cache example
+
+```python
+from useful_decorators import cache_result
+
+
+@cache_result(maxsize=128)
+def expensive_lookup(value: str) -> str:
+    return value.upper()
+```

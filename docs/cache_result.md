@@ -127,7 +127,7 @@ class CacheInfo:
 
 ## Sync and async
 
-First implementation should prioritize sync support.
+The first implementation prioritizes sync support.
 
 Async support should either:
 
@@ -155,10 +155,26 @@ Use `mirror_metadata()` so `__name__`, `__doc__`, annotations, and `__wrapped__`
 
 ## Async scope decision
 
-Async support is explicitly deferred for `v0.1.0`. The first implementation should reject async callables with a clear `ConfigurationError` until async cache semantics are designed and tested separately.
+Async support is explicitly deferred for `v0.1.0`. The implementation rejects async callables with a clear `ConfigurationError` until async cache semantics are designed and tested separately.
 
 Reason: caching coroutine results incorrectly is an easy way to create reused-coroutine bugs, accidental task sharing, and confusing exception behavior. Sync caching should land first; async caching deserves its own hardened slice.
 
 ## Cache key errors
 
 Unhashable generated cache keys should raise `CacheKeyError`, which inherits from both `TypeError` and `UsefulDecoratorsError`.
+
+## Implemented core behavior
+
+The current implementation includes:
+
+- sync function support
+- default key generation
+- custom key functions
+- typed key mode
+- unhashable key failures via `CacheKeyError`
+- hit/miss statistics via `cache_info()`
+- cache reset via `cache_clear()`
+- metadata preservation
+- explicit async rejection
+
+TTL expiry and max-size eviction are still planned follow-up work.
