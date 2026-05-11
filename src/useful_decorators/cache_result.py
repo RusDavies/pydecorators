@@ -35,6 +35,108 @@ class _CacheEntry:
     is_exception: bool = False
 
 
+class MemoryCacheBackend:
+    """Thread-safe in-memory cache backend used by ``@cache_result``.
+
+    This backend owns storage, TTL pruning, LRU eviction, and hit/miss
+    statistics. The decorator remains responsible for key generation and for
+    executing wrapped functions outside backend locks.
+    """
+
+    def __init__(
+        self,
+        *,
+        ttl: float | None = None,
+        maxsize: int | None = 128,
+        clock: Clock | None = None,
+    ) -> None:
+        if ttl is not None and ttl <= 0:
+            raise ConfigurationError("ttl must be greater than zero when provided")
+        if maxsize is not None and maxsize <= 0:
+            raise ConfigurationError("maxsize must be greater than zero when provided")
+
+        self._ttl = ttl
+        self._maxsize = maxsize
+        self._clock = clock or monotonic
+        self._lock = RLock()
+        self._cache: OrderedDict[Hashable, _CacheEntry] = OrderedDict()
+        self._hits = 0
+        self._misses = 0
+
+    def get(self, key: Hashable) -> _CacheEntry | None:
+        """Return a cache entry for *key*, or ``None`` after recording a miss."""
+
+        with self._lock:
+            entry = self._cache.get(key)
+            if entry is not None:
+                if self._is_expired(entry):
+                    self._cache.pop(key, None)
+                else:
+                    self._hits += 1
+                    self._cache.move_to_end(key)
+                    return entry
+            self._misses += 1
+            return None
+
+    def set_value(self, key: Hashable, value: object) -> None:
+        """Store a successful cached value."""
+
+        self._set_entry(key, _CacheEntry(value, expires_at=self._expires_at()))
+
+    def set_exception(self, key: Hashable, exception: BaseException) -> None:
+        """Store an exception payload for later re-raising."""
+
+        self._set_entry(
+            key,
+            _CacheEntry(exception, expires_at=self._expires_at(), is_exception=True),
+        )
+
+    def clear(self) -> None:
+        """Clear cached entries and reset statistics."""
+
+        with self._lock:
+            self._cache.clear()
+            self._hits = 0
+            self._misses = 0
+
+    def info(self) -> CacheInfo:
+        """Return current cache statistics after pruning expired entries."""
+
+        with self._lock:
+            self._prune_expired()
+            return CacheInfo(
+                hits=self._hits,
+                misses=self._misses,
+                maxsize=self._maxsize,
+                currsize=len(self._cache),
+            )
+
+    def _set_entry(self, key: Hashable, entry: _CacheEntry) -> None:
+        with self._lock:
+            self._cache[key] = entry
+            self._cache.move_to_end(key)
+            self._evict_if_needed()
+
+    def _is_expired(self, entry: _CacheEntry) -> bool:
+        return entry.expires_at is not None and self._clock() >= entry.expires_at
+
+    def _expires_at(self) -> float | None:
+        if self._ttl is None:
+            return None
+        return self._clock() + self._ttl
+
+    def _evict_if_needed(self) -> None:
+        if self._maxsize is None:
+            return
+        while len(self._cache) > self._maxsize:
+            self._cache.popitem(last=False)
+
+    def _prune_expired(self) -> None:
+        expired_keys = [key for key, entry in self._cache.items() if self._is_expired(entry)]
+        for expired_key in expired_keys:
+            self._cache.pop(expired_key, None)
+
+
 def _ensure_hashable(value: object) -> Hashable:
     try:
         hash(value)
@@ -73,87 +175,39 @@ def cache_result(
     semantics are designed separately.
     """
 
-    if ttl is not None and ttl <= 0:
-        raise ConfigurationError("ttl must be greater than zero when provided")
-    if maxsize is not None and maxsize <= 0:
-        raise ConfigurationError("maxsize must be greater than zero when provided")
-
-    cache_clock = clock or monotonic
+    backend = MemoryCacheBackend(ttl=ttl, maxsize=maxsize, clock=clock)
 
     def decorator(func: Callable[P, R]) -> Callable[P, R]:
         if is_async_callable(func):
             raise ConfigurationError("cache_result does not support async functions yet")
-
-        lock = RLock()
-        cache: OrderedDict[Hashable, _CacheEntry] = OrderedDict()
-        hits = 0
-        misses = 0
 
         def make_key(args: tuple[object, ...], kwargs: dict[str, object]) -> Hashable:
             if key is not None:
                 return _ensure_hashable(key(*args, **kwargs))
             return _default_cache_key(args, kwargs, typed=typed)
 
-        def is_expired(entry: _CacheEntry) -> bool:
-            return entry.expires_at is not None and cache_clock() >= entry.expires_at
-
-        def expires_at() -> float | None:
-            if ttl is None:
-                return None
-            return cache_clock() + ttl
-
-        def evict_if_needed() -> None:
-            if maxsize is None:
-                return
-            while len(cache) > maxsize:
-                cache.popitem(last=False)
-
         def cache_info() -> CacheInfo:
-            with lock:
-                expired_keys = [key for key, entry in cache.items() if is_expired(entry)]
-                for expired_key in expired_keys:
-                    cache.pop(expired_key, None)
-                return CacheInfo(hits=hits, misses=misses, maxsize=maxsize, currsize=len(cache))
+            return backend.info()
 
         def cache_clear() -> None:
-            nonlocal hits, misses
-            with lock:
-                cache.clear()
-                hits = 0
-                misses = 0
+            backend.clear()
 
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            nonlocal hits, misses
             cache_key = make_key(cast(tuple[object, ...], args), cast(dict[str, object], kwargs))
-            with lock:
-                entry = cache.get(cache_key)
-                if entry is not None:
-                    if is_expired(entry):
-                        cache.pop(cache_key, None)
-                    else:
-                        hits += 1
-                        cache.move_to_end(cache_key)
-                        if entry.is_exception:
-                            raise cast(BaseException, entry.payload)
-                        return cast(R, entry.payload)
-                misses += 1
+            entry = backend.get(cache_key)
+            if entry is not None:
+                if entry.is_exception:
+                    raise cast(BaseException, entry.payload)
+                return cast(R, entry.payload)
 
             try:
                 result = func(*args, **kwargs)
             except Exception as exc:
                 if cache_exceptions:
-                    with lock:
-                        cache[cache_key] = _CacheEntry(
-                            exc, expires_at=expires_at(), is_exception=True
-                        )
-                        cache.move_to_end(cache_key)
-                        evict_if_needed()
+                    backend.set_exception(cache_key, exc)
                 raise
 
-            with lock:
-                cache[cache_key] = _CacheEntry(result, expires_at=expires_at())
-                cache.move_to_end(cache_key)
-                evict_if_needed()
+            backend.set_value(cache_key, result)
             return result
 
         wrapped = mirror_metadata(wrapper, func)

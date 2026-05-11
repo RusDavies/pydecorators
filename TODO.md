@@ -139,6 +139,17 @@
 - [ ] Consider opt-in sliding TTL refresh mode after user feedback.
 - [ ] Consider request coalescing for duplicate concurrent misses after user feedback.
 
+### Newly Implied `@cache_result` Backend Follow-Ups
+
+- [x] Refactor current in-memory cache storage into `MemoryCacheBackend`.
+- [ ] Define a formal cache backend protocol/interface.
+- [ ] Add `backend=` parameter to `@cache_result` while preserving memory default.
+- [ ] Decide serializer interface for persistent/distributed backends.
+- [ ] Design `DiskCacheBackend` storage strategy, likely SQLite.
+- [ ] Design `RedisCacheBackend` as optional dependency extra.
+- [ ] Design `DatabaseCacheBackend` adapter boundary.
+- [ ] Add backend conformance test suite reusable by memory/disk/redis/database backends.
+
 ## 4. `@retry`
 
 - [ ] Design signature.

@@ -1,4 +1,4 @@
-from useful_decorators import CacheInfo, CacheKeyError
+from useful_decorators import CacheInfo, CacheKeyError, MemoryCacheBackend
 from useful_decorators.cache_result import _CacheEntry
 from useful_decorators.exceptions import UsefulDecoratorsError
 
@@ -36,3 +36,25 @@ def test_cache_key_error_is_type_error_and_package_error() -> None:
 
     assert isinstance(error, TypeError)
     assert isinstance(error, UsefulDecoratorsError)
+
+
+def test_memory_cache_backend_tracks_values_and_stats() -> None:
+    backend = MemoryCacheBackend(maxsize=2)
+
+    assert backend.get("missing") is None
+    backend.set_value("key", "value")
+
+    entry = backend.get("key")
+    assert entry is not None
+    assert entry.payload == "value"
+    assert backend.info() == CacheInfo(hits=1, misses=1, maxsize=2, currsize=1)
+
+
+def test_memory_cache_backend_clear_resets_entries_and_stats() -> None:
+    backend = MemoryCacheBackend()
+
+    assert backend.get("missing") is None
+    backend.set_value("key", "value")
+    backend.clear()
+
+    assert backend.info() == CacheInfo(hits=0, misses=0, maxsize=128, currsize=0)

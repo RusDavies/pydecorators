@@ -8,6 +8,7 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 
 Current public API:
 
+- `MemoryCacheBackend`
 - `cache_result`
 - `CacheInfo`
 - `CacheKeyError`
@@ -57,3 +58,7 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 ### `CacheKeyError`
 
 `CacheKeyError` is raised when planned `@cache_result` key generation cannot produce a hashable key. It inherits from both `TypeError` and `UsefulDecoratorsError`.
+
+### `MemoryCacheBackend`
+
+`MemoryCacheBackend` is the default in-process storage backend used by `@cache_result`. It owns TTL pruning, LRU maxsize eviction, hit/miss statistics, and thread-safe cache mutation. It is public so future backend work can use the same shape as a reference implementation.
