@@ -289,11 +289,16 @@
 
 ### Newly Implied Markdown Anchor Policy Follow-Ups
 
-- [ ] Extend Markdown anchor validation to all docs Markdown links, not just docs/index.md.
+- [x] Extend Markdown anchor validation to all docs Markdown links, not just docs/index.md.
+
+### Newly Implied All-Docs Link Policy Follow-Ups
+
+- [ ] Extend local Markdown link validation to README, CONTRIBUTING, RELEASE, and other root docs.
+- [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
-- [ ] Add policy test checking docs links outside docs/index.md.
+- [x] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.
 - [ ] Add policy test ensuring README links to core docs pages.
 - [x] Add tests that all public exceptions appear in public API docs.
