@@ -85,7 +85,7 @@ Each entry should store:
 - expiry timestamp, or `None`
 - marker indicating whether the payload is an exception
 
-Suggested internal shape:
+Implemented internal shape:
 
 ```python
 @dataclass(slots=True)
@@ -114,7 +114,7 @@ The wrapped function should expose:
 - `cache_clear() -> None`
 - `cache_info() -> CacheInfo`
 
-Suggested `CacheInfo` shape:
+Implemented `CacheInfo` shape:
 
 ```python
 @dataclass(frozen=True, slots=True)
@@ -152,3 +152,13 @@ The wrapped function itself should not execute while holding the lock. Lock only
 ## Metadata preservation
 
 Use `mirror_metadata()` so `__name__`, `__doc__`, annotations, and `__wrapped__` survive decoration.
+
+## Async scope decision
+
+Async support is explicitly deferred for `v0.1.0`. The first implementation should reject async callables with a clear `ConfigurationError` until async cache semantics are designed and tested separately.
+
+Reason: caching coroutine results incorrectly is an easy way to create reused-coroutine bugs, accidental task sharing, and confusing exception behavior. Sync caching should land first; async caching deserves its own hardened slice.
+
+## Cache key errors
+
+Unhashable generated cache keys should raise `CacheKeyError`, which inherits from both `TypeError` and `UsefulDecoratorsError`.

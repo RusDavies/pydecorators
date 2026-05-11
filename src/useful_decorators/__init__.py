@@ -4,8 +4,10 @@ The package is intentionally small and boring: reliability, caching, rate limiti
 timeouts, and developer ergonomics without dragging in a framework-shaped sofa.
 """
 
+from useful_decorators.cache_result import CacheInfo
 from useful_decorators.deprecated import deprecated
 from useful_decorators.exceptions import (
+    CacheKeyError,
     ConfigurationError,
     FunctionTimedOut,
     RateLimitExceeded,
@@ -15,6 +17,8 @@ from useful_decorators.exceptions import (
 __version__ = "0.1.0"
 
 __all__ = [
+    "CacheInfo",
+    "CacheKeyError",
     "ConfigurationError",
     "FunctionTimedOut",
     "RateLimitExceeded",

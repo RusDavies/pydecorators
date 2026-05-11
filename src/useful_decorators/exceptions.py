@@ -15,3 +15,7 @@ class RateLimitExceeded(UsefulDecoratorsError):
 
 class FunctionTimedOut(TimeoutError, UsefulDecoratorsError):
     """Raised when a decorated function exceeds its configured timeout."""
+
+
+class CacheKeyError(TypeError, UsefulDecoratorsError):
+    """Raised when ``@cache_result`` cannot build a hashable cache key."""
