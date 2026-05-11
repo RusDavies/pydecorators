@@ -2,6 +2,10 @@ import ast
 import re
 from pathlib import Path
 
+import pytest
+
+pytestmark = pytest.mark.docs_policy
+
 
 def public_example_functions(example_path: Path) -> set[str]:
     tree = ast.parse(example_path.read_text())
