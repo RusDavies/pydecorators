@@ -2,17 +2,17 @@
 
 ## 0. Project Setup
 
-- [ ] Decide final package name and import namespace.
-- [ ] Decide supported Python versions.
-- [ ] Choose license.
-- [ ] Create `pyproject.toml`.
-- [ ] Create `src/` package layout.
-- [ ] Create `tests/` layout.
-- [ ] Add `README.md` with early project description.
-- [ ] Add `CHANGELOG.md`.
-- [ ] Add `.gitignore` for Python artifacts.
-- [ ] Add formatter/linter/type-checker configuration.
-- [ ] Add basic CI workflow.
+- [x] Decide final package name and import namespace.
+- [x] Decide supported Python versions.
+- [x] Choose license.
+- [x] Create `pyproject.toml`.
+- [x] Create `src/` package layout.
+- [x] Create `tests/` layout.
+- [x] Add `README.md` with early project description.
+- [x] Add `CHANGELOG.md`.
+- [x] Add `.gitignore` for Python artifacts.
+- [x] Add formatter/linter/type-checker configuration.
+- [x] Add basic CI workflow.
 
 ## 1. API Design Backlog
 
