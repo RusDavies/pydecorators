@@ -203,7 +203,12 @@
 
 ### Newly Implied Disk Concurrency Docs Follow-Ups
 
-- [ ] Add explicit DiskCacheBackend usage example to README.
+- [x] Add explicit DiskCacheBackend usage example to README.
+
+### Newly Implied Disk README Example Follow-Ups
+
+- [ ] Add executable docs example coverage for DiskCacheBackend usage.
+- [ ] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
 - [ ] Document recommended cache file location/permissions for CLI and service use.
 - [ ] Add stress/smoke test for concurrent disk backend reads and writes.
 - [ ] Decide whether disk backend should expose cache vacuum/compaction maintenance.

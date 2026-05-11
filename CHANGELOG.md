@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `DiskCacheBackend` README usage example.
 - README guidance for `DiskCacheBackend` concurrency and single-host expectations.
 - `DiskCacheBackend` SQLite WAL/busy-timeout tuning options and tests.
 - `DiskCacheBackend` treats corrupt disk cache payloads as misses and drops the bad row.

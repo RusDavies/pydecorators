@@ -72,6 +72,25 @@ def expensive_lookup(value: str) -> str:
 
 Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend.
 
+For a trusted local persistent cache, create one `DiskCacheBackend` and pass it to `@cache_result`:
+
+```python
+from pathlib import Path
+
+from useful_decorators import DiskCacheBackend, cache_result
+
+backend = DiskCacheBackend(
+    Path(".cache/useful-decorators.sqlite3"),
+    ttl=3600,
+    maxsize=10_000,
+)
+
+
+@cache_result(backend=backend, namespace="users")
+def load_user_display_name(user_id: str) -> str:
+    return fetch_user_display_name(user_id)
+```
+
 Disk backend design lives in `docs/disk_cache_backend.md`; implementation uses SQLite and the cache serializer interface. The default disk payload serializer uses pickle, so cache databases must be treated as trusted local files only — do not load cache DBs from untrusted sources or place them in world-writable directories.
 
 `DiskCacheBackend` is intended for single-host local caching. It uses normal SQLite file locking, requests WAL mode by default, and configures a 5000 ms busy timeout to reduce transient `database is locked` failures. Those settings improve local reader/writer behavior, but they do not make it a distributed cache and they do not promise safe cross-host semantics on shared/network filesystems. If multiple processes use the same cache file, expect normal SQLite contention behavior and keep cached values disposable.
