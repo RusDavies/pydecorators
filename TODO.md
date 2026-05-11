@@ -312,7 +312,12 @@
 
 ### Newly Implied Release Docs Maintenance Follow-Ups
 
-- [ ] Add pre-release command or script that runs only documentation policy tests.
+- [x] Add pre-release command or script that runs only documentation policy tests.
+
+### Newly Implied Docs Policy Command Follow-Ups
+
+- [ ] Consider adding a package-manager alias for the docs policy script if project tooling grows beyond plain Python scripts.
+- [ ] Add CI job split for documentation policy tests if CI runtime becomes noisy.
 - [ ] Consider splitting documentation policy tests out of `test_public_api_policy.py`.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
