@@ -285,7 +285,12 @@
 
 ### Newly Implied Docs Example Conventions Link Follow-Ups
 
-- [ ] Add anchor validation for local Markdown links with `#fragment` targets.
+- [x] Add anchor validation for local Markdown links with `#fragment` targets.
+
+### Newly Implied Markdown Anchor Policy Follow-Ups
+
+- [ ] Extend Markdown anchor validation to all docs Markdown links, not just docs/index.md.
+- [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [ ] Add policy test checking docs links outside docs/index.md.

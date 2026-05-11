@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Local Markdown anchor validation for docs index links.
 - Docs index executable example conventions link policy test.
 - Docs example filename convention policy test.
 - Executable docs example naming conventions.

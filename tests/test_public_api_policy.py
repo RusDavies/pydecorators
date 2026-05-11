@@ -89,17 +89,34 @@ def test_public_exceptions_reference_covers_public_exceptions() -> None:
         assert f"`{name}`" in exceptions_reference
 
 
-def docs_index_local_links() -> set[Path]:
+def docs_index_markdown_links() -> list[str]:
     docs_index = Path("docs/index.md")
-    text = docs_index.read_text()
-    links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+    links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", docs_index.read_text())
 
     assert links
+    return links
+
+
+def docs_index_local_links() -> set[Path]:
+    docs_index = Path("docs/index.md")
     return {
         docs_index.parent / link.split("#", maxsplit=1)[0]
-        for link in links
+        for link in docs_index_markdown_links()
         if "://" not in link and not link.startswith("#")
     }
+
+
+def markdown_heading_anchor(heading: str) -> str:
+    anchor = heading.strip().lower()
+    anchor = re.sub(r"[^a-z0-9 _-]", "", anchor)
+    anchor = anchor.replace(" ", "-")
+    anchor = re.sub(r"-+", "-", anchor)
+    return anchor
+
+
+def markdown_heading_anchors(path: Path) -> set[str]:
+    headings = re.findall(r"^#{1,6}\s+(.+)$", path.read_text(), flags=re.MULTILINE)
+    return {markdown_heading_anchor(heading) for heading in headings}
 
 
 def test_docs_index_links_resolve_to_existing_files() -> None:
@@ -166,3 +183,21 @@ def test_docs_index_links_to_executable_example_conventions() -> None:
 
     assert "../CONTRIBUTING.md#executable-documentation-examples" in docs_index
     assert "## Executable documentation examples" in contributing
+
+
+def test_docs_index_local_markdown_fragment_links_resolve() -> None:
+    docs_index = Path("docs/index.md")
+    fragment_links = [
+        link
+        for link in docs_index_markdown_links()
+        if "://" not in link and "#" in link and not link.startswith("#")
+    ]
+
+    assert fragment_links
+    for link in fragment_links:
+        path_part, fragment = link.split("#", maxsplit=1)
+        target = docs_index.parent / path_part
+        assert target.suffix == ".md"
+        assert fragment in markdown_heading_anchors(target), (
+            f"missing Markdown anchor target: {link}"
+        )
