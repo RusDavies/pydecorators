@@ -1,3 +1,4 @@
+import ast
 import inspect
 import re
 from pathlib import Path
@@ -20,6 +21,16 @@ def public_api_note_for(name: str) -> str:
     )
     assert match is not None
     return match.group("body")
+
+
+def public_example_functions(example_path: Path) -> set[str]:
+    tree = ast.parse(example_path.read_text())
+    return {
+        node.name
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
+        and not node.name.startswith("_")
+    }
 
 
 def test_documented_public_api_matches_all_exports() -> None:
@@ -122,3 +133,17 @@ def test_docs_examples_are_exercised_by_docs_example_tests() -> None:
     }
 
     assert example_files - explicitly_exempt == exercised_examples
+
+
+def test_public_docs_example_functions_have_assertions() -> None:
+    explicitly_exempt = {Path("docs/examples/__init__.py")}
+    example_files = sorted(set(Path("docs/examples").glob("*.py")) - explicitly_exempt)
+    docs_example_tests = Path("tests/test_docs_examples.py").read_text()
+
+    for example_path in example_files:
+        module_name = example_path.stem
+        for function_name in public_example_functions(example_path):
+            expected_call = f"examples.{function_name}("
+            assert expected_call in docs_example_tests, (
+                f"missing assertion call for {module_name}.{function_name}"
+            )
