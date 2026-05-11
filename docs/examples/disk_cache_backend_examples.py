@@ -32,3 +32,13 @@ def disk_cache_example(cache_path: Path) -> tuple[str, str, int]:
         return first, second, _CALLS
     finally:
         backend.close()
+
+
+def scoped_disk_cache_example(cache_path: Path) -> tuple[str | None, int]:
+    """Use DiskCacheBackend as a short scoped cache without a decorator."""
+
+    with DiskCacheBackend(cache_path, ttl=60, maxsize=16) as backend:
+        backend.set_value("answer", "cached")
+        entry = backend.get("answer")
+        info = backend.info()
+        return (entry.payload if entry is not None else None), info.hits

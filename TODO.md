@@ -217,7 +217,12 @@
 
 ### Newly Implied Disk Lifecycle Docs Follow-Ups
 
-- [ ] Add context-manager DiskCacheBackend example for short scoped cache use.
+- [x] Add context-manager DiskCacheBackend example for short scoped cache use.
+
+### Newly Implied Disk Context-Manager Docs Follow-Ups
+
+- [ ] Add test proving decorator-bound DiskCacheBackend fails after context-manager exit.
+- [ ] Document CacheBackendClosedError in README cache section.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
 - [ ] Document recommended cache file location/permissions for CLI and service use.
 - [ ] Add stress/smoke test for concurrent disk backend reads and writes.

@@ -203,3 +203,17 @@ This policy is intentionally conservative for cache data: caches are disposable,
 - `wal=False` is available for environments where WAL sidecar files are undesirable.
 
 This remains a single-host local cache. SQLite handles its normal file locking, but this backend is not a distributed cache and does not promise cross-host filesystem semantics.
+
+## Scoped context-manager use
+
+`DiskCacheBackend` can be used as a context manager for short scoped backend operations:
+
+```python
+from useful_decorators import DiskCacheBackend
+
+with DiskCacheBackend(".cache/tool.sqlite3", ttl=60, maxsize=16) as backend:
+    backend.set_value("answer", "cached")
+    entry = backend.get("answer")
+```
+
+Do not wrap a decorator-bound backend in a short `with` block unless all decorated calls happen before the block exits. Once the context manager closes the backend, later decorated calls will fail with `CacheBackendClosedError`.

@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `DiskCacheBackend` context-manager documentation example and executable coverage.
 - Executable `DiskCacheBackend` documentation example coverage.
 - `DiskCacheBackend` README lifecycle guidance showing explicit `close()` cleanup.
 - `DiskCacheBackend` README usage example.
