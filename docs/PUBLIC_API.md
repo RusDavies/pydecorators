@@ -8,6 +8,7 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 
 Current public API:
 
+- `cache_result`
 - `CacheInfo`
 - `CacheKeyError`
 - `deprecated`

@@ -96,26 +96,32 @@
 - [x] Decide exact runtime exception type for unhashable cache keys.
 - [ ] Add thread-safety tests for sync cache mutation.
 - [x] Decide whether async support is in-scope for `v0.1.0` or explicitly deferred.
-- [ ] Implement cache key generation.
+- [x] Implement cache key generation.
 - [ ] Implement TTL expiry.
 - [ ] Implement max-size eviction.
-- [ ] Implement manual cache clear method.
-- [ ] Implement cache info/statistics method.
-- [ ] Implement sync support.
+- [x] Implement manual cache clear method.
+- [x] Implement cache info/statistics method.
+- [x] Implement sync support.
 - [x] Implement async support or explicitly defer it.
 
 ### Newly Implied `@cache_result` Prep Follow-Ups
 
-- [ ] Add explicit async rejection test when `@cache_result` implementation lands.
+- [x] Add explicit async rejection test when `@cache_result` implementation lands.
 - [x] Add public API docs entry for `CacheInfo` and `CacheKeyError`.
-- [ ] Add cache statistics reset behavior tests for `cache_clear()`.
-- [ ] Add tests for cache hits/misses.
+- [x] Add cache statistics reset behavior tests for `cache_clear()`.
+- [x] Add tests for cache hits/misses.
 - [ ] Add tests for TTL expiry.
 - [ ] Add tests for max-size eviction.
-- [ ] Add tests for custom key function.
-- [ ] Add tests for metadata preservation.
-- [ ] Add README example.
-- [ ] Add per-decorator docs.
+- [x] Add tests for custom key function.
+- [x] Add tests for metadata preservation.
+- [x] Add README example.
+- [x] Add per-decorator docs.
+### Newly Implied `@cache_result` Sync-Core Follow-Ups
+
+- [ ] Add tests for `cache_exceptions=True`.
+- [ ] Add tests proving wrapped function execution happens outside the cache lock.
+- [ ] Add tests for positional-vs-keyword equivalent calls if canonical argument binding is desired.
+- [ ] Decide whether default key generation should canonicalize calls using `inspect.signature`.
 
 ## 4. `@retry`
 
