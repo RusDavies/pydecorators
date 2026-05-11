@@ -11,3 +11,5 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 - Initial project packaging foundation.
 - Empty typed `useful_decorators` package.
 - Import smoke test.
+- API design notes and shared internal decorator helpers.
+- Public exception hierarchy.
