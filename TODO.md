@@ -80,14 +80,22 @@
 
 ## 3. `@cache_result`
 
-- [ ] Design signature.
-  - [ ] `ttl`
-  - [ ] `maxsize`
-  - [ ] `key`
-  - [ ] `typed`
-  - [ ] `cache_exceptions`
-  - [ ] `clock`
-- [ ] Decide whether to wrap or extend `functools.lru_cache`.
+- [x] Design signature.
+  - [x] `ttl`
+  - [x] `maxsize`
+  - [x] `key`
+  - [x] `typed`
+  - [x] `cache_exceptions`
+  - [x] `clock`
+- [x] Decide whether to wrap or extend `functools.lru_cache`.
+
+### Newly Implied `@cache_result` Design Follow-Ups
+
+- [ ] Define `CacheInfo` public shape.
+- [ ] Define internal `CacheEntry` shape.
+- [ ] Decide exact runtime exception type for unhashable cache keys.
+- [ ] Add thread-safety tests for sync cache mutation.
+- [ ] Decide whether async support is in-scope for `v0.1.0` or explicitly deferred.
 - [ ] Implement cache key generation.
 - [ ] Implement TTL expiry.
 - [ ] Implement max-size eviction.
