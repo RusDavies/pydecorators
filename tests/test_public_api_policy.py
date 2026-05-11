@@ -149,3 +149,12 @@ def test_public_docs_example_functions_have_assertions() -> None:
             assert expected_call in docs_example_tests, (
                 f"missing assertion call for {module_name}.{function_name}"
             )
+
+
+def test_docs_example_filenames_follow_convention() -> None:
+    explicitly_exempt = {Path("docs/examples/__init__.py")}
+    example_files = set(Path("docs/examples").glob("*.py")) - explicitly_exempt
+
+    assert example_files
+    for example_path in example_files:
+        assert example_path.name.endswith("_examples.py")
