@@ -240,7 +240,12 @@
 
 ### Newly Implied Public Exception Policy Follow-Ups
 
-- [ ] Add tests that public exception inheritance matches documented behavior.
+- [x] Add tests that public exception inheritance matches documented behavior.
+
+### Newly Implied Public Exception Inheritance Follow-Ups
+
+- [ ] Add a structured public exception metadata table to docs.
+- [ ] Add doctested exception handling examples for public exception types.
 - [ ] Add short examples for `ConfigurationError`, `CacheKeyError`, and `CacheSerializationError`.
 - [ ] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
