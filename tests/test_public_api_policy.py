@@ -259,3 +259,15 @@ def test_root_docs_link_to_docs_index_where_appropriate() -> None:
 
     for root_doc in root_docs_that_should_link_index:
         assert "docs/index.md" in root_doc.read_text()
+
+
+def test_contributing_documents_root_docs_index_link_policy() -> None:
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    assert "## Root documentation links" in contributing
+    assert (
+        "Root docs that help users or contributors navigate the project should link "
+        "to `docs/index.md`." in contributing
+    )
+    for required_root_doc in ("README.md", "CONTRIBUTING.md", "RELEASE.md"):
+        assert f"- `{required_root_doc}`" in contributing
