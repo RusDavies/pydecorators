@@ -232,6 +232,7 @@ class DiskCacheBackend:
         self.path = Path(path)
         self._ttl = ttl
         self._maxsize = maxsize
+        self._key_serializer = PickleCacheSerializer()
         self._serializer = serializer or PickleCacheSerializer()
         self._clock = clock or monotonic
         self._lock = RLock()
@@ -288,6 +289,27 @@ class DiskCacheBackend:
         """Return cache statistics."""
 
         raise NotImplementedError("DiskCacheBackend.info is not implemented yet")
+
+    def _serialize_key(self, key: Hashable) -> bytes:
+        """Serialize a cache key for SQLite storage."""
+
+        return self._key_serializer.dumps(key)
+
+    def _serialize_payload(self, value: object) -> bytes:
+        """Serialize a cached value or exception payload."""
+
+        return self._serializer.dumps(value)
+
+    def _deserialize_payload(self, data: bytes) -> object:
+        """Deserialize a cached value or exception payload."""
+
+        return self._serializer.loads(data)
+
+    @property
+    def serializer_content_type(self) -> str:
+        """Return the configured payload serializer content type."""
+
+        return self._serializer.content_type
 
     def _initialize_schema(self) -> None:
         with self._lock, self._connection:
