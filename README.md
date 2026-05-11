@@ -97,7 +97,7 @@ finally:
     backend.close()
 ```
 
-For long-running applications, keep the backend for the application lifetime and close it from your normal shutdown hook.
+For long-running applications, keep the backend for the application lifetime and close it from your normal shutdown hook. For short scoped backend operations that are not decorator-bound, `DiskCacheBackend` also supports `with DiskCacheBackend(...) as backend:`.
 
 Disk backend design lives in `docs/disk_cache_backend.md`; implementation uses SQLite and the cache serializer interface. The default disk payload serializer uses pickle, so cache databases must be treated as trusted local files only — do not load cache DBs from untrusted sources or place them in world-writable directories.
 

@@ -42,3 +42,14 @@ def test_disk_cache_backend_documentation_example_executes(tmp_path: Path) -> No
     assert first == "User user-123"
     assert second == "User user-123"
     assert calls == 1
+
+
+def test_disk_cache_backend_context_manager_documentation_example_executes(
+    tmp_path: Path,
+) -> None:
+    examples = load_disk_cache_examples()
+
+    value, hits = examples.scoped_disk_cache_example(tmp_path / "scoped-cache.sqlite3")
+
+    assert value == "cached"
+    assert hits == 1
