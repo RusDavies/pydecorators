@@ -78,7 +78,7 @@ def cache_result(
     if maxsize is not None and maxsize <= 0:
         raise ConfigurationError("maxsize must be greater than zero when provided")
 
-    _ = clock or monotonic
+    cache_clock = clock or monotonic
 
     def decorator(func: Callable[P, R]) -> Callable[P, R]:
         if is_async_callable(func):
@@ -94,8 +94,25 @@ def cache_result(
                 return _ensure_hashable(key(*args, **kwargs))
             return _default_cache_key(args, kwargs, typed=typed)
 
+        def is_expired(entry: _CacheEntry) -> bool:
+            return entry.expires_at is not None and cache_clock() >= entry.expires_at
+
+        def expires_at() -> float | None:
+            if ttl is None:
+                return None
+            return cache_clock() + ttl
+
+        def evict_if_needed() -> None:
+            if maxsize is None:
+                return
+            while len(cache) > maxsize:
+                cache.popitem(last=False)
+
         def cache_info() -> CacheInfo:
             with lock:
+                expired_keys = [key for key, entry in cache.items() if is_expired(entry)]
+                for expired_key in expired_keys:
+                    cache.pop(expired_key, None)
                 return CacheInfo(hits=hits, misses=misses, maxsize=maxsize, currsize=len(cache))
 
         def cache_clear() -> None:
@@ -111,11 +128,14 @@ def cache_result(
             with lock:
                 entry = cache.get(cache_key)
                 if entry is not None:
-                    hits += 1
-                    cache.move_to_end(cache_key)
-                    if entry.is_exception:
-                        raise cast(BaseException, entry.payload)
-                    return cast(R, entry.payload)
+                    if is_expired(entry):
+                        cache.pop(cache_key, None)
+                    else:
+                        hits += 1
+                        cache.move_to_end(cache_key)
+                        if entry.is_exception:
+                            raise cast(BaseException, entry.payload)
+                        return cast(R, entry.payload)
                 misses += 1
 
             try:
@@ -123,11 +143,17 @@ def cache_result(
             except Exception as exc:
                 if cache_exceptions:
                     with lock:
-                        cache[cache_key] = _CacheEntry(exc, expires_at=None, is_exception=True)
+                        cache[cache_key] = _CacheEntry(
+                            exc, expires_at=expires_at(), is_exception=True
+                        )
+                        cache.move_to_end(cache_key)
+                        evict_if_needed()
                 raise
 
             with lock:
-                cache[cache_key] = _CacheEntry(result, expires_at=None)
+                cache[cache_key] = _CacheEntry(result, expires_at=expires_at())
+                cache.move_to_end(cache_key)
+                evict_if_needed()
             return result
 
         wrapped = mirror_metadata(wrapper, func)
