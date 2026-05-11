@@ -281,7 +281,12 @@
 
 - [ ] Add policy test that docs example module names match their linked labels in docs/index.md.
 - [ ] Consider moving docs-example policy helpers into a dedicated test module if public API policy tests get too broad.
-- [ ] Add policy test that docs/index.md links to the executable example conventions section.
+- [x] Add policy test that docs/index.md links to the executable example conventions section.
+
+### Newly Implied Docs Example Conventions Link Follow-Ups
+
+- [ ] Add anchor validation for local Markdown links with `#fragment` targets.
+- [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [ ] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.
