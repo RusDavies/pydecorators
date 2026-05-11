@@ -142,8 +142,14 @@
 ### Newly Implied `@cache_result` Backend Follow-Ups
 
 - [x] Refactor current in-memory cache storage into `MemoryCacheBackend`.
-- [ ] Define a formal cache backend protocol/interface.
-- [ ] Add `backend=` parameter to `@cache_result` while preserving memory default.
+- [x] Define a formal cache backend protocol/interface.
+- [x] Add `backend=` parameter to `@cache_result` while preserving memory default.
+
+### Newly Implied Backend Interface Follow-Ups
+
+- [ ] Document whether backend instances should be shared across decorated functions.
+- [ ] Add tests for deliberately shared backend instances across multiple decorated functions.
+- [ ] Decide whether backend implementations should receive namespace/prefix support.
 - [ ] Decide serializer interface for persistent/distributed backends.
 - [ ] Design `DiskCacheBackend` storage strategy, likely SQLite.
 - [ ] Design `RedisCacheBackend` as optional dependency extra.

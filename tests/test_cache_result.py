@@ -1,8 +1,10 @@
+from collections.abc import Hashable
 from typing import Any, cast
 
 import pytest
 
 from useful_decorators import CacheInfo, cache_result
+from useful_decorators.cache_result import _CacheEntry
 from useful_decorators.exceptions import CacheKeyError, ConfigurationError
 
 
@@ -361,3 +363,52 @@ def test_cache_result_cached_exceptions_expire_after_ttl() -> None:
 
     assert calls == 2
     assert get_cache_info(fail) == CacheInfo(hits=1, misses=2, maxsize=128, currsize=1)
+
+
+class RecordingBackend:
+    def __init__(self) -> None:
+        self.entries: dict[object, object] = {}
+        self.hits = 0
+        self.misses = 0
+        self.cleared = False
+
+    def get(self, key: Hashable) -> _CacheEntry | None:
+        if key in self.entries:
+            self.hits += 1
+            return _CacheEntry(self.entries[key], expires_at=None)
+        self.misses += 1
+        return None
+
+    def set_value(self, key: Hashable, value: object) -> None:
+        self.entries[key] = value
+
+    def set_exception(self, key: Hashable, exception: BaseException) -> None:
+        self.entries[key] = exception
+
+    def clear(self) -> None:
+        self.entries.clear()
+        self.cleared = True
+
+    def info(self) -> CacheInfo:
+        return CacheInfo(
+            hits=self.hits, misses=self.misses, maxsize=None, currsize=len(self.entries)
+        )
+
+
+def test_cache_result_accepts_custom_backend() -> None:
+    backend = RecordingBackend()
+    calls = 0
+
+    @cache_result(backend=backend)
+    def value(number: int) -> int:
+        nonlocal calls
+        calls += 1
+        return number * 2
+
+    assert value(2) == 4
+    assert value(2) == 4
+    assert calls == 1
+    assert get_cache_info(value) == CacheInfo(hits=1, misses=1, maxsize=None, currsize=1)
+
+    clear_cache(value)
+    assert backend.cleared

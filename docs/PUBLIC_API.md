@@ -8,6 +8,7 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 
 Current public API:
 
+- `CacheBackend`
 - `MemoryCacheBackend`
 - `cache_result`
 - `CacheInfo`
@@ -62,3 +63,7 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 ### `MemoryCacheBackend`
 
 `MemoryCacheBackend` is the default in-process storage backend used by `@cache_result`. It owns TTL pruning, LRU maxsize eviction, hit/miss statistics, and thread-safe cache mutation. It is public so future backend work can use the same shape as a reference implementation.
+
+### `CacheBackend`
+
+`CacheBackend` is the protocol implemented by cache storage backends. It defines `get`, `set_value`, `set_exception`, `clear`, and `info`. Custom backends can implement this protocol and be passed to `@cache_result(backend=...)`.

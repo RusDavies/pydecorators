@@ -58,3 +58,9 @@ def test_memory_cache_backend_clear_resets_entries_and_stats() -> None:
     backend.clear()
 
     assert backend.info() == CacheInfo(hits=0, misses=0, maxsize=128, currsize=0)
+
+
+def test_memory_cache_backend_implements_cache_backend_protocol() -> None:
+    from useful_decorators import CacheBackend
+
+    assert isinstance(MemoryCacheBackend(), CacheBackend)
