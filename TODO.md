@@ -30,11 +30,11 @@
 
 ### Newly Implied API Design Follow-Ups
 
-- [ ] Add tests that every public decorator is listed in `__all__`.
-- [ ] Add documentation policy for what counts as public API.
-- [ ] Add version consistency check between `pyproject.toml` and `useful_decorators.__version__`.
-- [ ] Decide whether internal helpers should use protocols for callable clock/sleep injection.
-- [ ] Add contributor guidance for adding a new decorator end-to-end.
+- [x] Add tests that every public decorator is listed in `__all__`.
+- [x] Add documentation policy for what counts as public API.
+- [x] Add version consistency check between `pyproject.toml` and `useful_decorators.__version__`.
+- [x] Decide whether internal helpers should use protocols for callable clock/sleep injection.
+- [x] Add contributor guidance for adding a new decorator end-to-end.
 
 ## 2. `@deprecated`
 
@@ -66,8 +66,17 @@
 
 ### Newly Implied Documentation Follow-Ups
 
-- [ ] Add executable documentation examples or doctest-style validation.
-- [ ] Add a public API stability policy before first release.
+- [x] Add executable documentation examples or doctest-style validation.
+- [x] Add a public API stability policy before first release.
+
+### Newly Implied Hardening Follow-Ups
+
+- [x] Add automated validation that documented public API names match `__all__`.
+- [x] Add CI matrix coverage for the minimum supported Python version locally or via CI artifact review.
+
+### Newly Implied Release Hardening Follow-Ups
+
+- [ ] Add a dedicated release checklist file before publishing `v0.1.0`.
 
 ## 3. `@cache_result`
 

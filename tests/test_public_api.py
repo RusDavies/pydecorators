@@ -17,3 +17,9 @@ def test_public_exceptions_are_exported() -> None:
 def test_all_exports_existing_attributes() -> None:
     for name in useful_decorators.__all__:
         assert hasattr(useful_decorators, name)
+
+
+def test_public_decorators_are_exported_via_all() -> None:
+    public_decorators = {"deprecated"}
+
+    assert public_decorators <= set(useful_decorators.__all__)

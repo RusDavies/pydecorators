@@ -44,3 +44,7 @@ mypy
 pytest
 python -m build
 ```
+
+## Public API and contributing
+
+See `docs/PUBLIC_API.md` for the public API policy and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
