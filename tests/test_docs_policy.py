@@ -369,6 +369,13 @@ def test_external_link_checker_matches_ignore_patterns() -> None:
     checker = load_external_link_checker_module()
     patterns = ["https://unstable.example.com/*", "https://example.com/exact"]
 
+    assert checker.ignored_link_pattern("https://unstable.example.com/docs", patterns) == (
+        "https://unstable.example.com/*"
+    )
+    assert checker.ignored_link_pattern("https://example.com/exact", patterns) == (
+        "https://example.com/exact"
+    )
+    assert checker.ignored_link_pattern("https://example.com/other", patterns) is None
     assert checker.is_ignored_link("https://unstable.example.com/docs", patterns)
     assert checker.is_ignored_link("https://example.com/exact", patterns)
     assert not checker.is_ignored_link("https://example.com/other", patterns)
@@ -399,3 +406,34 @@ def test_external_link_checker_syntax_only_honors_ignore_file(tmp_path: Path) ->
     )
 
     assert "syntax-checked 1 external HTTP(S) link(s); ignored 1" in result.stdout
+
+
+def test_external_link_checker_verbose_mode_reports_ignored_links(tmp_path: Path) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text(
+        "[ignored](https://ignored.example.com/docs)\n[checked](https://example.com/docs)\n"
+    )
+    (tmp_path / ".external-links-ignore").write_text("https://ignored.example.com/*\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+            "--verbose",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "checking" in result.stdout
+    assert "https://example.com/docs" in result.stdout
+    assert "ignored" in result.stdout
+    assert "https://ignored.example.com/docs" in result.stdout
+    assert "matched https://ignored.example.com/*" in result.stdout

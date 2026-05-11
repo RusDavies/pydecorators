@@ -30,8 +30,15 @@ def load_ignore_patterns(path: Path) -> list[str]:
     return patterns
 
 
+def ignored_link_pattern(link: str, patterns: list[str]) -> str | None:
+    for pattern in patterns:
+        if fnmatch.fnmatchcase(link, pattern):
+            return pattern
+    return None
+
+
 def is_ignored_link(link: str, patterns: list[str]) -> bool:
-    return any(fnmatch.fnmatchcase(link, pattern) for pattern in patterns)
+    return ignored_link_pattern(link, patterns) is not None
 
 
 def markdown_links(path: Path) -> list[str]:
@@ -148,6 +155,11 @@ def main() -> int:
             "defaults to .external-links-ignore"
         ),
     )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="print checked and ignored external links during manual release checks",
+    )
     args = parser.parse_args()
 
     root = args.root.resolve()
@@ -158,12 +170,17 @@ def main() -> int:
     failures: list[str] = []
     checked = 0
     ignored = 0
+    ignored_links: list[str] = []
     for docs_file, links in external_http_links(root).items():
         for link in links:
-            if is_ignored_link(link, ignore_patterns):
+            ignore_pattern = ignored_link_pattern(link, ignore_patterns)
+            if ignore_pattern is not None:
                 ignored += 1
+                ignored_links.append(f"ignored {docs_file}: {link} (matched {ignore_pattern})")
                 continue
             checked += 1
+            if args.verbose:
+                print(f"checking {docs_file}: {link}")
             if not is_valid_external_http_link(link):
                 failures.append(f"{docs_file}: invalid syntax: {link}")
                 continue
@@ -177,6 +194,10 @@ def main() -> int:
         for failure in failures:
             print(failure, file=sys.stderr)
         return 1
+
+    if args.verbose:
+        for ignored_link in ignored_links:
+            print(ignored_link)
 
     mode = "syntax-checked" if args.syntax_only else "checked"
     ignored_message = f"; ignored {ignored}" if ignored else ""
