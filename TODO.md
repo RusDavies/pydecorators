@@ -362,7 +362,12 @@
 
 ### Newly Implied External Link Ignore Follow-Ups
 
-- [ ] Consider requiring comments/reasons for non-comment patterns in `.external-links-ignore` if the ignore list grows.
+- [x] Consider requiring comments/reasons for non-comment patterns in `.external-links-ignore` if the ignore list grows.
+
+### Newly Implied External Link Ignore Reason Follow-Ups
+
+- [ ] Consider validating `.external-links-ignore` patterns have HTTP(S) URL shape if real ignores are added.
+- [ ] Consider adding expiration dates for ignored external links if the ignore list grows.
 - [x] Consider reporting ignored external links in verbose mode during release checks.
 
 ### Newly Implied External Link Verbose Follow-Ups
