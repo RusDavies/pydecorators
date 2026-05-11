@@ -42,7 +42,7 @@ The script runs tests marked with the `docs_policy` pytest marker. External link
 ./scripts/check_external_links.py
 ```
 
-The checker uses `.external-links-ignore` for intentionally skipped third-party URLs. Keep ignores rare and specific. Every real ignore pattern must be preceded by a reason comment and documented in the commit that adds it. To audit checked and ignored links, run:
+The checker uses `.external-links-ignore` for intentionally skipped third-party URLs. Keep ignores rare and specific. Every real ignore pattern must be an HTTP(S) URL pattern, include a host, be preceded by a reason comment, and be documented in the commit that adds it. To audit checked and ignored links, run:
 
 ```bash
 ./scripts/check_external_links.py --syntax-only --verbose

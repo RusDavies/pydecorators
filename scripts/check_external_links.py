@@ -18,7 +18,16 @@ USER_AGENT = "useful-decorators-link-checker/0.1"
 DEFAULT_IGNORE_FILE = ".external-links-ignore"
 
 
-def ignore_file_reason_errors(path: Path) -> list[str]:
+def is_valid_external_http_pattern(pattern: str) -> bool:
+    parsed = urlparse(pattern)
+    if parsed.scheme not in {"http", "https"}:
+        return False
+    if not parsed.netloc:
+        return False
+    return not any(character.isspace() for character in pattern)
+
+
+def ignore_file_errors(path: Path) -> list[str]:
     if not path.exists():
         return []
 
@@ -36,9 +45,19 @@ def ignore_file_reason_errors(path: Path) -> list[str]:
             errors.append(
                 f"{path}:{line_number}: ignore pattern must be preceded by a reason comment"
             )
+        if not is_valid_external_http_pattern(line):
+            errors.append(f"{path}:{line_number}: ignore pattern must be an HTTP(S) URL pattern")
         previous_meaningful_line_was_comment = False
 
     return errors
+
+
+def ignore_file_reason_errors(path: Path) -> list[str]:
+    return [
+        error
+        for error in ignore_file_errors(path)
+        if "must be preceded by a reason comment" in error
+    ]
 
 
 def load_ignore_patterns(path: Path) -> list[str]:
@@ -189,9 +208,9 @@ def main() -> int:
     ignore_file = args.ignore_file
     if not ignore_file.is_absolute():
         ignore_file = root / ignore_file
-    ignore_reason_errors = ignore_file_reason_errors(ignore_file)
-    if ignore_reason_errors:
-        for error in ignore_reason_errors:
+    ignore_errors = ignore_file_errors(ignore_file)
+    if ignore_errors:
+        for error in ignore_errors:
             print(error, file=sys.stderr)
         return 1
 
