@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import re
 import sys
 import time
@@ -14,6 +15,23 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 USER_AGENT = "useful-decorators-link-checker/0.1"
+DEFAULT_IGNORE_FILE = ".external-links-ignore"
+
+
+def load_ignore_patterns(path: Path) -> list[str]:
+    if not path.exists():
+        return []
+    patterns: list[str] = []
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        patterns.append(line)
+    return patterns
+
+
+def is_ignored_link(link: str, patterns: list[str]) -> bool:
+    return any(fnmatch.fnmatchcase(link, pattern) for pattern in patterns)
 
 
 def markdown_links(path: Path) -> list[str]:
@@ -121,13 +139,30 @@ def main() -> int:
         action="store_true",
         help="validate URL syntax without fetching the network",
     )
+    parser.add_argument(
+        "--ignore-file",
+        type=Path,
+        default=Path(DEFAULT_IGNORE_FILE),
+        help=(
+            "file of external link ignore patterns, one fnmatch-style pattern per line; "
+            "defaults to .external-links-ignore"
+        ),
+    )
     args = parser.parse_args()
 
     root = args.root.resolve()
+    ignore_file = args.ignore_file
+    if not ignore_file.is_absolute():
+        ignore_file = root / ignore_file
+    ignore_patterns = load_ignore_patterns(ignore_file)
     failures: list[str] = []
     checked = 0
+    ignored = 0
     for docs_file, links in external_http_links(root).items():
         for link in links:
+            if is_ignored_link(link, ignore_patterns):
+                ignored += 1
+                continue
             checked += 1
             if not is_valid_external_http_link(link):
                 failures.append(f"{docs_file}: invalid syntax: {link}")
@@ -144,7 +179,8 @@ def main() -> int:
         return 1
 
     mode = "syntax-checked" if args.syntax_only else "checked"
-    print(f"{mode} {checked} external HTTP(S) link(s)")
+    ignored_message = f"; ignored {ignored}" if ignored else ""
+    print(f"{mode} {checked} external HTTP(S) link(s){ignored_message}")
     return 0
 
 

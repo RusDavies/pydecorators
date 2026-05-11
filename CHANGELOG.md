@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Ignore-file support for the optional external documentation link checker.
 - Retry/backoff support for the optional external documentation link checker.
 - Opt-in external documentation link checker.
 - External HTTP(S) documentation link syntax policy.

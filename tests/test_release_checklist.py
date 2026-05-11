@@ -50,6 +50,7 @@ def test_docs_policy_script_exists_and_is_documented() -> None:
 
     assert "./scripts/docs-policy.sh" in release_text
     assert script.exists()
+    assert Path(".external-links-ignore").exists()
     script_text = script.read_text()
     assert "-m docs_policy" in script_text
 
@@ -61,10 +62,13 @@ def test_release_checklist_documents_optional_external_link_checker() -> None:
 
     assert "./scripts/check_external_links.py" in release_text
     assert "./scripts/check_external_links.py --syntax-only" in release_text
+    assert ".external-links-ignore" in release_text
     assert "--retries 4 --backoff 1.0" in release_text
     assert script.exists()
+    assert Path(".external-links-ignore").exists()
     script_text = script.read_text()
     assert "urlopen" in script_text
     assert "--syntax-only" in script_text
+    assert "--ignore-file" in script_text
     assert "--retries" in script_text
     assert "--backoff" in script_text

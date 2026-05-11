@@ -349,3 +349,53 @@ def test_external_link_checker_does_not_retry_non_retryable_failures(
     assert detail == "HTTP Error 404: Not Found after 1 attempt(s)"
     assert attempts == 1
     assert sleeps == []
+
+
+def test_external_link_checker_loads_ignore_patterns(tmp_path: Path) -> None:
+    checker = load_external_link_checker_module()
+    ignore_file = tmp_path / "external-links.ignore"
+    ignore_file.write_text(
+        "# comment\n\nhttps://unstable.example.com/*\nhttps://example.com/exact\n"
+    )
+
+    assert checker.load_ignore_patterns(ignore_file) == [
+        "https://unstable.example.com/*",
+        "https://example.com/exact",
+    ]
+    assert checker.load_ignore_patterns(tmp_path / "missing.ignore") == []
+
+
+def test_external_link_checker_matches_ignore_patterns() -> None:
+    checker = load_external_link_checker_module()
+    patterns = ["https://unstable.example.com/*", "https://example.com/exact"]
+
+    assert checker.is_ignored_link("https://unstable.example.com/docs", patterns)
+    assert checker.is_ignored_link("https://example.com/exact", patterns)
+    assert not checker.is_ignored_link("https://example.com/other", patterns)
+
+
+def test_external_link_checker_syntax_only_honors_ignore_file(tmp_path: Path) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text(
+        "[ignored](https://ignored.example.com/bad path)\n[checked](https://example.com/docs)\n"
+    )
+    ignore_file = tmp_path / ".external-links-ignore"
+    ignore_file.write_text("https://ignored.example.com/*\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "syntax-checked 1 external HTTP(S) link(s); ignored 1" in result.stdout
