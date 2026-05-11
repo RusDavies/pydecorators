@@ -4,6 +4,10 @@ import warnings
 from pathlib import Path
 from types import ModuleType
 
+import pytest
+
+pytestmark = pytest.mark.docs_policy
+
 
 def load_docs_example(module_name: str) -> ModuleType:
     example_path = Path("docs/examples") / f"{module_name}.py"

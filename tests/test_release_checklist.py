@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 
 def test_release_checklist_exists_and_mentions_required_gates() -> None:
     text = Path("RELEASE.md").read_text()
@@ -24,6 +26,7 @@ def test_release_checklist_mentions_version_consistency() -> None:
     assert "version consistency test" in text
 
 
+@pytest.mark.docs_policy
 def test_release_checklist_documents_docs_maintenance() -> None:
     text = Path("RELEASE.md").read_text()
 
@@ -40,6 +43,7 @@ def test_release_checklist_documents_docs_maintenance() -> None:
         assert required in text
 
 
+@pytest.mark.docs_policy
 def test_docs_policy_script_exists_and_is_documented() -> None:
     release_text = Path("RELEASE.md").read_text()
     script = Path("scripts/docs-policy.sh")
@@ -47,9 +51,4 @@ def test_docs_policy_script_exists_and_is_documented() -> None:
     assert "./scripts/docs-policy.sh" in release_text
     assert script.exists()
     script_text = script.read_text()
-    for required in [
-        "tests/test_docs_policy.py",
-        "tests/test_docs_examples.py",
-        "tests/test_release_checklist.py",
-    ]:
-        assert required in script_text
+    assert "-m docs_policy" in script_text

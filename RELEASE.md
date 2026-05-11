@@ -36,7 +36,7 @@ Before publishing, treat docs as release artifacts, not garnish. Run:
 ./scripts/docs-policy.sh
 ```
 
-Then confirm:
+The script runs tests marked with the `docs_policy` pytest marker. Then confirm:
 
 - `README.md`, `CONTRIBUTING.md`, and `RELEASE.md` still link to `docs/index.md`.
 - `docs/index.md` links every top-level page in `docs/` except itself.

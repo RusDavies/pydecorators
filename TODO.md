@@ -323,7 +323,12 @@
 ### Newly Implied Docs Policy Test Split Follow-Ups
 
 - [ ] Consider splitting public API exception policy tests into a dedicated exception policy module if they keep growing.
-- [ ] Consider adding pytest markers for documentation-policy tests.
+- [x] Consider adding pytest markers for documentation-policy tests.
+
+### Newly Implied Docs Policy Marker Follow-Ups
+
+- [ ] Consider adding a CI job that runs `pytest -m docs_policy` directly.
+- [ ] Add contributor guidance for when new tests should use the `docs_policy` marker.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.
