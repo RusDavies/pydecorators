@@ -91,7 +91,7 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 
 ### `CacheSerializationError`
 
-`CacheSerializationError` wraps serializer failures so persistent/distributed backends can expose package-specific errors instead of raw serializer internals.
+`CacheSerializationError` wraps serializer failures so persistent/distributed backends can expose package-specific errors instead of raw serializer internals. It inherits from `UsefulDecoratorsError`.
 
 ### `CacheBackendClosedError`
 
@@ -120,7 +120,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `RateLimitExceeded`
 
-`RateLimitExceeded` is reserved for rate-limiting decorators and is raised when a rate-limited call exceeds its configured allowance.
+`RateLimitExceeded` is reserved for rate-limiting decorators and is raised when a rate-limited call exceeds its configured allowance. It inherits from `UsefulDecoratorsError`.
 
 ### `FunctionTimedOut`
 
