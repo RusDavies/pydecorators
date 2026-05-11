@@ -38,23 +38,31 @@
 
 ## 2. `@deprecated`
 
-- [ ] Design signature.
-  - [ ] `reason`
-  - [ ] `replacement`
-  - [ ] `version`
-  - [ ] `remove_in`
-  - [ ] `category`
-  - [ ] `stacklevel`
-- [ ] Implement sync function support.
-- [ ] Implement async function support.
-- [ ] Preserve function metadata.
-- [ ] Emit useful warning message.
-- [ ] Add tests for default warning.
-- [ ] Add tests for custom message.
-- [ ] Add tests for replacement/version/removal fields.
-- [ ] Add async tests.
-- [ ] Add README example.
-- [ ] Add per-decorator docs.
+- [x] Design signature.
+  - [x] `reason`
+  - [x] `replacement`
+  - [x] `version`
+  - [x] `remove_in`
+  - [x] `category`
+  - [x] `stacklevel`
+- [x] Implement sync function support.
+- [x] Implement async function support.
+- [x] Preserve function metadata.
+- [x] Emit useful warning message.
+- [x] Add tests for default warning.
+- [x] Add tests for custom message.
+- [x] Add tests for replacement/version/removal fields.
+- [x] Add async tests.
+- [x] Add README example.
+- [x] Add per-decorator docs.
+
+### Newly Implied `@deprecated` Follow-Ups
+
+- [ ] Add stacklevel behavior tests that verify warnings point at caller code.
+- [ ] Add class/method deprecation examples.
+- [ ] Decide whether deprecating classes should be supported explicitly.
+- [ ] Add documentation for warning filters and why `DeprecationWarning` may be hidden by default.
+- [ ] Add type-checking examples for decorators used bare and configured.
 
 ## 3. `@cache_result`
 
