@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- README core documentation link policy.
 - Shared documentation policy helper module.
 - Contributor checklist for documentation file updates.
 - Contributor guidance for documentation policy test markers.

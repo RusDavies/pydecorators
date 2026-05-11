@@ -350,7 +350,12 @@
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [x] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.
-- [ ] Add policy test ensuring README links to core docs pages.
+- [x] Add policy test ensuring README links to core docs pages.
+
+### Newly Implied README Core Docs Policy Follow-Ups
+
+- [ ] Consider documenting the README core-doc link set in CONTRIBUTING if the required list grows.
+- [ ] Consider grouping README documentation links into a dedicated Documentation section if the homepage grows longer.
 - [x] Add tests that all public exceptions appear in public API docs.
 
 ### Newly Implied Public Exception Policy Follow-Ups
