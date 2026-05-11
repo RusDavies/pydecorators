@@ -255,7 +255,12 @@
 
 ### Newly Implied Docs Examples Coverage Follow-Ups
 
-- [ ] Add policy test that each docs example file is executed by `tests/test_docs_examples.py` unless explicitly exempted.
+- [x] Add policy test that each docs example file is executed by `tests/test_docs_examples.py` unless explicitly exempted.
+
+### Newly Implied Docs Example Execution Follow-Ups
+
+- [ ] Refactor docs example loading into a shared helper to reduce repetitive importlib boilerplate.
+- [ ] Add policy test that each public example function has at least one assertion in docs example tests.
 - [ ] Add a naming convention note for executable docs examples.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [ ] Add policy test checking docs links outside docs/index.md.

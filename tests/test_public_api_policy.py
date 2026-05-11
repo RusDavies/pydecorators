@@ -110,3 +110,15 @@ def test_docs_examples_are_listed_from_docs_index() -> None:
     }
 
     assert example_files - explicitly_exempt == linked_examples
+
+
+def test_docs_examples_are_exercised_by_docs_example_tests() -> None:
+    explicitly_exempt = {Path("docs/examples/__init__.py")}
+    example_files = {path for path in Path("docs/examples").glob("*.py")}
+    docs_example_tests = Path("tests/test_docs_examples.py").read_text()
+    exercised_examples = {
+        Path(match)
+        for match in re.findall(r"Path\(\"(docs/examples/[^\"]+\.py)\"\)", docs_example_tests)
+    }
+
+    assert example_files - explicitly_exempt == exercised_examples
