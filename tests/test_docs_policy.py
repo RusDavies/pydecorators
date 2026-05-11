@@ -262,3 +262,17 @@ def test_markdown_heading_anchors_include_duplicate_heading_suffixes(tmp_path: P
         "examples-2",
         "details-1",
     }
+
+
+def test_external_link_checker_syntax_only_mode_passes_without_network() -> None:
+    import subprocess
+    import sys
+
+    result = subprocess.run(
+        [sys.executable, "scripts/check_external_links.py", "--syntax-only"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "syntax-checked" in result.stdout

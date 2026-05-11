@@ -348,7 +348,12 @@
 
 ### Newly Implied External Link Policy Follow-Ups
 
-- [ ] Consider adding an opt-in external link checker for release/manual maintenance, separate from default CI.
+- [x] Consider adding an opt-in external link checker for release/manual maintenance, separate from default CI.
+
+### Newly Implied External Link Checker Follow-Ups
+
+- [ ] Consider adding retry/backoff support to the manual external link checker if release checks see transient failures.
+- [ ] Add external link checker allowlist/ignore file if intentionally unstable third-party URLs appear.
 - [ ] Add allowlist or scheme policy if docs start using non-HTTP external links intentionally.
 - [x] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 
