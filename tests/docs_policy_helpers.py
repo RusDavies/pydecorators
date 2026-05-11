@@ -58,4 +58,14 @@ def markdown_heading_anchor(heading: str) -> str:
 
 def markdown_heading_anchors(path: Path) -> set[str]:
     headings = re.findall(r"^#{1,6}\s+(.+)$", path.read_text(), flags=re.MULTILINE)
-    return {markdown_heading_anchor(heading) for heading in headings}
+    anchors: set[str] = set()
+    seen_counts: dict[str, int] = {}
+
+    for heading in headings:
+        base_anchor = markdown_heading_anchor(heading)
+        count = seen_counts.get(base_anchor, 0)
+        seen_counts[base_anchor] = count + 1
+        anchor = base_anchor if count == 0 else f"{base_anchor}-{count}"
+        anchors.add(anchor)
+
+    return anchors
