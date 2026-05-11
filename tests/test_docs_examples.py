@@ -1,3 +1,4 @@
+import asyncio
 import importlib.util
 import warnings
 from pathlib import Path
@@ -21,12 +22,14 @@ def test_deprecated_documentation_examples_execute() -> None:
         warnings.simplefilter("ignore", DeprecationWarning)
         assert examples.old_bare_function(1, 2) == 3
         assert examples.old_configured_function(1, 2) == 3
+        assert asyncio.run(examples.old_async_function()) == "data"
         assert examples.Client().fetch_old() == "old"
 
 
 def test_disk_cache_backend_documentation_example_executes(tmp_path: Path) -> None:
     examples = load_docs_example("disk_cache_backend_examples")
 
+    assert examples.fetch_user_display_name("user-123") == "User user-123"
     first, second, calls = examples.disk_cache_example(tmp_path / "cache.sqlite3")
 
     assert first == "User user-123"

@@ -265,7 +265,12 @@
 
 - [ ] Consider parameterizing docs example execution tests by module/function once the example set grows.
 - [ ] Add a tiny helper for asserting expected docs example return values consistently.
-- [ ] Add policy test that each public example function has at least one assertion in docs example tests.
+- [x] Add policy test that each public example function has at least one assertion in docs example tests.
+
+### Newly Implied Docs Example Assertion Policy Follow-Ups
+
+- [ ] Extend docs example assertion policy if examples add public classes with public methods.
+- [ ] Consider AST-based assertion detection if string matching becomes too loose.
 - [ ] Add a naming convention note for executable docs examples.
 - [ ] Add docs contribution note explaining when a docs page should be added to the index.
 - [ ] Add policy test checking docs links outside docs/index.md.
