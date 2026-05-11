@@ -6,7 +6,7 @@ from collections import OrderedDict
 from collections.abc import Callable, Hashable
 from dataclasses import dataclass
 from threading import RLock
-from typing import Any, cast
+from typing import Any, Protocol, cast, runtime_checkable
 
 from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
 from useful_decorators._typing import Clock, P, R
@@ -33,6 +33,26 @@ class _CacheEntry:
     payload: Any
     expires_at: float | None
     is_exception: bool = False
+
+
+@runtime_checkable
+class CacheBackend(Protocol):
+    """Protocol implemented by cache storage backends."""
+
+    def get(self, key: Hashable) -> _CacheEntry | None:
+        """Return a cached entry for *key*, or ``None`` for a miss."""
+
+    def set_value(self, key: Hashable, value: object) -> None:
+        """Store a successful cached value."""
+
+    def set_exception(self, key: Hashable, exception: BaseException) -> None:
+        """Store an exception payload for later re-raising."""
+
+    def clear(self) -> None:
+        """Clear cached entries and reset statistics where supported."""
+
+    def info(self) -> CacheInfo:
+        """Return cache statistics."""
 
 
 class MemoryCacheBackend:
@@ -168,14 +188,15 @@ def cache_result(
     typed: bool = False,
     cache_exceptions: bool = False,
     clock: Clock | None = None,
+    backend: CacheBackend | None = None,
 ) -> Callable[[Callable[P, R]], Callable[P, R]]:
-    """Cache results from a synchronous function in process memory.
+    """Cache results from a synchronous function using a configurable backend.
 
     Async callables are intentionally rejected for ``v0.1.0`` until async cache
     semantics are designed separately.
     """
 
-    backend = MemoryCacheBackend(ttl=ttl, maxsize=maxsize, clock=clock)
+    cache_backend = backend or MemoryCacheBackend(ttl=ttl, maxsize=maxsize, clock=clock)
 
     def decorator(func: Callable[P, R]) -> Callable[P, R]:
         if is_async_callable(func):
@@ -187,14 +208,14 @@ def cache_result(
             return _default_cache_key(args, kwargs, typed=typed)
 
         def cache_info() -> CacheInfo:
-            return backend.info()
+            return cache_backend.info()
 
         def cache_clear() -> None:
-            backend.clear()
+            cache_backend.clear()
 
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             cache_key = make_key(cast(tuple[object, ...], args), cast(dict[str, object], kwargs))
-            entry = backend.get(cache_key)
+            entry = cache_backend.get(cache_key)
             if entry is not None:
                 if entry.is_exception:
                     raise cast(BaseException, entry.payload)
@@ -204,10 +225,10 @@ def cache_result(
                 result = func(*args, **kwargs)
             except Exception as exc:
                 if cache_exceptions:
-                    backend.set_exception(cache_key, exc)
+                    cache_backend.set_exception(cache_key, exc)
                 raise
 
-            backend.set_value(cache_key, result)
+            cache_backend.set_value(cache_key, result)
             return result
 
         wrapped = mirror_metadata(wrapper, func)

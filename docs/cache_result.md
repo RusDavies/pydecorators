@@ -210,3 +210,9 @@ This keeps lock scope small and avoids holding the cache lock while user code ru
 The current in-process cache storage has been refactored into `MemoryCacheBackend`. The decorator still defaults to memory storage and remains backward compatible.
 
 Future backends should follow the same separation of responsibilities: the decorator handles call wrapping and key generation; the backend handles storage, expiry, eviction, clearing, and statistics.
+
+## Custom backend parameter
+
+`@cache_result` accepts `backend=`. When omitted, the decorator creates a `MemoryCacheBackend` from `ttl`, `maxsize`, and `clock`.
+
+When a backend is provided, the backend owns storage policy. The decorator still owns key generation, metadata preservation, exception-caching decisions, and sync/async rejection. Backend instances are intentionally reusable, but callers should usually provide one backend per decorated function unless they deliberately want shared storage.

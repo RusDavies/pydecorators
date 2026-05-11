@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `CacheBackend` protocol and `backend=` parameter for `@cache_result`.
 - `MemoryCacheBackend` refactor as the default storage backend for `@cache_result`.
 - `@cache_result` TTL expiry, LRU maxsize eviction, and sync mutation thread-safety coverage.
 - `@cache_result` hardening tests for exception caching, lock behavior, and key canonicalization policy.
