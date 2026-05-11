@@ -15,6 +15,7 @@ from typing import Any, Protocol, cast, runtime_checkable
 from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
 from useful_decorators._typing import Clock, P, R
 from useful_decorators.exceptions import (
+    CacheBackendClosedError,
     CacheKeyError,
     CacheSerializationError,
     ConfigurationError,
@@ -266,29 +267,160 @@ class DiskCacheBackend:
                 self._closed = True
 
     def get(self, key: Hashable) -> _CacheEntry | None:
-        """Return a cached entry for *key*, or ``None`` for a miss."""
+        """Return a cached entry for *key*, or ``None`` after recording a miss."""
 
-        raise NotImplementedError("DiskCacheBackend.get is not implemented yet")
+        serialized_key = self._serialize_key(key)
+        now = self._clock()
+        with self._lock:
+            self._ensure_open()
+            with self._connection:
+                row = self._connection.execute(
+                    """
+                SELECT payload, is_exception, expires_at, serializer_content_type
+                FROM cache_entries
+                WHERE key = ?
+                """,
+                    (serialized_key,),
+                ).fetchone()
+                if row is None:
+                    self._record_miss()
+                    return None
+
+                payload, is_exception, expires_at, serializer_content_type = row
+                if expires_at is not None and now >= expires_at:
+                    self._connection.execute(
+                        "DELETE FROM cache_entries WHERE key = ?", (serialized_key,)
+                    )
+                    self._record_miss()
+                    return None
+
+                if serializer_content_type != self.serializer_content_type:
+                    self._connection.execute(
+                        "DELETE FROM cache_entries WHERE key = ?", (serialized_key,)
+                    )
+                    self._record_miss()
+                    return None
+
+                self._connection.execute(
+                    "UPDATE cache_entries SET last_accessed = ? WHERE key = ?",
+                    (now, serialized_key),
+                )
+                self._record_hit()
+                return _CacheEntry(
+                    self._deserialize_payload(payload),
+                    expires_at=expires_at,
+                    is_exception=bool(is_exception),
+                )
 
     def set_value(self, key: Hashable, value: object) -> None:
         """Store a successful cached value."""
 
-        raise NotImplementedError("DiskCacheBackend.set_value is not implemented yet")
+        self._set_entry(key, value, is_exception=False)
 
     def set_exception(self, key: Hashable, exception: BaseException) -> None:
         """Store an exception payload for later re-raising."""
 
-        raise NotImplementedError("DiskCacheBackend.set_exception is not implemented yet")
+        self._set_entry(key, exception, is_exception=True)
 
     def clear(self) -> None:
         """Clear cached entries and reset statistics."""
 
-        raise NotImplementedError("DiskCacheBackend.clear is not implemented yet")
+        with self._lock:
+            self._ensure_open()
+            with self._connection:
+                self._connection.execute("DELETE FROM cache_entries")
+                self._connection.execute("UPDATE cache_stats SET hits = 0, misses = 0 WHERE id = 1")
 
     def info(self) -> CacheInfo:
-        """Return cache statistics."""
+        """Return current cache statistics after pruning expired entries."""
 
-        raise NotImplementedError("DiskCacheBackend.info is not implemented yet")
+        with self._lock:
+            self._ensure_open()
+            with self._connection:
+                self._prune_expired()
+                hits, misses = self._connection.execute(
+                    "SELECT hits, misses FROM cache_stats WHERE id = 1"
+                ).fetchone()
+                currsize = self._connection.execute(
+                    "SELECT COUNT(*) FROM cache_entries"
+                ).fetchone()[0]
+                return CacheInfo(
+                    hits=hits,
+                    misses=misses,
+                    maxsize=self._maxsize,
+                    currsize=currsize,
+                )
+
+    def _set_entry(self, key: Hashable, payload: object, *, is_exception: bool) -> None:
+        serialized_key = self._serialize_key(key)
+        serialized_payload = self._serialize_payload(payload)
+        now = self._clock()
+        with self._lock:
+            self._ensure_open()
+            with self._connection:
+                self._connection.execute(
+                    """
+                INSERT OR REPLACE INTO cache_entries (
+                    key, payload, is_exception, expires_at, last_accessed, created_at,
+                    serializer_content_type
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                    (
+                        serialized_key,
+                        serialized_payload,
+                        int(is_exception),
+                        self._expires_at(now),
+                        now,
+                        now,
+                        self.serializer_content_type,
+                    ),
+                )
+                self._evict_if_needed()
+
+    def _expires_at(self, now: float) -> float | None:
+        if self._ttl is None:
+            return None
+        return now + self._ttl
+
+    def _ensure_open(self) -> None:
+        if self._closed:
+            raise CacheBackendClosedError("cache backend is closed")
+
+    def _record_hit(self) -> None:
+        self._connection.execute("UPDATE cache_stats SET hits = hits + 1 WHERE id = 1")
+
+    def _record_miss(self) -> None:
+        self._connection.execute("UPDATE cache_stats SET misses = misses + 1 WHERE id = 1")
+
+    def _prune_expired(self) -> None:
+        now = self._clock()
+        self._connection.execute(
+            "DELETE FROM cache_entries WHERE expires_at IS NOT NULL AND expires_at <= ?",
+            (now,),
+        )
+
+    def _evict_if_needed(self) -> None:
+        if self._maxsize is None:
+            return
+        overflow = (
+            self._connection.execute("SELECT COUNT(*) FROM cache_entries").fetchone()[0]
+            - self._maxsize
+        )
+        if overflow <= 0:
+            return
+        self._connection.execute(
+            """
+            DELETE FROM cache_entries
+            WHERE key IN (
+                SELECT key
+                FROM cache_entries
+                ORDER BY last_accessed ASC, created_at ASC
+                LIMIT ?
+            )
+            """,
+            (overflow,),
+        )
 
     def _serialize_key(self, key: Hashable) -> bytes:
         """Serialize a cache key for SQLite storage."""

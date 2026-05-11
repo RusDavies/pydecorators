@@ -170,4 +170,16 @@ Docs for `DiskCacheBackend` must warn:
 - `_deserialize_payload(data)` uses the configured payload serializer.
 - `serializer_content_type` exposes the configured payload serializer content type for row metadata.
 
-The first implementation stores serializer content type but does not yet enforce mismatch handling on read; that is tracked as follow-up work.
+The implementation stores serializer content type with each row. If a later backend instance uses a different serializer content type for the same database, matching rows are treated as misses and removed instead of being deserialized with the wrong serializer.
+
+## Implemented cache operations
+
+`DiskCacheBackend` now implements the `CacheBackend` protocol:
+
+- `get()` returns valid entries, records hits/misses, deletes expired rows, and updates `last_accessed` on hits.
+- `set_value()` stores successful values.
+- `set_exception()` stores cached exceptions for `cache_exceptions=True` use.
+- `clear()` deletes entries and resets hit/miss statistics.
+- `info()` prunes expired rows and reports `CacheInfo`.
+
+Operations after `close()` raise `CacheBackendClosedError`.

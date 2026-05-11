@@ -252,3 +252,9 @@ class CacheSerializer(Protocol):
 The default implementation is `PickleCacheSerializer`, which can round-trip ordinary Python objects for trusted caches. Pickle is unsafe for untrusted data, so disk/Redis backends must document trust boundaries clearly.
 
 Serializer failures should raise `CacheSerializationError`. `PickleCacheSerializer` wraps pickle serialization and deserialization failures in that package-specific exception.
+
+## Disk backend implementation
+
+`DiskCacheBackend` implements the `CacheBackend` protocol using SQLite. It supports value and exception storage, TTL expiry, LRU maxsize eviction, persistent entries across backend instances, `clear()`, `info()`, context-manager cleanup, and package-specific `CacheBackendClosedError` failures after `close()`.
+
+Disk payloads use the configured `CacheSerializer`; the default is `PickleCacheSerializer`, which is only safe for trusted local cache files. Rows whose stored serializer content type does not match the active serializer are treated as misses and removed rather than deserialized with the wrong serializer.
