@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Release documentation maintenance checklist section.
 - Root documentation index-linking policy documentation.
 - Root docs documentation-index mention policy test.
 - Root documentation local Markdown link validation.

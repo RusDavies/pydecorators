@@ -308,7 +308,12 @@
 ### Newly Implied Root Docs Policy Docs Follow-Ups
 
 - [ ] Add policy test that planning docs stay free of release/user-doc navigation requirements unless promoted.
-- [ ] Consider adding a short docs-maintenance section to RELEASE.md before first release.
+- [x] Consider adding a short docs-maintenance section to RELEASE.md before first release.
+
+### Newly Implied Release Docs Maintenance Follow-Ups
+
+- [ ] Add pre-release command or script that runs only documentation policy tests.
+- [ ] Consider splitting documentation policy tests out of `test_public_api_policy.py`.
 - [ ] Decide whether external HTTP links should be syntax-checked or left unchecked.
 - [ ] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.
 - [ ] Consider centralizing Markdown link parsing helpers for docs policy tests.
