@@ -1,68 +1,20 @@
-import ast
 import re
 from pathlib import Path
 
 import pytest
 
+from tests.docs_policy_helpers import (
+    docs_index_local_links,
+    docs_index_markdown_links,
+    is_external_or_page_anchor,
+    local_link_path,
+    markdown_heading_anchors,
+    markdown_links,
+    markdown_policy_files,
+    public_example_functions,
+)
+
 pytestmark = pytest.mark.docs_policy
-
-
-def public_example_functions(example_path: Path) -> set[str]:
-    tree = ast.parse(example_path.read_text())
-    return {
-        node.name
-        for node in tree.body
-        if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
-        and not node.name.startswith("_")
-    }
-
-
-def markdown_links(path: Path) -> list[str]:
-    return re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text())
-
-
-def markdown_policy_files() -> list[Path]:
-    root_docs = sorted(Path(".").glob("*.md"))
-    docs_files = sorted(Path("docs").rglob("*.md"))
-    return root_docs + docs_files
-
-
-def docs_index_markdown_links() -> list[str]:
-    links = markdown_links(Path("docs/index.md"))
-
-    assert links
-    return links
-
-
-def is_external_or_page_anchor(link: str) -> bool:
-    return "://" in link or link.startswith("#")
-
-
-def local_link_path(source: Path, link: str) -> Path:
-    path_part = link.split("#", maxsplit=1)[0]
-    return source.parent / path_part
-
-
-def docs_index_local_links() -> set[Path]:
-    docs_index = Path("docs/index.md")
-    return {
-        local_link_path(docs_index, link)
-        for link in docs_index_markdown_links()
-        if not is_external_or_page_anchor(link)
-    }
-
-
-def markdown_heading_anchor(heading: str) -> str:
-    anchor = heading.strip().lower()
-    anchor = re.sub(r"[^a-z0-9 _-]", "", anchor)
-    anchor = anchor.replace(" ", "-")
-    anchor = re.sub(r"-+", "-", anchor)
-    return anchor
-
-
-def markdown_heading_anchors(path: Path) -> set[str]:
-    headings = re.findall(r"^#{1,6}\s+(.+)$", path.read_text(), flags=re.MULTILINE)
-    return {markdown_heading_anchor(heading) for heading in headings}
 
 
 def test_docs_index_links_resolve_to_existing_files() -> None:
