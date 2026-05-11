@@ -64,6 +64,8 @@ When adding or changing docs files, use this checklist before calling the slice 
 4. Add `pytest.mark.docs_policy` coverage when the change introduces a new documentation rule.
 5. Run `./scripts/docs-policy.sh` before the full verification gate.
 
+External HTTP(S) links are syntax-checked only. The docs policy tests verify that they have an `http://` or `https://` scheme, a host, and no whitespace, but they do not fetch the network or fail builds because somebody else's server hiccuped. Local links and local Markdown anchors are checked for actual existence.
+
 If a planning/backlog file such as `GOAL.md`, `PLAN.md`, or `TODO.md` becomes user-facing navigation, update the root documentation link policy at the same time.
 
 ## Documentation index inclusion rule
