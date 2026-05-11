@@ -52,3 +52,16 @@ def test_docs_policy_script_exists_and_is_documented() -> None:
     assert script.exists()
     script_text = script.read_text()
     assert "-m docs_policy" in script_text
+
+
+@pytest.mark.docs_policy
+def test_release_checklist_documents_optional_external_link_checker() -> None:
+    release_text = Path("RELEASE.md").read_text()
+    script = Path("scripts/check_external_links.py")
+
+    assert "./scripts/check_external_links.py" in release_text
+    assert "./scripts/check_external_links.py --syntax-only" in release_text
+    assert script.exists()
+    script_text = script.read_text()
+    assert "urlopen" in script_text
+    assert "--syntax-only" in script_text

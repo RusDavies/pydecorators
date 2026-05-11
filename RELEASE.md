@@ -36,7 +36,19 @@ Before publishing, treat docs as release artifacts, not garnish. Run:
 ./scripts/docs-policy.sh
 ```
 
-The script runs tests marked with the `docs_policy` pytest marker. Then confirm:
+The script runs tests marked with the `docs_policy` pytest marker. External links are syntax-checked by default docs policy tests. For optional network validation during release maintenance, run:
+
+```bash
+./scripts/check_external_links.py
+```
+
+For a no-network local preview of the same link set, run:
+
+```bash
+./scripts/check_external_links.py --syntax-only
+```
+
+Then confirm:
 
 - `README.md`, `CONTRIBUTING.md`, and `RELEASE.md` still link to `docs/index.md`.
 - `docs/index.md` links every top-level page in `docs/` except itself.
