@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `@deprecated` decorator with sync and async support.
 - Initial project packaging foundation.
 - Empty typed `useful_decorators` package.
 - Import smoke test.
