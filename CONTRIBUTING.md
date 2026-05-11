@@ -53,3 +53,13 @@ After adding a new example file:
 2. Load it through `load_docs_example(...)` in `tests/test_docs_examples.py`.
 3. Add at least one assertion for each public top-level example function.
 4. Run the full verification gate.
+
+## Root documentation links
+
+Root docs that help users or contributors navigate the project should link to `docs/index.md`. Today that means:
+
+- `README.md`
+- `CONTRIBUTING.md`
+- `RELEASE.md`
+
+Planning/backlog docs such as `GOAL.md`, `PLAN.md`, and `TODO.md` are not required to link the docs index unless they grow into user-facing navigation docs.
