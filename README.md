@@ -9,7 +9,7 @@ The goal is to provide small, typed, well-tested decorators that work in scripts
 The initial `v0.1.0` scope is:
 
 - `@deprecated` — implemented
-- `@cache_result`
+- `@cache_result` — designed
 - `@retry`
 - `@rate_limit`
 - `@timeout`
@@ -52,3 +52,7 @@ See `docs/PUBLIC_API.md` for the public API policy and `CONTRIBUTING.md` for the
 ## Release process
 
 See `RELEASE.md` for the release checklist.
+
+## Decorator design docs
+
+See `docs/cache_result.md` for the planned cache decorator design.
