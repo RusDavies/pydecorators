@@ -8,6 +8,8 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 
 Current public API:
 
+- `CacheInfo`
+- `CacheKeyError`
 - `deprecated`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
@@ -44,3 +46,13 @@ Deprecated APIs should generally warn for at least one minor release before remo
 ## Compatibility hardening
 
 CI must include the minimum supported Python version from `pyproject.toml`. For the current project metadata, that means Python 3.11 must stay in the workflow matrix until support policy changes.
+
+## Public API notes
+
+### `CacheInfo`
+
+`CacheInfo` is the immutable statistics object returned by planned `@cache_result` wrappers via `cache_info()`. It exposes `hits`, `misses`, `maxsize`, and `currsize`.
+
+### `CacheKeyError`
+
+`CacheKeyError` is raised when planned `@cache_result` key generation cannot produce a hashable key. It inherits from both `TypeError` and `UsefulDecoratorsError`.
