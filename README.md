@@ -47,7 +47,7 @@ python -m build
 
 ## Public API and contributing
 
-See `docs/index.md` for the documentation index, `docs/PUBLIC_API.md` for the public API policy, `docs/exceptions.md` for public exception behavior, and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
+See `docs/index.md` for the documentation index, `docs/PUBLIC_API.md` for the public API policy, `docs/API_DESIGN.md` for broader API design notes, `docs/exceptions.md` for public exception behavior, and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
 
 ## Release process
 

@@ -185,3 +185,18 @@ def test_contributing_documents_docs_file_update_checklist() -> None:
         "TODO.md",
     ]:
         assert required in contributing
+
+
+def test_readme_links_to_core_docs_pages() -> None:
+    readme = Path("README.md").read_text()
+
+    for required_link in [
+        "docs/index.md",
+        "docs/PUBLIC_API.md",
+        "docs/API_DESIGN.md",
+        "docs/exceptions.md",
+        "docs/deprecated.md",
+        "docs/cache_result.md",
+        "docs/disk_cache_backend.md",
+    ]:
+        assert required_link in readme
