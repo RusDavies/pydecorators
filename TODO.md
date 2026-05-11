@@ -94,11 +94,11 @@
 - [x] Define `CacheInfo` public shape.
 - [x] Define internal `CacheEntry` shape.
 - [x] Decide exact runtime exception type for unhashable cache keys.
-- [ ] Add thread-safety tests for sync cache mutation.
+- [x] Add thread-safety tests for sync cache mutation.
 - [x] Decide whether async support is in-scope for `v0.1.0` or explicitly deferred.
 - [x] Implement cache key generation.
-- [ ] Implement TTL expiry.
-- [ ] Implement max-size eviction.
+- [x] Implement TTL expiry.
+- [x] Implement max-size eviction.
 - [x] Implement manual cache clear method.
 - [x] Implement cache info/statistics method.
 - [x] Implement sync support.
@@ -110,8 +110,14 @@
 - [x] Add public API docs entry for `CacheInfo` and `CacheKeyError`.
 - [x] Add cache statistics reset behavior tests for `cache_clear()`.
 - [x] Add tests for cache hits/misses.
-- [ ] Add tests for TTL expiry.
-- [ ] Add tests for max-size eviction.
+- [x] Add tests for TTL expiry.
+- [x] Add tests for max-size eviction.
+
+### Newly Implied `@cache_result` Policy Follow-Ups
+
+- [x] Add tests for TTL behavior with cached exceptions.
+- [x] Add docs note that `cache_info()` prunes expired entries before reporting `currsize`.
+- [x] Decide whether TTL should refresh on cache hit in a future sliding-expiration mode.
 - [x] Add tests for custom key function.
 - [x] Add tests for metadata preservation.
 - [x] Add README example.
@@ -125,8 +131,13 @@
 
 ### Newly Implied `@cache_result` Hardening Follow-Ups
 
-- [ ] Add optional canonical key generation design note if users request call-style equivalence.
-- [ ] Add race-condition policy note for duplicate concurrent misses on the same key.
+- [x] Add optional canonical key generation design note if users request call-style equivalence.
+- [x] Add race-condition policy note for duplicate concurrent misses on the same key.
+
+### Newly Implied `@cache_result` Future Options
+
+- [ ] Consider opt-in sliding TTL refresh mode after user feedback.
+- [ ] Consider request coalescing for duplicate concurrent misses after user feedback.
 
 ## 4. `@retry`
 

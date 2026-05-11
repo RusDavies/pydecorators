@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `@cache_result` TTL expiry, LRU maxsize eviction, and sync mutation thread-safety coverage.
 - `@cache_result` hardening tests for exception caching, lock behavior, and key canonicalization policy.
 - Sync-core `@cache_result` implementation with key generation, stats, clear, and async rejection.
 - `CacheInfo` and `CacheKeyError` support types for planned `@cache_result`.

@@ -177,7 +177,7 @@ The current implementation includes:
 - metadata preservation
 - explicit async rejection
 
-TTL expiry and max-size eviction are still planned follow-up work.
+TTL expiry and max-size LRU eviction are implemented for sync functions.
 
 ## Canonical argument binding decision
 
@@ -185,8 +185,22 @@ Default key generation does not canonicalize equivalent call styles in `v0.1.0`.
 
 Reason: canonical binding requires `inspect.signature` work on every uncached call path or additional setup complexity. The first implementation keeps key generation simple and predictable. Users who need canonical behavior can provide a custom `key` function.
 
-A future release may add opt-in canonical key generation if real usage shows it is worth the complexity.
+A future release may add opt-in canonical key generation if real usage shows it is worth the complexity. For now, this is documented as a possible future option rather than active `v0.1.0` scope.
 
 ## Lock behavior
 
 The sync implementation protects cache lookup, mutation, statistics, and eviction with a lock, but executes the wrapped function outside that lock. This avoids blocking unrelated cache misses while a slow wrapped function runs.
+
+## TTL and eviction behavior
+
+TTL uses the configured monotonic clock. Entries expire when `clock() >= expires_at`; cache hits do not refresh TTL in `v0.1.0`.
+
+When `maxsize` is exceeded, the least-recently-used entry is evicted. Cache hits move entries to the most-recently-used position.
+
+`cache_info()` prunes expired entries before reporting `currsize`.
+
+## Duplicate concurrent misses
+
+`@cache_result` does not coalesce duplicate concurrent misses in `v0.1.0`. If two threads miss the same key at the same time, both may execute the wrapped function, and the later result may overwrite the earlier cached result.
+
+This keeps lock scope small and avoids holding the cache lock while user code runs. Request coalescing can be designed later if users need it.

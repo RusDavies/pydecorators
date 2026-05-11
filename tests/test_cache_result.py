@@ -233,3 +233,131 @@ def test_cache_result_typed_key_distinguishes_keyword_value_types() -> None:
     assert identify(value=1) == "int"
     assert identify(value=1.0) == "float"
     assert calls == 2
+
+
+class FakeClock:
+    def __init__(self) -> None:
+        self.now = 0.0
+
+    def __call__(self) -> float:
+        return self.now
+
+    def advance(self, seconds: float) -> None:
+        self.now += seconds
+
+
+def test_cache_result_expires_entries_after_ttl() -> None:
+    clock = FakeClock()
+    calls = 0
+
+    @cache_result(ttl=10, clock=clock)
+    def value() -> int:
+        nonlocal calls
+        calls += 1
+        return calls
+
+    assert value() == 1
+    assert value() == 1
+    clock.advance(10)
+    assert value() == 2
+    assert get_cache_info(value) == CacheInfo(hits=1, misses=2, maxsize=128, currsize=1)
+
+
+def test_cache_info_prunes_expired_entries() -> None:
+    clock = FakeClock()
+
+    @cache_result(ttl=5, clock=clock)
+    def value(number: int) -> int:
+        return number
+
+    assert value(1) == 1
+    clock.advance(5)
+
+    assert get_cache_info(value) == CacheInfo(hits=0, misses=1, maxsize=128, currsize=0)
+
+
+def test_cache_result_evicts_least_recently_used_entry_when_maxsize_is_exceeded() -> None:
+    calls = 0
+
+    @cache_result(maxsize=2)
+    def value(number: int) -> int:
+        nonlocal calls
+        calls += 1
+        return number
+
+    assert value(1) == 1
+    assert value(2) == 2
+    assert value(1) == 1
+    assert value(3) == 3
+    assert value(2) == 2
+
+    assert calls == 4
+    assert get_cache_info(value) == CacheInfo(hits=1, misses=4, maxsize=2, currsize=2)
+
+
+def test_cache_result_supports_unbounded_maxsize() -> None:
+    calls = 0
+
+    @cache_result(maxsize=None)
+    def value(number: int) -> int:
+        nonlocal calls
+        calls += 1
+        return number
+
+    for number in range(10):
+        assert value(number) == number
+
+    assert calls == 10
+    assert get_cache_info(value).currsize == 10
+    assert get_cache_info(value).maxsize is None
+
+
+def test_cache_result_sync_cache_mutation_is_thread_safe() -> None:
+    import threading
+
+    @cache_result(maxsize=32)
+    def value(number: int) -> int:
+        return number
+
+    errors: list[BaseException] = []
+
+    def worker(offset: int) -> None:
+        try:
+            for index in range(200):
+                assert value((index + offset) % 40) >= 0
+        except BaseException as exc:  # pragma: no cover - only fails on race bugs
+            errors.append(exc)
+
+    threads = [threading.Thread(target=worker, args=(offset,)) for offset in range(8)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=5)
+
+    assert not errors
+    assert all(not thread.is_alive() for thread in threads)
+    assert get_cache_info(value).currsize <= 32
+
+
+def test_cache_result_cached_exceptions_expire_after_ttl() -> None:
+    clock = FakeClock()
+    calls = 0
+
+    @cache_result(ttl=10, cache_exceptions=True, clock=clock)
+    def fail() -> int:
+        nonlocal calls
+        calls += 1
+        raise RuntimeError(f"boom {calls}")
+
+    with pytest.raises(RuntimeError, match="boom 1"):
+        fail()
+    with pytest.raises(RuntimeError, match="boom 1"):
+        fail()
+
+    clock.advance(10)
+
+    with pytest.raises(RuntimeError, match="boom 2"):
+        fail()
+
+    assert calls == 2
+    assert get_cache_info(fail) == CacheInfo(hits=1, misses=2, maxsize=128, currsize=1)
