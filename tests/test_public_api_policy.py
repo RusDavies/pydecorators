@@ -158,3 +158,11 @@ def test_docs_example_filenames_follow_convention() -> None:
     assert example_files
     for example_path in example_files:
         assert example_path.name.endswith("_examples.py")
+
+
+def test_docs_index_links_to_executable_example_conventions() -> None:
+    docs_index = Path("docs/index.md").read_text()
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    assert "../CONTRIBUTING.md#executable-documentation-examples" in docs_index
+    assert "## Executable documentation examples" in contributing
