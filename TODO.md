@@ -352,7 +352,12 @@
 
 ### Newly Implied External Link Checker Follow-Ups
 
-- [ ] Consider adding retry/backoff support to the manual external link checker if release checks see transient failures.
+- [x] Consider adding retry/backoff support to the manual external link checker if release checks see transient failures.
+
+### Newly Implied External Link Checker Retry Follow-Ups
+
+- [ ] Consider reporting per-attempt retry details in verbose mode if manual release checks become hard to diagnose.
+- [ ] Consider capping maximum retry backoff if higher retry counts are introduced.
 - [ ] Add external link checker allowlist/ignore file if intentionally unstable third-party URLs appear.
 - [ ] Add allowlist or scheme policy if docs start using non-HTTP external links intentionally.
 - [x] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.

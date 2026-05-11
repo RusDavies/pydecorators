@@ -1,5 +1,7 @@
+import importlib.util
 import re
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
@@ -18,6 +20,17 @@ from tests.docs_policy_helpers import (
 )
 
 pytestmark = pytest.mark.docs_policy
+
+
+def load_external_link_checker_module() -> ModuleType:
+    spec = importlib.util.spec_from_file_location(
+        "check_external_links", "scripts/check_external_links.py"
+    )
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def test_docs_index_links_resolve_to_existing_files() -> None:
@@ -276,3 +289,63 @@ def test_external_link_checker_syntax_only_mode_passes_without_network() -> None
     )
 
     assert "syntax-checked" in result.stdout
+
+
+def test_external_link_checker_retries_transient_failures_with_backoff(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    checker = load_external_link_checker_module()
+    attempts = 0
+    sleeps: list[float] = []
+
+    def fake_check_url_once(url: str, timeout: float) -> tuple[bool, str, bool]:
+        nonlocal attempts
+        attempts += 1
+        assert url == "https://example.com"
+        assert timeout == 3.0
+        if attempts < 3:
+            return False, "temporary outage", True
+        return True, "200", False
+
+    monkeypatch.setattr(checker, "check_url_once", fake_check_url_once)
+
+    ok, detail = checker.check_url(
+        "https://example.com",
+        timeout=3.0,
+        retries=3,
+        backoff=0.25,
+        sleep=sleeps.append,
+    )
+
+    assert ok
+    assert detail == "200"
+    assert attempts == 3
+    assert sleeps == [0.25, 0.5]
+
+
+def test_external_link_checker_does_not_retry_non_retryable_failures(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    checker = load_external_link_checker_module()
+    attempts = 0
+    sleeps: list[float] = []
+
+    def fake_check_url_once(url: str, timeout: float) -> tuple[bool, str, bool]:
+        nonlocal attempts
+        attempts += 1
+        return False, "HTTP Error 404: Not Found", False
+
+    monkeypatch.setattr(checker, "check_url_once", fake_check_url_once)
+
+    ok, detail = checker.check_url(
+        "https://example.com/missing",
+        timeout=3.0,
+        retries=3,
+        backoff=0.25,
+        sleep=sleeps.append,
+    )
+
+    assert not ok
+    assert detail == "HTTP Error 404: Not Found after 1 attempt(s)"
+    assert attempts == 1
+    assert sleeps == []
