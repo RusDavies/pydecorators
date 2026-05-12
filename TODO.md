@@ -215,7 +215,13 @@
 
 ### Newly Implied Payload Preview Redaction Follow-Ups
 
-- [ ] Consider designing a `preview_redactor` callback before implementing payload previews.
+- [x] Design a `preview_redactor` callback before implementing payload previews.
+
+### Newly Implied Preview Redactor Callback Follow-Ups
+
+- [ ] Consider adding `DiskCachePreviewContext` only if `inspect_entries()` enters public scope.
+- [ ] Consider tracking redaction failure counts in a future inspection report.
+- [ ] Consider documenting whether built-in redaction policies run before or after caller-provided redactors if both are ever supported.
 - [ ] Consider documenting a no-previews mode for support bundles and CI artifacts if inspection tooling is added.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
