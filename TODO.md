@@ -56,6 +56,7 @@
 - [x] Add README example.
 - [x] Add per-decorator docs.
 
+
 ### Newly Implied `@deprecated` Follow-Ups
 
 - [x] Add stacklevel behavior tests that verify warnings point at caller code.
@@ -595,32 +596,39 @@
 
 ## 4. `@retry`
 
-- [ ] Design signature.
-  - [ ] `attempts`
-  - [ ] `delay`
-  - [ ] `backoff`
-  - [ ] `max_delay`
-  - [ ] `jitter`
-  - [ ] `exceptions`
-  - [ ] `retry_if`
-  - [ ] `before_attempt`
-  - [ ] `after_attempt`
-  - [ ] `sleep`
-- [ ] Implement configuration validation.
-- [ ] Implement sync retry loop.
-- [ ] Implement async retry loop.
-- [ ] Implement exponential backoff.
-- [ ] Implement jitter.
-- [ ] Implement exception filtering.
-- [ ] Implement predicate-based retry decision.
-- [ ] Add tests for success after retry.
-- [ ] Add tests for exhausted attempts.
-- [ ] Add tests for non-retryable exceptions.
-- [ ] Add tests for backoff calculation.
-- [ ] Add tests using fake sleep to avoid slow tests.
-- [ ] Add async tests.
-- [ ] Add README example.
-- [ ] Add per-decorator docs.
+- [x] Design signature.
+  - [x] `attempts`
+  - [x] `delay`
+  - [x] `backoff`
+  - [x] `max_delay`
+  - [x] `jitter`
+  - [x] `exceptions`
+  - [x] `retry_if`
+  - [x] `before_attempt`
+  - [x] `after_attempt`
+  - [x] `sleep`
+- [x] Implement configuration validation.
+- [x] Implement sync retry loop.
+- [x] Implement async retry loop.
+- [x] Implement exponential backoff.
+- [x] Implement jitter.
+- [x] Implement exception filtering.
+- [x] Implement predicate-based retry decision.
+- [x] Add tests for success after retry.
+- [x] Add tests for exhausted attempts.
+- [x] Add tests for non-retryable exceptions.
+- [x] Add tests for backoff calculation.
+- [x] Add tests using fake sleep to avoid slow tests.
+- [x] Add async tests.
+- [x] Add README example.
+- [x] Add per-decorator docs.
+### Newly Implied `@retry` Follow-Ups
+
+- [ ] Add tests for deterministic jitter by monkeypatching random source.
+- [ ] Consider richer hook context objects if attempt hooks need delay/exception metadata beyond the current simple signature.
+- [ ] Add retry examples to executable docs examples if retry usage patterns grow.
+- [ ] Consider whether async retry should support async before/after hooks if users request them.
+- [ ] Document idempotency guidance for retrying side-effecting functions before public release.
 
 ## 5. `@rate_limit`
 

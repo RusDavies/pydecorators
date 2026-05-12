@@ -236,7 +236,7 @@ def test_readme_python_code_blocks_parse() -> None:
 
     code_blocks = readme_python_code_blocks()
 
-    assert len(code_blocks) == 3
+    assert len(code_blocks) == 4
     for code_block in code_blocks:
         ast.parse(code_block)
 
@@ -248,6 +248,8 @@ def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> Non
     for required in [
         "from useful_decorators import deprecated",
         "@deprecated(",
+        "from useful_decorators import retry",
+        "@retry(attempts=3, delay=0.25, backoff=2, exceptions=ConnectionError)",
         "from useful_decorators import cache_result",
         "@cache_result(maxsize=128)",
         "from useful_decorators import DiskCacheBackend, cache_result",

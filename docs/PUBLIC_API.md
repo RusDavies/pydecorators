@@ -21,6 +21,7 @@ Current public API:
 - `CacheInfo`
 - `CacheKeyError`
 - `deprecated`
+- `retry`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
@@ -131,6 +132,10 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 ### `DiskCacheBackend`
 
 `DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, and `info`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+
+### `retry`
+
+`retry` retries sync and async callables after configured exception types. It is configured-only and supports explicit attempts, delay, exponential backoff, max delay, jitter, exception filtering, a `retry_if` predicate, attempt hooks, and injectable sleep functions for tests. Invalid retry policy raises `ConfigurationError` at decoration time. See `docs/retry.md` for behavior and examples.
 
 ### `RateLimitExceeded`
 
