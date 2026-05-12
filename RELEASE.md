@@ -70,6 +70,8 @@ For a no-network local preview of the same link set, run:
 ./scripts/check_external_links.py --syntax-only
 ```
 
+See [Quality Gates](docs/quality_gates.md) for what each command checks.
+
 Then confirm:
 
 - `README.md`, `CONTRIBUTING.md`, and `RELEASE.md` still link to `docs/index.md`.

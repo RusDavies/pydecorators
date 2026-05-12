@@ -818,3 +818,16 @@ def test_contributing_documents_full_gate_hatch_alias() -> None:
 
     assert "hatch run full-gate" in text
     assert "dogfood" in text
+
+
+def test_quality_gates_page_documents_full_gate_commands() -> None:
+    text = Path("docs/quality_gates.md").read_text()
+
+    for command in [
+        "hatch run full-gate",
+        "./scripts/docs-policy.sh",
+        "ruff check .",
+        "mypy",
+        "python scripts/dogfood_external_project.py",
+    ]:
+        assert command in text

@@ -826,7 +826,7 @@
 - [x] Add clean-wheel smoke test in an isolated venv before release.
 - [ ] Consider adding coverage summary comments if pull-request reporting becomes useful.
 - [ ] Consider running pre-commit in CI only if hook runtime stays modest.
-- [ ] Add a quality-gates docs page if gate explanations outgrow README/CONTRIBUTING/RELEASE.
+- [x] Add quality-gates docs page for local verification commands.
 ## 12. Release Backlog
 
 - [x] Confirm PyPI package name availability.

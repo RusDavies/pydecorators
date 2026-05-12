@@ -40,6 +40,8 @@ python scripts/dogfood_local_wheel.py
 python scripts/dogfood_external_project.py
 ```
 
+See [Quality Gates](docs/quality_gates.md) for what each command checks.
+
 The project also ships optional pre-commit hooks. Install them with `pre-commit install` if you want local lint/format/type checks before commits. This is optional because surprise Git hooks are how productivity gets mugged in an alley.
 
 ## Public API rule
