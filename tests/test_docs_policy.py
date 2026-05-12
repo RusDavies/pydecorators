@@ -68,9 +68,11 @@ def test_docs_examples_are_exercised_by_docs_example_tests() -> None:
     explicitly_exempt = {Path("docs/examples/__init__.py")}
     example_files = {path for path in Path("docs/examples").glob("*.py")}
     docs_example_tests = Path("tests/test_docs_examples.py").read_text()
+    exercised_module_names = set(
+        re.findall(r"load_docs_example\(\"([^\"]+)\"\)", docs_example_tests)
+    ) | set(re.findall(r'\("([^\"]+_examples)"', docs_example_tests))
     exercised_examples = {
-        Path("docs/examples") / f"{module_name}.py"
-        for module_name in re.findall(r"load_docs_example\(\"([^\"]+)\"\)", docs_example_tests)
+        Path("docs/examples") / f"{module_name}.py" for module_name in exercised_module_names
     }
 
     assert example_files - explicitly_exempt == exercised_examples
