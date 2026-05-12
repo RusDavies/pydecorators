@@ -311,6 +311,7 @@ README_CORE_DOC_LINKS = [
 def test_readme_links_to_core_docs_pages() -> None:
     readme = Path("README.md").read_text()
 
+    assert "## Documentation" in readme
     for required_link in README_CORE_DOC_LINKS:
         assert required_link in readme
 
