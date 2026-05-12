@@ -349,7 +349,7 @@
 
 ### Newly Implied Disk Cache Versioning Follow-Ups
 
-- [ ] Consider adding a formal cache-versioning recipe to README if persistent cache reuse becomes part of the public quickstart.
+- [x] Consider adding a formal cache-versioning recipe to README if persistent cache reuse becomes part of the public quickstart.
 - [x] Consider adding migration/clear guidance to RELEASE.md before the first public release.
 
 ### Newly Implied Release Cache Compatibility Follow-Ups
