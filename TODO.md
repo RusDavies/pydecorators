@@ -407,7 +407,7 @@
 ### Newly Implied Docs Example Loader Refactor Follow-Ups
 
 - [ ] Consider parameterizing docs example execution tests by module/function once the example set grows.
-- [ ] Add a tiny helper for asserting expected docs example return values consistently.
+- [x] Add a tiny helper for asserting expected docs example return values consistently.
 - [x] Add policy test that each public example function has at least one assertion in docs example tests.
 
 ### Newly Implied Docs Example Assertion Policy Follow-Ups
