@@ -265,6 +265,43 @@ def test_cache_result_expires_entries_after_ttl() -> None:
     assert get_cache_info(value) == CacheInfo(hits=1, misses=2, maxsize=128, currsize=1)
 
 
+def test_cache_result_can_refresh_ttl_on_hit() -> None:
+    clock = FakeClock()
+    calls = 0
+
+    @cache_result(ttl=10, refresh_ttl_on_hit=True, clock=clock)
+    def value() -> int:
+        nonlocal calls
+        calls += 1
+        return calls
+
+    assert value() == 1
+    clock.advance(9)
+    assert value() == 1
+    clock.advance(9)
+    assert value() == 1
+    clock.advance(10)
+    assert value() == 2
+    assert get_cache_info(value) == CacheInfo(hits=2, misses=2, maxsize=128, currsize=1)
+
+
+def test_cache_result_does_not_refresh_ttl_on_hit_by_default() -> None:
+    clock = FakeClock()
+    calls = 0
+
+    @cache_result(ttl=10, clock=clock)
+    def value() -> int:
+        nonlocal calls
+        calls += 1
+        return calls
+
+    assert value() == 1
+    clock.advance(9)
+    assert value() == 1
+    clock.advance(1)
+    assert value() == 2
+
+
 def test_cache_info_prunes_expired_entries() -> None:
     clock = FakeClock()
 

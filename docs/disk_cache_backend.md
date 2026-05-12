@@ -34,6 +34,7 @@ class DiskCacheBackend:
         *,
         ttl: float | None = None,
         maxsize: int | None = 128,
+        refresh_ttl_on_hit: bool = False,
         serializer: CacheSerializer | None = None,
         on_drop: Callable[[DiskCacheDropEvent], object] | None = None,
         clock: Clock | None = None,
@@ -45,6 +46,7 @@ class DiskCacheBackend:
 - `path`: SQLite database path.
 - `ttl`: optional entry lifetime in seconds.
 - `maxsize`: optional maximum entry count.
+- `refresh_ttl_on_hit`: when `True`, hits extend entry expiry to `clock() + ttl`; default `False` keeps fixed write-time expiry.
 - `serializer`: payload serializer; defaults to `PickleCacheSerializer`.
 - `on_drop`: optional diagnostic hook called with `DiskCacheDropEvent` when a stored row is dropped during lookup because of a serializer content-type mismatch or payload deserialization failure.
 - `clock`: injectable monotonic-ish clock for deterministic tests.
@@ -104,7 +106,15 @@ Payloads use the configured `CacheSerializer`. The built-in serializers are:
 - `None` means no TTL expiry.
 - Reads treat expired rows as misses and delete the expired row.
 - `info()` prunes expired rows before reporting `currsize`.
-- Cache hits do not refresh TTL in the first implementation.
+- Cache hits refresh TTL only when `refresh_ttl_on_hit=True`; the default fixed TTL does not refresh on hit.
+
+## Sliding TTL refresh
+
+`DiskCacheBackend(refresh_ttl_on_hit=True)` enables sliding TTL for disk-backed entries. On a valid hit, the backend updates both `last_accessed` and `expires_at`; the refreshed expiry is `clock() + ttl`.
+
+Default behavior remains fixed TTL: entries expire based on their original write time even if they are read repeatedly. This is easier to reason about for release/build caches. Sliding TTL is useful for local service caches where hot entries should stay warm.
+
+If `ttl=None`, `refresh_ttl_on_hit=True` has no practical effect because entries have no expiry to refresh.
 
 ## LRU eviction
 
@@ -209,7 +219,7 @@ The implementation stores serializer content type with each row. If a later back
 
 `DiskCacheBackend` now implements the `CacheBackend` protocol:
 
-- `get()` returns valid entries, records hits/misses, deletes expired rows, and updates `last_accessed` on hits.
+- `get()` returns valid entries, records hits/misses, deletes expired rows, updates `last_accessed` on hits, and refreshes `expires_at` on hits only when `refresh_ttl_on_hit=True`.
 - `set_value()` stores successful values.
 - `set_exception()` stores cached exceptions for `cache_exceptions=True` use.
 - `clear()` deletes entries and resets hit/miss statistics.

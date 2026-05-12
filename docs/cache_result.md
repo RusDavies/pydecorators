@@ -193,7 +193,7 @@ The sync implementation protects cache lookup, mutation, statistics, and evictio
 
 ## TTL and eviction behavior
 
-TTL uses the configured monotonic clock. Entries expire when `clock() >= expires_at`; cache hits do not refresh TTL in `v0.1.0`.
+TTL uses the configured monotonic clock. Entries expire when `clock() >= expires_at`. By default, TTL is fixed from write time. Set `refresh_ttl_on_hit=True` for sliding TTL behavior, where each successful hit extends that entry's expiry to `clock() + ttl`.
 
 When `maxsize` is exceeded, the least-recently-used entry is evicted. Cache hits move entries to the most-recently-used position.
 
@@ -213,7 +213,7 @@ Future backends should follow the same separation of responsibilities: the decor
 
 ## Custom backend parameter
 
-`@cache_result` accepts `backend=`. When omitted, the decorator creates a `MemoryCacheBackend` from `ttl`, `maxsize`, and `clock`.
+`@cache_result` accepts `backend=`. When omitted, the decorator creates a `MemoryCacheBackend` from `ttl`, `maxsize`, `refresh_ttl_on_hit`, and `clock`.
 
 When a backend is provided, the backend owns storage policy. The decorator still owns key generation, metadata preservation, exception-caching decisions, and sync/async rejection. Backend instances are intentionally reusable, but callers should usually provide one backend per decorated function unless they deliberately want shared storage.
 
