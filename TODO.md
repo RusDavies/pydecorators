@@ -629,7 +629,7 @@
 - [x] Add per-decorator docs.
 ### Newly Implied `@retry` Follow-Ups
 
-- [ ] Add tests for deterministic jitter by monkeypatching random source.
+- [x] Add tests for deterministic jitter by monkeypatching random source.
 - [ ] Consider richer hook context objects if attempt hooks need delay/exception metadata beyond the current simple signature.
 - [ ] Add retry examples to executable docs examples if retry usage patterns grow.
 - [ ] Add executable idempotency examples if users need side-effecting retry recipes.
