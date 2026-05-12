@@ -423,7 +423,7 @@
 ### Newly Implied Docs Example Filename Policy Follow-Ups
 
 - [x] Add policy test that docs example module names match their linked labels in docs/index.md.
-- [ ] Consider generating the executable example list in docs/index.md if example count grows.
+- [x] Generate/check the executable example list in docs/index.md.
 - [ ] Consider moving docs-example policy helpers into a dedicated test module if public API policy tests get too broad.
 - [x] Add policy test that docs/index.md links to the executable example conventions section.
 
