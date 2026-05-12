@@ -98,3 +98,25 @@ def test_disk_cache_backend_design_doc_covers_sqlite_column_stability() -> None:
         "add an explicit API instead of scraping",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_inspection_api_design() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Supported cache-inspection API design",
+        "DiskCacheInspectionEntry",
+        "DiskCacheInspectionReport",
+        "inspect_entries",
+        "read-only",
+        "should not expose serialized `key` bytes by default",
+        "key_sha256",
+        "Payload previews should be best-effort and bounded",
+        "report serializer content type and payload byte size",
+        "explicit `limit`/pagination behavior",
+        "structured data suitable for a future CLI",
+        "Non-goals for the first inspection API",
+        "automatic deserialization of untrusted pickle payloads",
+        "stay a design note until a real user or release requirement needs it",
+    ]:
+        assert required in text

@@ -199,7 +199,13 @@
 
 ### Newly Implied SQLite Column Stability Follow-Ups
 
-- [ ] Consider adding a supported cache-inspection API if users need stable tooling beyond ad hoc SQLite debugging.
+- [x] Add supported cache-inspection API design note for stable tooling beyond ad hoc SQLite debugging.
+
+### Newly Implied Cache Inspection API Follow-Ups
+
+- [ ] Implement `DiskCacheBackend.inspect_entries()` only if stable inspection tooling becomes part of public scope.
+- [ ] Consider adding redacted key digests such as `key_sha256` if operators need to correlate rows without exposing serialized keys.
+- [ ] Consider adding bounded payload preview policy tests before implementing any inspection API.
 - [ ] Consider adding a schema-version metadata table before any public release that promises disk-cache file compatibility.
 - [x] Document pickle trust-boundary warning in disk/Redis backend docs.
 - [x] Design `DiskCacheBackend` storage strategy, likely SQLite.
