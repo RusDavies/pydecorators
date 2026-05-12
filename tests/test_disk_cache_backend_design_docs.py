@@ -36,3 +36,20 @@ def test_disk_cache_backend_design_doc_covers_persistent_key_stability() -> None
         "Use `clear()` or a new namespace",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_cache_versioning_guidance() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Cache versioning and schema changes",
+        "persistent disk-cache reuse as a compatibility surface",
+        "versioned namespace",
+        "users:v1",
+        "Bump the namespace",
+        "cache_clear()",
+        "backend `clear()`",
+        "automatic schema migrations",
+        "Namespace versioning",
+    ]:
+        assert required in text
