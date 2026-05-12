@@ -212,7 +212,12 @@
 ### Newly Implied Disk Executable Docs Follow-Ups
 
 - [ ] Add automated README code-block extraction or sync check for documented examples.
-- [ ] Add docs example coverage for DiskCacheBackend persistence across process/backend instances.
+- [x] Add docs example coverage for DiskCacheBackend persistence across process/backend instances.
+
+### Newly Implied Disk Persistence Docs Follow-Ups
+
+- [ ] Add subprocess-level persistence example coverage if process-boundary behavior becomes user-facing release guidance.
+- [ ] Consider documenting namespace/key stability expectations more prominently for persistent cache reuse.
 - [x] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
 
 ### Newly Implied Disk Lifecycle Docs Follow-Ups

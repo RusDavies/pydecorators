@@ -217,3 +217,10 @@ with DiskCacheBackend(".cache/tool.sqlite3", ttl=60, maxsize=16) as backend:
 ```
 
 Do not wrap a decorator-bound backend in a short `with` block unless all decorated calls happen before the block exits. Once the context manager closes the backend, later decorated calls will fail with `CacheBackendClosedError`.
+
+
+## Persistence across backend instances
+
+`DiskCacheBackend` stores cache entries in SQLite, so a later backend instance using the same database path can reuse entries written by an earlier backend instance. This is useful for CLIs, local tools, and service restarts where cache data is disposable but still worth keeping between runs.
+
+Use the same generated key inputs, including the same `namespace`, when you expect reuse across backend instances. Close each backend instance when its owner is done with it. See `docs/examples/disk_cache_backend_examples.py` for the executable persistence example used by the documentation test suite.
