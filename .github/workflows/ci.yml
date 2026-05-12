@@ -33,3 +33,5 @@ jobs:
         run: python -m build
       - name: Wheel install smoke test
         run: python scripts/smoke_wheel_install.py
+      - name: Dogfood wheel scenarios
+        run: python scripts/dogfood_local_wheel.py

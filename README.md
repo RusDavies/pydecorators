@@ -70,6 +70,7 @@ python scripts/smoke_examples.py
 pytest
 python -m build
 python scripts/smoke_wheel_install.py
+python scripts/dogfood_local_wheel.py
 ```
 
 `pytest` enforces coverage for `useful_decorators` with terminal and XML coverage reports.
@@ -79,6 +80,14 @@ Optional local pre-commit hooks are available:
 ```bash
 pre-commit install
 pre-commit run --all-files
+```
+
+## Dogfooding before release
+
+Publishing is intentionally paused while the package is dogfooded locally. See `DOGFOOD.md` and run:
+
+```bash
+python scripts/dogfood_local_wheel.py
 ```
 
 ## Public API and contributing

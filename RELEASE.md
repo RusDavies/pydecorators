@@ -92,6 +92,7 @@ python scripts/smoke_examples.py
 pytest
 python -m build
 python scripts/smoke_wheel_install.py
+python scripts/dogfood_local_wheel.py
 ```
 
 Then confirm:
@@ -105,6 +106,7 @@ Then confirm:
 - [ ] Coverage remains above the configured floor and reports are generated.
 - [ ] Package build succeeds.
 - [ ] Clean-wheel install smoke test passes.
+- [ ] Dogfood wheel scenarios pass.
 - [ ] Built artifacts are not committed accidentally.
 
 ## Install smoke tests
@@ -122,6 +124,20 @@ Then confirm:
 - [ ] Import `useful_decorators`.
 - [ ] Import every public name from `useful_decorators.__all__`.
 - [ ] Run a tiny example using at least one decorator.
+
+## Dogfood gate
+
+Publishing is intentionally paused until local dogfood scenarios have run and findings in `DOGFOOD.md` are reviewed.
+
+```bash
+python scripts/dogfood_local_wheel.py
+```
+
+Before TestPyPI/PyPI:
+
+- [ ] Dogfood scenarios pass from an installed wheel.
+- [ ] `DOGFOOD.md` findings are reviewed.
+- [ ] API/documentation issues found during dogfood use are resolved or explicitly deferred.
 
 ## Publishing
 
