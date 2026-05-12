@@ -44,6 +44,14 @@ The key function must return a hashable value. Key generation errors propagate t
 
 Async functions use the same sliding-window policy. In block mode, the default async path uses `asyncio.sleep`; callers can inject a custom async sleep function for tests or schedulers.
 
+## Idempotency and side effects
+
+`@rate_limit` does not make an operation idempotent. It only controls how often the wrapped function is allowed to start in this process.
+
+Use rate limiting to protect dependencies, quotas, local tools, and best-effort workloads. For side-effecting operations such as payments, order submission, account creation, or message delivery, keep the operation's own idempotency controls in place. A blocked or rejected call might be retried by the caller, and a distributed system might run the same logical request in another process that has a separate in-memory bucket.
+
+If the protected dependency has its own retry-after or quota headers, prefer feeding those signals into caller behavior instead of assuming this local limiter has a complete picture. Local politeness is useful; it is not a treaty with the universe.
+
 ## Notes
 
 This is an in-process rate limiter. It is suitable for scripts, local tools, tests, and single-process services. It is not a distributed quota system. Multiple processes or hosts each have their own counters unless a future shared backend is added.

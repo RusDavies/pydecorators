@@ -34,6 +34,14 @@ Non-matching exceptions are never retried. Predicate-rejected exceptions are als
 
 `@retry` preserves wrapped function metadata and supports async functions with the same policy shape. Test suites should inject `sleep` so retry tests stay fast instead of taking a nap like a tiny unreliable server.
 
+## Idempotency guidance
+
+Only retry operations that are safe to run more than once, or operations protected by an idempotency key, transaction boundary, compare-and-swap guard, or similar duplicate-prevention mechanism.
+
+Good retry candidates include reads, cache refreshes, health checks, and dependency calls where the remote side treats duplicate requests as the same logical operation. Risky candidates include payments, account creation, email sending, order submission, inventory mutation, and anything that makes the outside world different each time it runs.
+
+If a side-effecting operation must be retried, make the idempotency key part of the operation being retried and log enough context to reconcile duplicate attempts. Do not hide non-idempotent business logic behind `@retry` just because transient failures are annoying. They are annoying; so are duplicate invoices.
+
 ## Examples
 
 Fixed delay:

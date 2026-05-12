@@ -627,8 +627,9 @@
 - [ ] Add tests for deterministic jitter by monkeypatching random source.
 - [ ] Consider richer hook context objects if attempt hooks need delay/exception metadata beyond the current simple signature.
 - [ ] Add retry examples to executable docs examples if retry usage patterns grow.
+- [ ] Add executable idempotency examples if users need side-effecting retry recipes.
 - [ ] Consider whether async retry should support async before/after hooks if users request them.
-- [ ] Document idempotency guidance for retrying side-effecting functions before public release.
+- [x] Document idempotency guidance for retrying side-effecting functions before public release.
 
 ## 5. `@rate_limit`
 
@@ -658,7 +659,7 @@
 
 - [ ] Add tests for concurrent sync callers sharing a rate-limit bucket.
 - [ ] Consider a structured `RateLimitExceeded` retry-after attribute if callers need machine-readable delays.
-- [ ] Add idempotency and distributed-limiter caveats before public release.
+- [x] Add idempotency and distributed-limiter caveats before public release.
 - [ ] Consider cleanup of idle keyed buckets if long-running services create unbounded keys.
 - [ ] Add executable docs examples for `@rate_limit` if rate-limit examples grow.
 
