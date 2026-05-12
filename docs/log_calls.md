@@ -57,3 +57,11 @@ Async functions work the same way:
 async def refresh_user(user_id: str) -> None:
     ...
 ```
+
+
+## Executable examples
+
+Copy-pasteable examples live in `docs/examples/log_calls_examples.py` and are
+covered by `tests/test_docs_examples.py`. They demonstrate keyword redaction,
+result summarization, and async logging using an in-memory test handler so the
+examples do not depend on global logging configuration.
