@@ -333,6 +333,21 @@ CLI design constraints:
 
 Pre-implementation tests should cover default aggregate/no-preview output, row output requiring `--rows`, preview output requiring `--include-payload-preview`, sensitivity warnings, JSON safe defaults, and no mutation during CLI inspection.
 
+## Inspection sensitivity-warning design
+
+Future inspection CLI/support-bundle tooling should warn users before producing diagnostic output that may be shared outside the local machine. The warning is not decoration; it is a guardrail against treating cache diagnostics as harmless build logs.
+
+Warning expectations:
+
+- Text CLI output should include a concise sensitivity warning by default for support-bundle and row-level inspection commands.
+- JSON output should include a machine-readable warning field, such as `sensitivity_warning`, unless a documented envelope already carries equivalent classification metadata.
+- Preview-enabled output should use stronger wording than aggregate/no-preview output.
+- Quiet/scripted modes should require an explicit flag and should document where the warning is available instead, such as command help, schema docs, or wrapper tooling.
+- Warnings should mention that metadata can reveal behavior even without payload previews.
+- Warnings should not claim that redaction or no-preview mode makes output safe for public posting.
+
+Pre-implementation tests should cover text warnings, JSON warning fields, stronger preview warnings, quiet-mode documentation, and absence of “safe for public sharing” language.
+
 ## Support-bundle metadata sensitivity
 
 No-preview safe mode removes payload text, but it does not make inspection output public-safe by magic. Metadata can still reveal how an application behaves, what it caches, how often entries are reused, and whether errors or specific serializer families are present. Treat support-bundle inspection reports as potentially sensitive operational diagnostics.
