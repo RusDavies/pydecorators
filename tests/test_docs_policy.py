@@ -811,3 +811,10 @@ def test_timeout_docs_explain_custom_exception_constructor_contract() -> None:
         "constructor arguments are not supported",
     ]:
         assert required in text
+
+
+def test_contributing_documents_full_gate_hatch_alias() -> None:
+    text = Path("CONTRIBUTING.md").read_text()
+
+    assert "hatch run full-gate" in text
+    assert "dogfood" in text

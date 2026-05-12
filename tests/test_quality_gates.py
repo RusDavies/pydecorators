@@ -68,3 +68,22 @@ def test_pyproject_exposes_docs_policy_hatch_alias() -> None:
     assert "[tool.hatch.envs.default.scripts]" in pyproject
     assert 'docs-policy = "./scripts/docs-policy.sh"' in pyproject
     assert "hatch run docs-policy" in contributing
+
+
+def test_hatch_full_gate_alias_matches_release_prep_commands() -> None:
+    pyproject = Path("pyproject.toml").read_text()
+
+    for command in [
+        "./scripts/docs-policy.sh",
+        "ruff check .",
+        "ruff format --check .",
+        "mypy",
+        "python scripts/smoke_imports.py",
+        "python scripts/smoke_examples.py",
+        "pytest",
+        "python -m build",
+        "python scripts/smoke_wheel_install.py",
+        "python scripts/dogfood_local_wheel.py",
+        "python scripts/dogfood_external_project.py",
+    ]:
+        assert command in pyproject

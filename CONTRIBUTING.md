@@ -111,6 +111,14 @@ hatch run docs-policy
 
 The Hatch alias intentionally delegates to the same script so local and CI documentation checks do not drift.
 
+For the full local release-prep gate, run:
+
+```bash
+hatch run full-gate
+```
+
+That alias chains docs policy, Ruff, formatting checks, mypy, smoke imports, smoke examples, pytest, package build, wheel install smoke, and both dogfood harnesses. It is intentionally boring. Boring gates are how we avoid exciting releases.
+
 ## Root documentation links
 
 Root docs that help users or contributors navigate the project should link to `docs/index.md`. Today that means:

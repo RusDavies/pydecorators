@@ -460,7 +460,7 @@
 
 ### Newly Implied Docs Policy Command Follow-Ups
 
-- [ ] Add additional Hatch aliases only if release/test command repetition gets annoying.
+- [x] Add Hatch full-gate alias for repeated release-prep verification.
 - [ ] Revisit planning-doc navigation policy only if TODO/PLAN become public website pages.
 - [x] Add a package-manager alias for the docs policy script.
 - [x] Add CI job split for documentation policy tests.
