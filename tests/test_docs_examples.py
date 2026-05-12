@@ -117,3 +117,11 @@ def test_public_exception_documentation_examples_execute() -> None:
     assert_example_result(examples.rate_limit_exceeded_example(), "rate limited")
     assert_example_result(asyncio.run(examples.function_timed_out_example()), "timed out")
     assert_example_result(examples.env_requirement_error_example(), "missing env")
+
+
+def test_rate_limit_documentation_examples_execute() -> None:
+    examples = load_docs_example("rate_limit_examples")
+
+    assert_example_result(examples.raise_mode_example(), "limited")
+    assert_example_result(examples.keyed_bucket_example(), ("called:tenant-a", "called:tenant-b"))
+    assert_example_result(examples.block_mode_example(), ("called", [60]))
