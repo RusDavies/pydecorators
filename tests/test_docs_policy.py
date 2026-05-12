@@ -831,3 +831,16 @@ def test_quality_gates_page_documents_full_gate_commands() -> None:
         "python scripts/dogfood_external_project.py",
     ]:
         assert command in text
+
+
+def test_docs_example_index_checker_is_in_docs_policy_script() -> None:
+    script = Path("scripts/docs-policy.sh").read_text()
+
+    assert "python scripts/check_docs_example_index.py" in script
+
+
+def test_docs_example_index_checker_lists_all_examples() -> None:
+    checker = Path("scripts/check_docs_example_index.py").read_text()
+
+    assert "sorted(EXAMPLES_DIR.glob" in checker
+    assert "__init__.py" in checker

@@ -32,17 +32,17 @@ Start here when navigating the Useful Decorators documentation.
 
 Executable documentation examples live under [`examples/`](examples/):
 
+- [`circuit_breaker_examples.py`](examples/circuit_breaker_examples.py)
+- [`composition_examples.py`](examples/composition_examples.py)
 - [`deprecated_examples.py`](examples/deprecated_examples.py)
 - [`disk_cache_backend_examples.py`](examples/disk_cache_backend_examples.py)
+- [`log_calls_examples.py`](examples/log_calls_examples.py)
 - [`measure_time_examples.py`](examples/measure_time_examples.py)
 - [`public_exception_examples.py`](examples/public_exception_examples.py)
+- [`rate_limit_examples.py`](examples/rate_limit_examples.py)
 - [`require_env_examples.py`](examples/require_env_examples.py)
 - [`retry_examples.py`](examples/retry_examples.py)
 - [`retry_idempotency_examples.py`](examples/retry_idempotency_examples.py)
-- [`circuit_breaker_examples.py`](examples/circuit_breaker_examples.py)
-- [`composition_examples.py`](examples/composition_examples.py)
-- [`log_calls_examples.py`](examples/log_calls_examples.py)
-- [`rate_limit_examples.py`](examples/rate_limit_examples.py)
 - [`timeout_examples.py`](examples/timeout_examples.py)
 - [`validate_types_examples.py`](examples/validate_types_examples.py)
 
