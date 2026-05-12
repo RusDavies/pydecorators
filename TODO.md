@@ -211,7 +211,12 @@
 
 ### Newly Implied Disk Executable Docs Follow-Ups
 
-- [ ] Add automated README code-block extraction or sync check for documented examples.
+- [x] Add automated README code-block extraction or sync check for documented examples.
+
+### Newly Implied README Code Block Policy Follow-Ups
+
+- [ ] Consider executing safe README snippets once examples are factored to avoid undefined placeholders.
+- [ ] Consider moving longer README snippets into docs/examples and embedding them from one source if snippet drift returns.
 - [x] Add docs example coverage for DiskCacheBackend persistence across process/backend instances.
 
 ### Newly Implied Disk Persistence Docs Follow-Ups
