@@ -17,6 +17,7 @@ Start here when navigating the Useful Decorators documentation.
 - [`@timeout`](timeout.md) — async timeout decorator behavior, cancellation semantics, and sync limitations.
 - [`@log_calls`](log_calls.md) — call logging decorator behavior, duration logging, argument/result controls, and security notes.
 - [`@measure_time`](measure_time.md) — timing decorator behavior, callback/logger/metrics hooks, and `TimingInfo`.
+- [`@validate_types`](validate_types.md) — lightweight runtime type validation behavior, supported annotations, and limitations.
 
 ## Cache backend docs
 

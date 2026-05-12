@@ -30,6 +30,7 @@ from useful_decorators.measure_time import TimingInfo, measure_time
 from useful_decorators.rate_limit import rate_limit
 from useful_decorators.retry import retry
 from useful_decorators.timeout import timeout
+from useful_decorators.validate_types import validate_types
 
 __version__ = "0.1.0"
 
@@ -57,4 +58,5 @@ __all__ = [
     "rate_limit",
     "retry",
     "timeout",
+    "validate_types",
 ]

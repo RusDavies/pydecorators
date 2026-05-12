@@ -729,14 +729,21 @@
 
 ### `@validate_types`
 
-- [ ] Decide whether to use standard-library type inspection only.
-- [ ] Support basic built-in types.
-- [ ] Support `Optional`/union types.
-- [ ] Support return value validation option.
-- [ ] Add clear validation error messages.
-- [ ] Add tests.
-- [ ] Document limitations.
+- [x] Decide whether to use standard-library type inspection only.
+- [x] Support basic built-in types.
+- [x] Support `Optional`/union types.
+- [x] Support return value validation option.
+- [x] Add clear validation error messages.
+- [x] Add tests.
+- [x] Document limitations.
 
+
+### Newly Implied `@validate_types` Follow-Ups
+
+- [ ] Consider deep container validation only if users need it and limitations can stay clear.
+- [ ] Consider support for `Literal` and `Annotated` if lightweight validation use cases require them.
+- [ ] Add executable docs examples for `@validate_types` if validation examples grow.
+- [ ] Consider a package-specific validation exception only if callers need to distinguish validation failures from ordinary `TypeError`.
 ### `@require_env`
 
 - [ ] Design signature.
