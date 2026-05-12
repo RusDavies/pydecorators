@@ -14,6 +14,7 @@ def test_ci_runs_quality_gates_and_smoke_tests() -> None:
     ci = Path(".github/workflows/ci.yml").read_text()
 
     for required in [
+        "pytest -m docs_policy",
         "ruff check .",
         "ruff format --check .",
         "mypy",

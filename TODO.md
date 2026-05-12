@@ -462,7 +462,8 @@
 
 - [ ] Revisit planning-doc navigation policy only if TODO/PLAN become public website pages.
 - [ ] Consider adding a package-manager alias for the docs policy script if project tooling grows beyond plain Python scripts.
-- [ ] Add CI job split for documentation policy tests if CI runtime becomes noisy.
+- [x] Add CI job split for documentation policy tests.
+- [ ] Consider making docs-policy job path-filtered if CI time becomes annoying.
 - [x] Consider splitting documentation policy tests out of `test_public_api_policy.py`.
 
 ### Newly Implied Docs Policy Test Split Follow-Ups
@@ -472,7 +473,7 @@
 
 ### Newly Implied Docs Policy Marker Follow-Ups
 
-- [ ] Consider adding a CI job that runs `pytest -m docs_policy` directly.
+- [x] Add CI job that runs `pytest -m docs_policy` directly.
 - [x] Add contributor guidance for when new tests should use the `docs_policy` marker.
 
 ### Newly Implied Docs Policy Marker Guidance Follow-Ups
