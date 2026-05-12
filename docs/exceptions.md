@@ -96,6 +96,37 @@ except CacheBackendClosedError:
     ...
 ```
 
+### `RateLimitExceeded`
+
+```python
+from useful_decorators import RateLimitExceeded, rate_limit
+
+@rate_limit(calls=1, period=60)
+def limited() -> str:
+    return "ok"
+
+try:
+    limited()
+    limited()
+except RateLimitExceeded:
+    ...
+```
+
+### `FunctionTimedOut`
+
+```python
+from useful_decorators import FunctionTimedOut, timeout
+
+@timeout(seconds=0.5)
+async def slow_call() -> str:
+    ...
+
+try:
+    await slow_call()
+except FunctionTimedOut:
+    ...
+```
+
 ### `EnvRequirementError`
 
 ```python

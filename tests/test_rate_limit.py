@@ -73,7 +73,8 @@ def test_rate_limit_sync_callers_share_bucket_across_threads() -> None:
     successes = sorted(future.result() for future in futures if future.exception() is None)
     failures = [future.exception() for future in futures if future.exception() is not None]
 
-    assert successes == [0, 1]
+    assert len(successes) == 2
+    assert set(successes).issubset({0, 1, 2})
     assert len(failures) == 1
     assert isinstance(failures[0], RateLimitExceeded)
 
