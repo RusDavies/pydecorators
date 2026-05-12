@@ -803,16 +803,23 @@
 - [ ] Add a security hardening page if cache/logging/validation warnings keep growing.
 ## 11. Quality Backlog
 
-- [ ] Add unit test coverage target.
-- [ ] Add coverage reporting.
-- [ ] Add type checking gate.
-- [ ] Add linting gate.
-- [ ] Add formatting gate.
-- [ ] Add packaging build check.
-- [ ] Add import smoke test.
-- [ ] Add examples smoke test.
-- [ ] Add pre-commit configuration if useful.
+- [x] Add unit test coverage target.
+- [x] Add coverage reporting.
+- [x] Add type checking gate.
+- [x] Add linting gate.
+- [x] Add formatting gate.
+- [x] Add packaging build check.
+- [x] Add import smoke test.
+- [x] Add examples smoke test.
+- [x] Add pre-commit configuration if useful.
 
+
+### Newly Implied Quality Follow-Ups
+
+- [ ] Consider uploading coverage XML from CI if repository hosting/reporting is configured.
+- [ ] Add clean-wheel smoke test in an isolated venv before release.
+- [ ] Consider running pre-commit in CI only if hook runtime stays modest.
+- [ ] Add a quality-gates docs page if gate explanations outgrow README/CONTRIBUTING/RELEASE.
 ## 12. Release Backlog
 
 - [ ] Confirm PyPI package name availability.
