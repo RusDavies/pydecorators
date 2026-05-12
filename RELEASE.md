@@ -149,15 +149,15 @@ Do **not** publish from a random developer shell unless there is a deliberate re
 
 ### Preferred path: PyPI/TestPyPI trusted publishing
 
-Use this once the GitHub repository at `https://github.com/RusDavies/blakemere-decorators` exists and the release workflow is ready:
+Use this once the GitHub repository at `https://github.com/RusDavies/blakemere-decorators` exists and `.github/workflows/release.yml` is ready:
 
 1. In TestPyPI, create or claim the `blakemere-decorators` project.
 2. Add a trusted publisher for the GitHub repository:
    - owner: `RusDavies`
    - repository: `blakemere-decorators`
-   - workflow file: the release workflow that will publish distributions
-   - environment: use a protected environment such as `testpypi` if configured
-3. Repeat the trusted-publisher setup in PyPI for the production project, using a separate protected environment such as `pypi`.
+   - workflow file: `.github/workflows/release.yml`
+   - environment: `testpypi`
+3. Repeat the trusted-publisher setup in PyPI for the production project, using the separate protected environment `pypi`.
 4. Keep TestPyPI and PyPI publishing as separate jobs or separate manual approvals so a test release cannot accidentally become a production release with a moustache.
 5. Build distributions in CI with:
 
@@ -165,7 +165,7 @@ Use this once the GitHub repository at `https://github.com/RusDavies/blakemere-d
    python -m build
    ```
 
-6. Publish with the Python Packaging Authority publish action or an equivalent OIDC-aware publisher. The release job should publish only files from `dist/` produced by the same workflow run.
+6. Publish with the Python Packaging Authority publish action in `.github/workflows/release.yml`. The release job publishes only files from `dist/` produced by the same workflow run.
 7. After publishing to TestPyPI, install from TestPyPI in a clean environment and run the import/decorator smoke checks before approving PyPI.
 
 ### Fallback path: scoped API tokens
@@ -194,7 +194,8 @@ Immediately before publishing, re-check that `blakemere-decorators` still resolv
 
 ## Publishing
 
-For first release, use TestPyPI before PyPI.
+For first release, use TestPyPI before PyPI. The included `.github/workflows/release.yml` workflow is manual-only (`workflow_dispatch`) and requires the caller to choose `testpypi` or `pypi` plus the expected version. It builds, verifies, uploads the `dist/` artifacts between jobs, and publishes through trusted publishing using protected environments.
+
 
 - [ ] Publish to TestPyPI.
 - [ ] Install from TestPyPI in a clean environment.
