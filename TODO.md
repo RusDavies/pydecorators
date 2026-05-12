@@ -843,10 +843,11 @@
 
 ### Newly Implied Release Blockers / Follow-Ups
 
-- [ ] Choose a new PyPI distribution name because `useful-decorators` is already occupied on PyPI.
-- [ ] Update `pyproject.toml` package name after Russ chooses the distribution name.
-- [ ] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
+- [x] Choose a new PyPI distribution name because `useful-decorators` is already occupied on PyPI.
+- [x] Update `pyproject.toml` package name after Russ chooses the distribution name.
+- [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
 - [ ] Add trusted publishing / API token instructions once the repository and package name are final.
+- [ ] Re-check `blakemere-decorators` availability immediately before final publish.
 ## 13. Future Ideas
 
 - [ ] Optional Redis-backed cache.

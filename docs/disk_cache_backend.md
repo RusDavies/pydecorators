@@ -11,7 +11,7 @@ from pathlib import Path
 from useful_decorators import DiskCacheBackend, JsonCacheSerializer, PickleCacheSerializer
 
 backend = DiskCacheBackend(
-    path=Path(".cache/useful-decorators.sqlite3"),
+    path=Path(".cache/blakemere-decorators.sqlite3"),
     ttl=3600,
     maxsize=10_000,
     serializer=PickleCacheSerializer(),
@@ -172,7 +172,7 @@ from pathlib import Path
 from useful_decorators import DiskCacheBackend, JsonCacheSerializer, cache_result
 
 backend = DiskCacheBackend(
-    Path(".cache/useful-decorators.sqlite3"),
+    Path(".cache/blakemere-decorators.sqlite3"),
     serializer=JsonCacheSerializer(),
 )
 
@@ -728,7 +728,7 @@ CREATE TABLE IF NOT EXISTS cache_metadata (
 Initial rows could include:
 
 - `schema_version`: integer string for the SQLite schema contract, starting at `1`.
-- `created_by`: package name, such as `useful-decorators`.
+- `created_by`: package name, such as `blakemere-decorators`.
 - `created_with_version`: package version that initialized the file, for diagnostics only.
 - `updated_with_version`: last package version that opened or migrated the file, for diagnostics only.
 

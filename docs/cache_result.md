@@ -316,7 +316,7 @@ A future `RedisCacheBackend` should be an optional dependency extra, not part of
 redis = ["redis>=5"]
 ```
 
-Public import guidance should make the optional nature clear: installing `useful-decorators[redis]` enables Redis support, while the base package remains standard-library-only plus its existing local backends.
+Public import guidance should make the optional nature clear: installing `blakemere-decorators[redis]` enables Redis support, while the base package remains standard-library-only plus its existing local backends.
 
 Design constraints for a first Redis backend:
 

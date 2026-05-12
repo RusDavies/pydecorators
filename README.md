@@ -32,7 +32,7 @@ For a built local wheel:
 
 ```bash
 python -m build
-python -m pip install dist/useful_decorators-0.1.0-py3-none-any.whl
+python -m pip install dist/blakemere_decorators-0.1.0-py3-none-any.whl
 ```
 
 ## Quick start
@@ -269,7 +269,7 @@ from pathlib import Path
 from useful_decorators import DiskCacheBackend, cache_result
 
 backend = DiskCacheBackend(
-    Path(".cache/useful-decorators.sqlite3"),
+    Path(".cache/blakemere-decorators.sqlite3"),
     ttl=3600,
     maxsize=10_000,
 )

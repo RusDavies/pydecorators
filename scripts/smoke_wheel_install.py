@@ -18,9 +18,11 @@ def run(command: list[str], *, cwd: Path = PROJECT_ROOT, env: dict[str, str] | N
 
 
 def latest_wheel() -> Path:
-    wheels = sorted(DIST_DIR.glob("useful_decorators-*.whl"), key=lambda path: path.stat().st_mtime)
+    wheels = sorted(
+        DIST_DIR.glob("blakemere_decorators-*.whl"), key=lambda path: path.stat().st_mtime
+    )
     if not wheels:
-        raise SystemExit("No useful_decorators wheel found in dist/")
+        raise SystemExit("No blakemere_decorators wheel found in dist/")
     return wheels[-1]
 
 
@@ -28,7 +30,7 @@ def main() -> None:
     run([sys.executable, "-m", "build", "--wheel"])
     wheel = latest_wheel()
 
-    with tempfile.TemporaryDirectory(prefix="useful-decorators-wheel-smoke-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="blakemere-decorators-wheel-smoke-") as tmp:
         venv_dir = Path(tmp) / "venv"
         run([sys.executable, "-m", "venv", str(venv_dir)])
         python = venv_dir / ("Scripts" if os.name == "nt" else "bin") / "python"
