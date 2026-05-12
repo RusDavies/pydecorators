@@ -746,13 +746,20 @@
 - [ ] Consider a package-specific validation exception only if callers need to distinguish validation failures from ordinary `TypeError`.
 ### `@require_env`
 
-- [ ] Design signature.
-- [ ] Support required variable names.
-- [ ] Support custom validators.
-- [ ] Support loading only at call time.
-- [ ] Add tests with patched environment.
-- [ ] Add CLI/script examples.
+- [x] Design signature.
+- [x] Support required variable names.
+- [x] Support custom validators.
+- [x] Support loading only at call time.
+- [x] Add tests with patched environment.
+- [x] Add CLI/script examples.
 
+
+### Newly Implied `@require_env` Follow-Ups
+
+- [ ] Consider custom error messages for required environment variables if CLI UX needs them.
+- [ ] Consider optional empty-string rejection semantics if users want non-empty environment values by default.
+- [ ] Add executable docs examples for `@require_env` if environment examples grow.
+- [ ] Consider validator exception wrapping only if callers need normalized environment-check failures.
 ## 9. Resilience Decorators Backlog
 
 ### `@circuit_breaker`

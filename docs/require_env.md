@@ -1,0 +1,46 @@
+# `@require_env`
+
+`@require_env` checks required environment variables at call time before running a sync or async function.
+
+```python
+from useful_decorators import require_env
+
+
+@require_env("API_TOKEN")
+def call_service() -> str:
+    return "ok"
+```
+
+## Parameters
+
+- positional names: required environment variable names.
+- `validators`: optional mapping of variable name to callable. The callable receives the string value and should return `False` to reject it. Returning `True` or `None` accepts the value.
+- `environ`: optional mapping used instead of `os.environ`, mainly for tests.
+
+Invalid decorator configuration raises `ConfigurationError` at decoration time.
+
+## Call-time behavior
+
+Environment variables are checked when the wrapped function is called, not when it is decorated. This lets scripts load `.env` files, test fixtures patch environment values, or deployment platforms inject variables after import. Tiny mercy, because import-time environment checks are how CLIs become haunted furniture.
+
+Missing or invalid variables raise `EnvRequirementError` before the wrapped function runs.
+
+## Examples
+
+Multiple variables:
+
+```python
+@require_env("API_TOKEN", "REGION")
+def sync_catalog() -> None:
+    ...
+```
+
+Custom validators:
+
+```python
+@require_env("REGION", validators={"REGION": lambda value: value in {"ca", "us"}})
+def call_regional_service() -> None:
+    ...
+```
+
+Async functions are supported with the same call-time checks.

@@ -28,6 +28,7 @@ from useful_decorators.exceptions import (
 from useful_decorators.log_calls import log_calls
 from useful_decorators.measure_time import TimingInfo, measure_time
 from useful_decorators.rate_limit import rate_limit
+from useful_decorators.require_env import EnvRequirementError, require_env
 from useful_decorators.retry import retry
 from useful_decorators.timeout import timeout
 from useful_decorators.validate_types import validate_types
@@ -44,6 +45,7 @@ __all__ = [
     "ConfigurationError",
     "DiskCacheBackend",
     "DiskCacheDropEvent",
+    "EnvRequirementError",
     "FunctionTimedOut",
     "JsonCacheSerializer",
     "MemoryCacheBackend",
@@ -56,6 +58,7 @@ __all__ = [
     "log_calls",
     "measure_time",
     "rate_limit",
+    "require_env",
     "retry",
     "timeout",
     "validate_types",

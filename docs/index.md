@@ -18,6 +18,7 @@ Start here when navigating the Useful Decorators documentation.
 - [`@log_calls`](log_calls.md) — call logging decorator behavior, duration logging, argument/result controls, and security notes.
 - [`@measure_time`](measure_time.md) — timing decorator behavior, callback/logger/metrics hooks, and `TimingInfo`.
 - [`@validate_types`](validate_types.md) — lightweight runtime type validation behavior, supported annotations, and limitations.
+- [`@require_env`](require_env.md) — call-time environment variable requirements, validators, and script examples.
 
 ## Cache backend docs
 

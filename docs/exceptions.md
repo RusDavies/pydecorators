@@ -15,6 +15,7 @@ Use the most specific exception when you can recover from a known condition. Cat
 | `CacheBackendClosedError` | `UsefulDecoratorsError` | A closeable cache backend such as `DiskCacheBackend` is used after `close()`. |
 | `RateLimitExceeded` | `UsefulDecoratorsError` | A future rate-limited call exceeds its configured allowance. |
 | `FunctionTimedOut` | `TimeoutError`, `UsefulDecoratorsError` | A future timeout-decorated function exceeds its configured timeout. |
+| `EnvRequirementError` | `RuntimeError` | `@require_env` finds a missing or invalid required environment variable. |
 
 ## Examples
 
@@ -73,5 +74,20 @@ backend.close()
 try:
     backend.info()
 except CacheBackendClosedError:
+    ...
+```
+
+### `EnvRequirementError`
+
+```python
+from useful_decorators import EnvRequirementError, require_env
+
+@require_env("API_TOKEN", environ={})
+def call_service() -> None:
+    ...
+
+try:
+    call_service()
+except EnvRequirementError:
     ...
 ```

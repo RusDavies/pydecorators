@@ -16,6 +16,7 @@ The initial `v0.1.0` scope is:
 - `@log_calls` — implemented
 - `@measure_time` — implemented
 - `@validate_types` — implemented
+- `@require_env` — implemented
 
 
 ## Quick example
@@ -58,7 +59,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, and `docs/validate_types.md` for lightweight runtime type validation.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, and `docs/require_env.md` for environment checks.
 
 ### Retry example
 
@@ -140,6 +141,19 @@ def double(value: int) -> int:
 ```
 
 `@validate_types` provides lightweight, shallow runtime checks for simple annotations. It is not a full schema validator; sometimes the boring warning label is the difference between a tool and a liability.
+
+### Environment requirement example
+
+```python
+from useful_decorators import require_env
+
+
+@require_env("API_TOKEN")
+def call_service() -> str:
+    return "ok"
+```
+
+`@require_env` checks variables at call time, so tests and deployment systems can patch environment state after import.
 
 ### Cache example
 
