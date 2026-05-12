@@ -41,6 +41,20 @@ def test_disk_cache_backend_documentation_example_executes(tmp_path: Path) -> No
     assert calls == 1
 
 
+def test_disk_cache_backend_persistence_documentation_example_executes(
+    tmp_path: Path,
+) -> None:
+    examples = load_docs_example("disk_cache_backend_examples")
+
+    first, second, calls = examples.persistent_disk_cache_example(
+        tmp_path / "persistent-cache.sqlite3"
+    )
+
+    assert first == "User user-456"
+    assert second == "User user-456"
+    assert calls == 1
+
+
 def test_disk_cache_backend_context_manager_documentation_example_executes(
     tmp_path: Path,
 ) -> None:
