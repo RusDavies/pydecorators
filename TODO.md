@@ -844,6 +844,7 @@
 - [x] Add git tag naming convention for releases.
 - [x] Build package locally.
 - [x] Test install from local wheel.
+- [ ] Run `python scripts/check_package_name_availability.py` immediately before TestPyPI/PyPI publish.
 - [ ] Publish test release to TestPyPI.
 - [ ] Publish `v0.1.0` to PyPI when ready.
 
@@ -854,7 +855,7 @@
 - [x] Update `pyproject.toml` package name after Russ chooses the distribution name.
 - [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
 - [x] Add trusted publishing / API token instructions once the repository and package name are final.
-- [ ] Re-check `blakemere-decorators` availability immediately before final publish.
+- [x] Add repeatable checker to re-check `blakemere-decorators` availability immediately before final publish.
 - [ ] Configure GitHub protected environments `testpypi` and `pypi` before running release workflow.
 - [x] Add a release workflow for trusted publishing once GitHub environment names are confirmed.
 - [ ] Add executable composition examples if users need copy-paste stacking recipes.

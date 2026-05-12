@@ -190,7 +190,11 @@ Use API tokens only if trusted publishing is unavailable. If tokens are used:
 
 ### Final pre-publish checks
 
-Immediately before publishing, re-check that `blakemere-decorators` still resolves as expected on PyPI and TestPyPI, confirm the built version is not already present, and verify `pyproject.toml` project URLs point to the intended public repository.
+Immediately before publishing, re-check that `blakemere-decorators` still resolves as expected on PyPI and TestPyPI, confirm the built version is not already present, and verify `pyproject.toml` project URLs point to the intended public repository. Use the repeatable checker:
+
+   ```bash
+   python scripts/check_package_name_availability.py
+   ```
 
 ## Publishing
 
@@ -215,7 +219,7 @@ For first release, use TestPyPI before PyPI. The included `.github/workflows/rel
 
 ## Package name availability
 
-As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project. Russ chose `blakemere-decorators` as the replacement distribution name, and PyPI/TestPyPI returned 404 Not Found for that name when checked before updating `pyproject.toml`. Re-check availability immediately before publishing because package names are mutable external state, annoyingly.
+As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project. Russ chose `blakemere-decorators` as the replacement distribution name, and PyPI/TestPyPI returned 404 Not Found for that name when checked before updating `pyproject.toml`. Re-check availability immediately before publishing with `python scripts/check_package_name_availability.py` because package names are mutable external state, annoyingly.
 
 ## Tagging convention
 
