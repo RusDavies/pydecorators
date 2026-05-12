@@ -479,7 +479,8 @@
 
 ### Newly Implied Docs File Checklist Follow-Ups
 
-- [ ] Consider adding PR-template checkboxes for docs index, docs examples, and docs policy marker updates if GitHub hosting becomes active.
+- [x] Add PR-template checkboxes for docs index, docs examples, and docs policy marker updates.
+- [ ] Add issue templates if external contributors start filing repeated docs/release questions.
 - [ ] Add a docs-policy exemption registry if intentionally unindexed docs files become common.
 - [x] Consider moving Markdown policy helpers into `tests/docs_policy_helpers.py` if reuse grows.
 
