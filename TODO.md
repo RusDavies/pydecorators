@@ -344,7 +344,7 @@
 
 ### Newly Implied Disk Namespace Stability Follow-Ups
 
-- [ ] Consider adding a README note about namespace/key stability if persistent disk caching becomes a headline feature.
+- [x] Consider adding a README note about namespace/key stability if persistent disk caching becomes a headline feature.
 - [x] Consider adding cache schema/version namespace guidance before a public release.
 
 ### Newly Implied Disk Cache Versioning Follow-Ups
