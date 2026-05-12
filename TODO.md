@@ -244,7 +244,12 @@
 
 - [ ] Consider implementing `DiskCacheAggregateInspectionReport` only if support-bundle tooling enters public scope.
 - [ ] Consider aggregate truncation tests if inspection scans gain row limits.
-- [ ] Consider documenting aggregate timestamp ranges as diagnostics rather than audit evidence.
+- [x] Document aggregate timestamp ranges as diagnostics rather than audit evidence.
+
+### Newly Implied Aggregate Timestamp Follow-Ups
+
+- [ ] Consider CLI/help wording tests that timestamp fields are diagnostic, not audit evidence, if inspection tooling is implemented.
+- [ ] Consider omitting timestamp ranges from broad support bundles if users treat them as sensitive activity indicators.
 - [x] Add sensitivity-warning design/tests for future inspection CLI support bundles.
 
 ### Newly Implied Inspection Warning Follow-Ups
