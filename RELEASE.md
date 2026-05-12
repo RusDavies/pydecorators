@@ -142,6 +142,56 @@ Before TestPyPI/PyPI:
 - [ ] `DOGFOOD.md` findings are reviewed.
 - [ ] API/documentation issues found during dogfood use are resolved or explicitly deferred.
 
+
+## Publishing credentials and repository setup
+
+Do **not** publish from a random developer shell unless there is a deliberate reason. Prefer trusted publishing from GitHub Actions so no long-lived PyPI API token has to live on a laptop, in a chat log, or in CI secrets. Humans do keep inventing places to lose credentials; let us not help.
+
+### Preferred path: PyPI/TestPyPI trusted publishing
+
+Use this once the GitHub repository at `https://github.com/RusDavies/blakemere-decorators` exists and the release workflow is ready:
+
+1. In TestPyPI, create or claim the `blakemere-decorators` project.
+2. Add a trusted publisher for the GitHub repository:
+   - owner: `RusDavies`
+   - repository: `blakemere-decorators`
+   - workflow file: the release workflow that will publish distributions
+   - environment: use a protected environment such as `testpypi` if configured
+3. Repeat the trusted-publisher setup in PyPI for the production project, using a separate protected environment such as `pypi`.
+4. Keep TestPyPI and PyPI publishing as separate jobs or separate manual approvals so a test release cannot accidentally become a production release with a moustache.
+5. Build distributions in CI with:
+
+   ```bash
+   python -m build
+   ```
+
+6. Publish with the Python Packaging Authority publish action or an equivalent OIDC-aware publisher. The release job should publish only files from `dist/` produced by the same workflow run.
+7. After publishing to TestPyPI, install from TestPyPI in a clean environment and run the import/decorator smoke checks before approving PyPI.
+
+### Fallback path: scoped API tokens
+
+Use API tokens only if trusted publishing is unavailable. If tokens are used:
+
+1. Create separate tokens for TestPyPI and PyPI.
+2. Scope each token to only the `blakemere-decorators` project after the project exists. For the first upload, a broader token may be unavoidable; rotate it immediately after the project is created and replace it with a project-scoped token.
+3. Store tokens only in the CI secret store or a local password manager. Never commit tokens to this repository. Yes, even “temporarily”. Especially “temporarily”.
+4. Use Twine for token publishing:
+
+   ```bash
+   python -m pip install --upgrade build twine
+   python -m build
+   python -m twine check dist/*
+   python -m twine upload --repository testpypi dist/*
+   python -m twine upload dist/*
+   ```
+
+5. For token auth, Twine username is `__token__`; the password is the token value. Prefer environment variables or an interactive prompt over command-line arguments so tokens do not land in shell history.
+6. Rotate any token that may have been exposed and remove it from every secret store where it is no longer needed.
+
+### Final pre-publish checks
+
+Immediately before publishing, re-check that `blakemere-decorators` still resolves as expected on PyPI and TestPyPI, confirm the built version is not already present, and verify `pyproject.toml` project URLs point to the intended public repository.
+
 ## Publishing
 
 For first release, use TestPyPI before PyPI.

@@ -833,7 +833,7 @@
 ### Newly Implied Release Checklist Follow-Ups
 
 - [x] Add clean-venv local wheel install smoke test script.
-- [ ] Add TestPyPI/PyPI publishing instructions once package credentials and repository location are finalized.
+- [x] Add TestPyPI/PyPI publishing instructions once package credentials and repository location are finalized.
 - [x] Add git tag naming convention for releases.
 - [x] Build package locally.
 - [x] Test install from local wheel.
@@ -846,8 +846,9 @@
 - [x] Choose a new PyPI distribution name because `useful-decorators` is already occupied on PyPI.
 - [x] Update `pyproject.toml` package name after Russ chooses the distribution name.
 - [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
-- [ ] Add trusted publishing / API token instructions once the repository and package name are final.
+- [x] Add trusted publishing / API token instructions once the repository and package name are final.
 - [ ] Re-check `blakemere-decorators` availability immediately before final publish.
+- [ ] Add a release workflow for trusted publishing once GitHub environment names are confirmed.
 - [ ] Add executable composition examples if users need copy-paste stacking recipes.
 
 ## 13. Dogfood Backlog
