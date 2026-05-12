@@ -6,6 +6,7 @@ from types import ModuleType
 import pytest
 
 from tests.docs_policy_helpers import (
+    DOCS_INDEX_EXEMPTIONS,
     asserted_example_function_calls,
     docs_index_local_links,
     docs_index_markdown_links,
@@ -48,11 +49,17 @@ def test_docs_index_links_resolve_to_existing_files() -> None:
 
 
 def test_top_level_docs_markdown_files_are_linked_from_docs_index() -> None:
-    explicitly_exempt = {Path("docs/index.md")}
     top_level_docs = {path for path in Path("docs").glob("*.md")}
     linked_docs = {path for path in docs_index_local_links() if path.suffix == ".md"}
 
-    assert top_level_docs - explicitly_exempt <= linked_docs
+    assert top_level_docs - DOCS_INDEX_EXEMPTIONS <= linked_docs
+
+
+def test_docs_index_exemptions_are_intentional_docs_files() -> None:
+    assert {Path("docs/index.md")} == DOCS_INDEX_EXEMPTIONS
+    for exempt_path in DOCS_INDEX_EXEMPTIONS:
+        assert exempt_path.exists()
+        assert exempt_path.suffix == ".md"
 
 
 def test_docs_examples_are_listed_from_docs_index() -> None:
