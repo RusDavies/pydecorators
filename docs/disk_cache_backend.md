@@ -309,6 +309,29 @@ Safe-mode expectations:
 - Documentation should describe safe-mode output as lower-risk, not risk-free. Serializer content types, row counts, and payload sizes can still reveal application behavior. Tiny metadata can still wear a trench coat.
 - Any future CLI should use safe mode by default and require an explicit flag such as `--include-payload-preview` before printing previews.
 
+## Support-bundle metadata sensitivity
+
+No-preview safe mode removes payload text, but it does not make inspection output public-safe by magic. Metadata can still reveal how an application behaves, what it caches, how often entries are reused, and whether errors or specific serializer families are present. Treat support-bundle inspection reports as potentially sensitive operational diagnostics.
+
+Metadata that may reveal information:
+
+- row counts can reveal feature usage, tenant/customer volume, or whether a workflow has run
+- serializer content types can reveal implementation choices or payload classes
+- payload byte sizes can reveal approximate record sizes, document sizes, or response-shape changes
+- exception flags can reveal failing workflows or error-prone data paths
+- expiry presence and timestamp patterns can reveal cache policy, workload timing, or recent activity
+- pagination/truncation metadata can reveal cache scale even without payload previews
+
+Support-bundle guidance:
+
+- Prefer aggregate summaries over per-row metadata when broad sharing is enough.
+- Share per-row no-preview reports only with trusted support/debugging recipients.
+- Avoid attaching inspection reports to public issues unless the project owner has reviewed them.
+- Document retention expectations for generated support bundles; caches are disposable, but reports can outlive the original cache file in places with worse access control.
+- If a future CLI generates support bundles, it should label reports as potentially sensitive and default to aggregate/no-preview output.
+
+Pre-implementation tests should cover documentation and examples that label no-preview reports as lower-risk but still sensitive. If a future CLI/support-bundle command is added, tests should assert its default output excludes previews and includes a sensitivity warning.
+
 Pre-implementation tests should cover:
 
 - support/CI safe mode omits preview fields or sets them to `None`

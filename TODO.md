@@ -228,7 +228,13 @@
 
 - [ ] Consider making any future inspection CLI default to no-preview safe mode.
 - [ ] Consider adding tests that safe mode never invokes preview redactors if inspection tooling is implemented.
-- [ ] Consider documenting support-bundle metadata sensitivity even when previews are disabled.
+- [x] Document support-bundle metadata sensitivity even when previews are disabled.
+
+### Newly Implied Support Bundle Metadata Follow-Ups
+
+- [ ] Consider aggregate-only inspection report design before adding any support-bundle command.
+- [ ] Consider sensitivity-warning tests if a future inspection CLI emits support bundles.
+- [ ] Consider retention/deletion guidance for generated cache inspection reports if support tooling is added.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
 

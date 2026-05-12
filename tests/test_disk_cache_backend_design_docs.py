@@ -225,3 +225,24 @@ def test_disk_cache_backend_design_doc_covers_no_preview_safe_mode() -> None:
         "safe mode never calls caller-provided redactors",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_support_bundle_metadata_sensitivity() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Support-bundle metadata sensitivity",
+        "does not make inspection output public-safe by magic",
+        "potentially sensitive operational diagnostics",
+        "row counts can reveal feature usage",
+        "serializer content types can reveal implementation choices",
+        "payload byte sizes can reveal approximate record sizes",
+        "exception flags can reveal failing workflows",
+        "timestamp patterns can reveal cache policy",
+        "Prefer aggregate summaries over per-row metadata",
+        "trusted support/debugging recipients",
+        "retention expectations",
+        "default to aggregate/no-preview output",
+        "includes a sensitivity warning",
+    ]:
+        assert required in text
