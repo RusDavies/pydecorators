@@ -188,3 +188,11 @@ def test_require_env_documentation_examples_execute() -> None:
     assert "API_TOKEN" in examples.missing_variable_example()
     assert "failed validation" in examples.validator_example()
     assert_example_result(asyncio.run(examples.async_require_env_example()), "refreshed")
+
+
+def test_circuit_breaker_documentation_examples_execute() -> None:
+    examples = load_docs_example("circuit_breaker_examples")
+
+    assert_example_result(examples.open_circuit_example(), "fallback")
+    assert_example_result(examples.half_open_recovery_example(), ["ok", "ok"])
+    assert_example_result(asyncio.run(examples.async_circuit_breaker_example()), "async fallback")
