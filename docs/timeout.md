@@ -53,3 +53,11 @@ class ExternalCallTimedOut(Exception):
 async def call_external_service() -> str:
     ...
 ```
+
+
+## Executable examples
+
+Copy-pasteable async examples live in `docs/examples/timeout_examples.py` and are
+covered by `tests/test_docs_examples.py`. They demonstrate successful completion,
+timeout handling, and custom timeout exceptions without relying on sync timeout
+tricks.

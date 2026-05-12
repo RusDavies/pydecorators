@@ -125,3 +125,13 @@ def test_rate_limit_documentation_examples_execute() -> None:
     assert_example_result(examples.raise_mode_example(), "limited")
     assert_example_result(examples.keyed_bucket_example(), ("called:tenant-a", "called:tenant-b"))
     assert_example_result(examples.block_mode_example(), ("called", [60]))
+
+
+def test_timeout_documentation_examples_execute() -> None:
+    examples = load_docs_example("timeout_examples")
+
+    assert_example_result(asyncio.run(examples.successful_timeout_example()), "finished")
+    assert_example_result(asyncio.run(examples.timeout_failure_example()), "timed out")
+    assert_example_result(
+        asyncio.run(examples.custom_timeout_exception_example()), "vendor call timed out"
+    )

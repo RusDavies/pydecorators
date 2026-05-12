@@ -691,7 +691,7 @@
 
 - [x] Add tests proving timed-out coroutines receive cancellation.
 - [x] Document custom timeout exception constructor compatibility.
-- [ ] Add executable docs examples for `@timeout` if async examples grow.
+- [x] Add executable docs examples for `@timeout`.
 - [ ] Revisit sync timeout support only with explicit platform/cancellation constraints.
 
 ## 7. Observability Decorators Backlog
