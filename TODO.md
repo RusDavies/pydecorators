@@ -195,7 +195,12 @@
 ### Newly Implied JSON Row Inspection Follow-Ups
 
 - [ ] Consider adding a CLI-style inspection recipe if users ask for operational cache debugging workflows.
-- [ ] Consider documenting which SQLite columns are stable enough for debugging versus internal implementation detail before public release.
+- [x] Document which SQLite columns are stable enough for debugging versus internal implementation detail before public release.
+
+### Newly Implied SQLite Column Stability Follow-Ups
+
+- [ ] Consider adding a supported cache-inspection API if users need stable tooling beyond ad hoc SQLite debugging.
+- [ ] Consider adding a schema-version metadata table before any public release that promises disk-cache file compatibility.
 - [x] Document pickle trust-boundary warning in disk/Redis backend docs.
 - [x] Design `DiskCacheBackend` storage strategy, likely SQLite.
 

@@ -202,6 +202,25 @@ LIMIT 1;
 
 Executable example: `docs/examples/disk_cache_backend_examples.py::inspect_json_cache_row_example` writes a JSON payload with `JsonCacheSerializer`, opens the SQLite file directly, reads `payload` and `serializer_content_type`, and verifies the stored payload is ordinary compact JSON such as `{"id":"user-123","active":true}` with content type `application/json`.
 
+## SQLite column stability for debugging
+
+Direct SQLite inspection is supported only as a debugging aid. The durable public API remains `DiskCacheBackend`, `CacheBackend`, `CacheInfo`, serializers, and documented decorator behavior. Do not treat the SQLite file as an application database, replication source, or migration target unless a future release explicitly promotes that contract.
+
+Debugging-friendly columns:
+
+- `payload`: useful to inspect when the active serializer is human-readable, such as `JsonCacheSerializer` or a custom JSON serializer. The meaning belongs to the serializer, not SQLite.
+- `serializer_content_type`: useful to confirm which serializer family wrote a row and why a lookup may drop an incompatible row as a miss.
+- `is_exception`: useful to distinguish cached return values from cached exceptions.
+- `created_at`, `last_accessed`, and `expires_at`: useful for rough TTL/LRU debugging. Treat values as backend timestamps, not externally stable audit timestamps.
+
+Internal implementation details:
+
+- `key`: an internal serialized cache key. Its bytes depend on Python values, decorator key policy, namespace, `typed=True`, and implementation details. Do not parse it or use it as an external identifier.
+- Table names, indexes, PRAGMAs, statistics storage, eviction queries, and exact timestamp update timing are internal unless specifically documented as public API.
+- The shape of `cache_stats` is internal. Use `backend.info()` or decorated function `cache_info()` for supported hit/miss/current-size reporting.
+
+Safe rule: inspect `payload` and `serializer_content_type` to answer “what did this local cache row store?”, but use backend APIs to mutate, clear, count, or rely on behavior. If tooling needs more stable inspection guarantees later, add an explicit API instead of scraping private organs.
+
 ## JSON adapter recipe for datetimes and bytes
 
 `JsonCacheSerializer` intentionally supports only ordinary JSON-compatible values. If cached payloads need common Python scalar adapters such as `datetime` or `bytes`, write a custom `CacheSerializer` with an explicit tagged representation instead of silently teaching the built-in serializer Python-specific tricks.

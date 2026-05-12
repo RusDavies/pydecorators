@@ -77,3 +77,24 @@ def test_disk_cache_backend_design_doc_covers_maintenance_helper_design() -> Non
         "running `VACUUM` automatically",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_sqlite_column_stability() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## SQLite column stability for debugging",
+        "Direct SQLite inspection is supported only as a debugging aid",
+        "Debugging-friendly columns",
+        "`payload`",
+        "`serializer_content_type`",
+        "`is_exception`",
+        "`created_at`, `last_accessed`, and `expires_at`",
+        "Internal implementation details",
+        "`key`: an internal serialized cache key",
+        "The shape of `cache_stats` is internal",
+        "backend.info()",
+        "cache_info()",
+        "add an explicit API instead of scraping",
+    ]:
+        assert required in text
