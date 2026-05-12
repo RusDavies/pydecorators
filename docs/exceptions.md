@@ -49,10 +49,15 @@ except CacheKeyError:
 ### `CacheSerializationError`
 
 ```python
-from useful_decorators import CacheSerializationError, PickleCacheSerializer
+from useful_decorators import CacheSerializationError, JsonCacheSerializer, PickleCacheSerializer
 
 try:
     PickleCacheSerializer().dumps(lambda value: value)
+except CacheSerializationError:
+    ...
+
+try:
+    JsonCacheSerializer().dumps({"not_json": object()})
 except CacheSerializationError:
     ...
 ```

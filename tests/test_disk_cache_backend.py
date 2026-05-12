@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from useful_decorators import DiskCacheBackend
+from useful_decorators import DiskCacheBackend, JsonCacheSerializer
 from useful_decorators.exceptions import ConfigurationError
 
 
@@ -103,6 +103,38 @@ class JsonLikeSerializer:
         import json
 
         return json.loads(data.decode("utf-8"))
+
+
+def test_disk_cache_backend_uses_json_payload_serializer(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(
+        tmp_path / "cache.sqlite3",
+        serializer=JsonCacheSerializer(),
+    )
+    try:
+        payload = {"value": [1, 2, 3], "ok": True}
+        serialized = backend._serialize_payload(payload)
+
+        assert serialized == b'{"value":[1,2,3],"ok":true}'
+        assert backend._deserialize_payload(serialized) == payload
+        assert backend.serializer_content_type == "application/json"
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_persists_json_payloads_across_instances(tmp_path: Path) -> None:
+    db_path = tmp_path / "cache.sqlite3"
+    first = DiskCacheBackend(db_path, serializer=JsonCacheSerializer())
+    first.set_value("key", {"answer": 42})
+    first.close()
+
+    second = DiskCacheBackend(db_path, serializer=JsonCacheSerializer())
+    try:
+        entry = second.get("key")
+
+        assert entry is not None
+        assert entry.payload == {"answer": 42}
+    finally:
+        second.close()
 
 
 def test_disk_cache_backend_uses_custom_payload_serializer(tmp_path: Path) -> None:

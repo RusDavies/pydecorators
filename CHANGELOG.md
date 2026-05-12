@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `JsonCacheSerializer` for simple JSON-compatible persistent cache payloads.
 - README Python code-block extraction and sync policy tests.
 - Release checklist guidance for persistent disk-cache migration and clearing.
 - `DiskCacheBackend` cache versioning and schema-change guidance.
