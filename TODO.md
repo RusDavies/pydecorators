@@ -204,7 +204,12 @@
 
 - [ ] Consider exposing structured dropped-row counters in `CacheInfo` or a disk-specific diagnostics API after user feedback.
 - [ ] Consider allowing operators to opt into raising instead of dropping corrupt rows if strict cache integrity becomes useful.
-- [ ] Add disk backend integrity-check/maintenance helper design.
+- [x] Add disk backend integrity-check/maintenance helper design.
+
+### Newly Implied Disk Maintenance Helper Follow-Ups
+
+- [ ] Implement `DiskCacheBackend.maintain()` and `DiskCacheMaintenanceReport` if operator maintenance becomes part of the public v0.1.0 scope.
+- [ ] Add tests for maintenance helper pruning expired rows, dropping corrupt payloads, reporting serializer mismatches, and explicit VACUUM behavior if implemented.
 - [x] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
 
 ### Newly Implied Disk SQLite Tuning Follow-Ups

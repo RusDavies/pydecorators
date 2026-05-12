@@ -260,6 +260,47 @@ For persistent cache reuse, treat cache keys as part of the on-disk compatibilit
 - If you provide a custom `key` function, keep its output stable across releases and process restarts. A changed custom key function can orphan old cache rows.
 - Changing serializers, payload types, or cache value schemas may make old rows disposable. Use `clear()` or a new namespace when old persistent values should not be reused.
 
+## Integrity check and maintenance helper design
+
+A future disk-cache maintenance helper should be explicit and operator-facing, not part of normal `get()` hot-path behavior. The intended public shape is a small method on `DiskCacheBackend`, tentatively `maintain()`, with a report object such as `DiskCacheMaintenanceReport`.
+
+Planned call shape:
+
+```python
+report = backend.maintain(
+    prune_expired=True,
+    validate_payloads=False,
+    vacuum=False,
+)
+```
+
+The helper should support these maintenance actions deliberately:
+
+- `prune_expired=True`: delete expired rows without waiting for individual lookups or `info()`.
+- `validate_payloads=True`: scan rows whose `serializer_content_type` matches the active backend serializer and attempt payload deserialization, dropping rows that fail.
+- serializer mismatch cleanup: count and optionally drop rows whose stored `serializer_content_type` does not match the active serializer.
+- `vacuum=True`: run SQLite `VACUUM` only as an explicit operator choice, because it can be more expensive and may require exclusive database access.
+
+The report should be structured rather than log-text-only. At minimum it should include:
+
+- `rows_seen`
+- `expired_rows_dropped`
+- `serializer_mismatch_rows_dropped`
+- `corrupt_payload_rows_dropped`
+- `vacuum_ran`
+
+Maintenance should reuse `DiskCacheDropEvent` / `on_drop` for rows it discards, using the same reasons as lookup-time cleanup where possible. That keeps diagnostics consistent instead of inventing a second tiny telemetry kingdom.
+
+Non-goals for the first maintenance helper:
+
+- repairing corrupted payloads
+- migrating payload schemas automatically
+- promising cross-host/shared-filesystem safety
+- running `VACUUM` automatically from `get()`, `set_value()`, or `info()`
+- raising on corrupt rows by default
+
+The default posture remains cache-friendly: disposable rows can be pruned, counted, and logged, but normal callers should not fail just because the cache contains stale or malformed data.
+
 ## Cache versioning and schema changes
 
 Before public release, treat persistent disk-cache reuse as a compatibility surface. If a cached value's meaning, payload shape, serializer, or trust boundary changes, do not silently reuse rows written by older code. Pick one of these strategies deliberately:
