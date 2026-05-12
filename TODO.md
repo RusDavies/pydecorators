@@ -858,7 +858,7 @@
 - [x] Add repeatable checker to re-check `blakemere-decorators` availability immediately before final publish.
 - [ ] Configure GitHub protected environments `testpypi` and `pypi` before running release workflow.
 - [x] Add a release workflow for trusted publishing once GitHub environment names are confirmed.
-- [ ] Add executable composition examples if users need copy-paste stacking recipes.
+- [x] Add executable composition examples.
 
 ## 13. Dogfood Backlog
 

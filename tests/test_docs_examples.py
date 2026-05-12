@@ -204,3 +204,21 @@ def test_retry_documentation_examples_execute() -> None:
     assert_example_result(examples.transient_success_example(), ("ok", [0.25], [1, 2]))
     assert_example_result(examples.predicate_example(), "permanent invalid request")
     assert_example_result(asyncio.run(examples.async_retry_example()), ("user", [0.1]))
+
+
+def test_composition_documentation_examples_execute() -> None:
+    examples = load_docs_example("composition_examples")
+
+    assert_example_result(examples.measure_whole_operation_example(), ("user", 1, 1.0))
+
+    messages = examples.log_one_logical_call_example()
+    assert sum("call_api started" in message for message in messages) == 1
+    assert sum("call_api finished" in message for message in messages) == 1
+
+    assert_example_result(
+        examples.circuit_outside_retry_example(), "open after one logical failure"
+    )
+    assert_example_result(
+        asyncio.run(examples.timeout_outside_retry_example()),
+        "whole operation timed out",
+    )
