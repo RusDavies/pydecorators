@@ -568,7 +568,7 @@
 
 ### Newly Implied Public Exception Examples Follow-Ups
 
-- [ ] Add public exception examples for reserved future decorators once implemented.
+- [x] Add public exception examples for newer decorators once implemented.
 - [x] Add README link to public exception docs once centralized exception reference exists.
 - [x] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.

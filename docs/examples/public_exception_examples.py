@@ -1,11 +1,22 @@
 """Executable examples for public exception documentation."""
 
+import asyncio
+from contextlib import suppress
+
 from useful_decorators import (
     CacheKeyError,
     CacheSerializationError,
+    CircuitBreakerOpen,
     ConfigurationError,
+    EnvRequirementError,
+    FunctionTimedOut,
     PickleCacheSerializer,
+    RateLimitExceeded,
     cache_result,
+    circuit_breaker,
+    rate_limit,
+    require_env,
+    timeout,
 )
 
 
@@ -17,6 +28,23 @@ def configuration_error_example() -> str:
     except ConfigurationError:
         return "invalid configuration"
     return "valid"
+
+
+def circuit_breaker_open_example() -> str:
+    """Handle an open circuit breaker."""
+
+    @circuit_breaker(failure_threshold=1, reset_timeout=10)
+    def call_service() -> None:
+        raise RuntimeError("down")
+
+    with suppress(RuntimeError):
+        call_service()
+
+    try:
+        call_service()
+    except CircuitBreakerOpen:
+        return "circuit open"
+    return "circuit closed"
 
 
 def cache_key_error_example() -> str:
@@ -43,3 +71,47 @@ def cache_serialization_error_example() -> str:
     except CacheSerializationError:
         return "serialization failed"
     return "serialization succeeded"
+
+
+def rate_limit_exceeded_example() -> str:
+    """Handle a rate-limited call."""
+
+    @rate_limit(calls=1, period=60)
+    def limited() -> str:
+        return "ok"
+
+    limited()
+    try:
+        limited()
+    except RateLimitExceeded:
+        return "rate limited"
+    return "allowed"
+
+
+async def function_timed_out_example() -> str:
+    """Handle an async timeout."""
+
+    @timeout(seconds=0.01)
+    async def slow() -> str:
+        await asyncio.sleep(1)
+        return "late"
+
+    try:
+        await slow()
+    except FunctionTimedOut:
+        return "timed out"
+    return "finished"
+
+
+def env_requirement_error_example() -> str:
+    """Handle a missing required environment variable."""
+
+    @require_env("API_TOKEN", environ={})
+    def call_service() -> str:
+        return "called"
+
+    try:
+        call_service()
+    except EnvRequirementError:
+        return "missing env"
+    return "env present"

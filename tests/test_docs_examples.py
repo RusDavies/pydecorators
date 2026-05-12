@@ -111,5 +111,9 @@ def test_public_exception_documentation_examples_execute() -> None:
     examples = load_docs_example("public_exception_examples")
 
     assert_example_result(examples.configuration_error_example(), "invalid configuration")
+    assert_example_result(examples.circuit_breaker_open_example(), "circuit open")
     assert_example_result(examples.cache_key_error_example(), "unhashable key")
     assert_example_result(examples.cache_serialization_error_example(), "serialization failed")
+    assert_example_result(examples.rate_limit_exceeded_example(), "rate limited")
+    assert_example_result(asyncio.run(examples.function_timed_out_example()), "timed out")
+    assert_example_result(examples.env_requirement_error_example(), "missing env")
