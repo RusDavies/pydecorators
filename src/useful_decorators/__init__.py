@@ -27,6 +27,7 @@ from useful_decorators.exceptions import (
 )
 from useful_decorators.rate_limit import rate_limit
 from useful_decorators.retry import retry
+from useful_decorators.timeout import timeout
 
 __version__ = "0.1.0"
 
@@ -50,4 +51,5 @@ __all__ = [
     "deprecated",
     "rate_limit",
     "retry",
+    "timeout",
 ]

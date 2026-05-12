@@ -664,22 +664,29 @@
 
 ## 6. `@timeout`
 
-- [ ] Design signature.
-  - [ ] `seconds`
-  - [ ] `message`
-  - [ ] `exception`
-- [ ] Define timeout exception.
-- [ ] Implement async timeout using `asyncio.wait_for`.
-- [ ] Evaluate sync timeout strategies.
-  - [ ] Signal-based Unix timeout.
-  - [ ] Thread-based timeout with documented limitations.
-  - [ ] Explicitly async-only for first release.
-- [ ] Choose conservative sync behavior.
-- [ ] Add tests for async timeout success.
-- [ ] Add tests for async timeout failure.
-- [ ] Add tests for metadata preservation.
-- [ ] Add docs warning about sync limitations.
-- [ ] Add README example.
+- [x] Design signature.
+  - [x] `seconds`
+  - [x] `message`
+  - [x] `exception`
+- [x] Define timeout exception.
+- [x] Implement async timeout using `asyncio.wait_for`.
+- [x] Evaluate sync timeout strategies.
+  - [x] Signal-based Unix timeout.
+  - [x] Thread-based timeout with documented limitations.
+  - [x] Explicitly async-only for first release.
+- [x] Choose conservative sync behavior.
+- [x] Add tests for async timeout success.
+- [x] Add tests for async timeout failure.
+- [x] Add tests for metadata preservation.
+- [x] Add docs warning about sync limitations.
+- [x] Add README example.
+
+### Newly Implied `@timeout` Follow-Ups
+
+- [ ] Add tests proving timed-out coroutines receive cancellation if timeout cancellation semantics become public guidance.
+- [ ] Consider custom exception constructor compatibility if users pass exception classes requiring non-message arguments.
+- [ ] Add executable docs examples for `@timeout` if async examples grow.
+- [ ] Revisit sync timeout support only with explicit platform/cancellation constraints.
 
 ## 7. Observability Decorators Backlog
 

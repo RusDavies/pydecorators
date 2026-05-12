@@ -12,7 +12,7 @@ The initial `v0.1.0` scope is:
 - `@cache_result` — sync/disk backend implemented
 - `@retry` — implemented
 - `@rate_limit` — implemented
-- `@timeout`
+- `@timeout` — async implementation complete
 
 
 ## Quick example
@@ -28,7 +28,7 @@ def old_function() -> str:
 
 ## Development status
 
-Pre-alpha. The project foundation exists and `@deprecated`, `@cache_result`, `@retry`, and `@rate_limit` are implemented.
+Pre-alpha. The project foundation exists and `@deprecated`, `@cache_result`, `@retry`, `@rate_limit`, and async `@timeout` are implemented.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
 
@@ -55,7 +55,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, and `docs/rate_limit.md` for rate limiting.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, and `docs/timeout.md` for async timeout behavior.
 
 ### Retry example
 
@@ -82,6 +82,19 @@ def call_user_api(user_id: str) -> str:
 ```
 
 `@rate_limit` uses an in-process sliding window and supports global or keyed buckets, raise or block mode, async functions, and injectable clocks/sleep functions for tests.
+
+### Timeout example
+
+```python
+from useful_decorators import timeout
+
+
+@timeout(seconds=2)
+async def fetch_user(user_id: str) -> str:
+    return user_id
+```
+
+`@timeout` currently supports async functions using `asyncio.wait_for`. Sync functions are rejected deliberately until a safe, well-documented sync timeout strategy exists.
 
 ### Cache example
 
