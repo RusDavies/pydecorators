@@ -1,6 +1,7 @@
 import asyncio
 import importlib.util
 import warnings
+from collections.abc import Callable
 from pathlib import Path
 from types import ModuleType
 
@@ -107,9 +108,16 @@ def test_json_cache_row_inspection_documentation_example_executes(
     assert_example_result(filename, "inspect-json-cache.sqlite3")
 
 
-def test_public_exception_documentation_examples_execute() -> None:
-    examples = load_docs_example("public_exception_examples")
+def _deprecated_assertions(examples: ModuleType) -> None:
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        assert_example_result(examples.old_bare_function(1, 2), 3)
+        assert_example_result(examples.old_configured_function(1, 2), 3)
+        assert_example_result(asyncio.run(examples.old_async_function()), "data")
+        assert_example_result(examples.Client().fetch_old(), "old")
 
+
+def _public_exception_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.configuration_error_example(), "invalid configuration")
     assert_example_result(examples.circuit_breaker_open_example(), "circuit open")
     assert_example_result(examples.cache_key_error_example(), "unhashable key")
@@ -119,17 +127,13 @@ def test_public_exception_documentation_examples_execute() -> None:
     assert_example_result(examples.env_requirement_error_example(), "missing env")
 
 
-def test_rate_limit_documentation_examples_execute() -> None:
-    examples = load_docs_example("rate_limit_examples")
-
+def _rate_limit_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.raise_mode_example(), "limited")
     assert_example_result(examples.keyed_bucket_example(), ("called:tenant-a", "called:tenant-b"))
     assert_example_result(examples.block_mode_example(), ("called", [60]))
 
 
-def test_timeout_documentation_examples_execute() -> None:
-    examples = load_docs_example("timeout_examples")
-
+def _timeout_assertions(examples: ModuleType) -> None:
     assert_example_result(asyncio.run(examples.successful_timeout_example()), "finished")
     assert_example_result(asyncio.run(examples.timeout_failure_example()), "timed out")
     assert_example_result(
@@ -137,9 +141,7 @@ def test_timeout_documentation_examples_execute() -> None:
     )
 
 
-def test_log_calls_documentation_examples_execute() -> None:
-    examples = load_docs_example("log_calls_examples")
-
+def _log_calls_assertions(examples: ModuleType) -> None:
     redacted = examples.redacted_arguments_example()
     assert any("api_key" in message for message in redacted)
     assert any("<redacted>" in message for message in redacted)
@@ -153,9 +155,7 @@ def test_log_calls_documentation_examples_execute() -> None:
     assert any("refresh_user finished" in message for message in async_messages)
 
 
-def test_measure_time_documentation_examples_execute() -> None:
-    examples = load_docs_example("measure_time_examples")
-
+def _measure_time_assertions(examples: ModuleType) -> None:
     result, info = examples.callback_example()
     assert_example_result(result, "ready")
     assert_example_result(info.function, "callback_example.<locals>.load_report")
@@ -172,43 +172,33 @@ def test_measure_time_documentation_examples_execute() -> None:
     assert_example_result(async_info.success, True)
 
 
-def test_validate_types_documentation_examples_execute() -> None:
-    examples = load_docs_example("validate_types_examples")
-
+def _validate_types_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.argument_validation_example(), "hello Ada!")
     assert "argument 'value' expected int" in examples.argument_error_example()
     assert_example_result(examples.return_validation_example(), "ready")
     assert_example_result(asyncio.run(examples.async_validation_example()), "user:anonymous")
 
 
-def test_require_env_documentation_examples_execute() -> None:
-    examples = load_docs_example("require_env_examples")
-
+def _require_env_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.required_variables_example(), "called")
     assert "API_TOKEN" in examples.missing_variable_example()
     assert "failed validation" in examples.validator_example()
     assert_example_result(asyncio.run(examples.async_require_env_example()), "refreshed")
 
 
-def test_circuit_breaker_documentation_examples_execute() -> None:
-    examples = load_docs_example("circuit_breaker_examples")
-
+def _circuit_breaker_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.open_circuit_example(), "fallback")
     assert_example_result(examples.half_open_recovery_example(), ["ok", "ok"])
     assert_example_result(asyncio.run(examples.async_circuit_breaker_example()), "async fallback")
 
 
-def test_retry_documentation_examples_execute() -> None:
-    examples = load_docs_example("retry_examples")
-
+def _retry_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.transient_success_example(), ("ok", [0.25], [1, 2]))
     assert_example_result(examples.predicate_example(), "permanent invalid request")
     assert_example_result(asyncio.run(examples.async_retry_example()), ("user", [0.1]))
 
 
-def test_composition_documentation_examples_execute() -> None:
-    examples = load_docs_example("composition_examples")
-
+def _composition_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.measure_whole_operation_example(), ("user", 1, 1.0))
 
     messages = examples.log_one_logical_call_example()
@@ -224,8 +214,29 @@ def test_composition_documentation_examples_execute() -> None:
     )
 
 
-def test_retry_idempotency_documentation_examples_execute() -> None:
-    examples = load_docs_example("retry_idempotency_examples")
-
+def _retry_idempotency_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.idempotency_key_example(), ("charge:5000:invoice-123", 3))
     assert_example_result(examples.retry_read_example(), "ready")
+
+
+EXAMPLE_ASSERTIONS: tuple[tuple[str, Callable[[ModuleType], None]], ...] = (
+    ("deprecated_examples", _deprecated_assertions),
+    ("public_exception_examples", _public_exception_assertions),
+    ("rate_limit_examples", _rate_limit_assertions),
+    ("timeout_examples", _timeout_assertions),
+    ("log_calls_examples", _log_calls_assertions),
+    ("measure_time_examples", _measure_time_assertions),
+    ("validate_types_examples", _validate_types_assertions),
+    ("require_env_examples", _require_env_assertions),
+    ("circuit_breaker_examples", _circuit_breaker_assertions),
+    ("retry_examples", _retry_assertions),
+    ("composition_examples", _composition_assertions),
+    ("retry_idempotency_examples", _retry_idempotency_assertions),
+)
+
+
+@pytest.mark.parametrize(("module_name", "assertions"), EXAMPLE_ASSERTIONS)
+def test_documentation_examples_execute(
+    module_name: str, assertions: Callable[[ModuleType], None]
+) -> None:
+    assertions(load_docs_example(module_name))
