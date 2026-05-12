@@ -26,6 +26,7 @@ from useful_decorators.exceptions import (
     UsefulDecoratorsError,
 )
 from useful_decorators.log_calls import log_calls
+from useful_decorators.measure_time import TimingInfo, measure_time
 from useful_decorators.rate_limit import rate_limit
 from useful_decorators.retry import retry
 from useful_decorators.timeout import timeout
@@ -47,10 +48,12 @@ __all__ = [
     "MemoryCacheBackend",
     "PickleCacheSerializer",
     "RateLimitExceeded",
+    "TimingInfo",
     "UsefulDecoratorsError",
     "cache_result",
     "deprecated",
     "log_calls",
+    "measure_time",
     "rate_limit",
     "retry",
     "timeout",

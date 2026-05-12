@@ -25,6 +25,8 @@ Current public API:
 - `rate_limit`
 - `timeout`
 - `log_calls`
+- `measure_time`
+- `TimingInfo`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
@@ -147,6 +149,14 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 ### `log_calls`
 
 `log_calls` logs call start, completion duration, optional argument metadata, optional summarized return values, and exceptions for sync and async callables. Argument and result logging are opt-in because logs are a common place to accidentally preserve secrets. See `docs/log_calls.md` for behavior and security notes.
+
+### `measure_time`
+
+`measure_time` records sync and async function duration and emits timing data through an optional callback, logger, or metrics hook. It records success and failure timings while re-raising wrapped exceptions unchanged. See `docs/measure_time.md` for behavior and examples.
+
+### `TimingInfo`
+
+`TimingInfo` is the immutable dataclass emitted to `measure_time(callback=...)`. It exposes `function`, `duration`, `success`, and optional `exception`.
 
 ### `RateLimitExceeded`
 

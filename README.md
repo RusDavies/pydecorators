@@ -14,6 +14,7 @@ The initial `v0.1.0` scope is:
 - `@rate_limit` — implemented
 - `@timeout` — async implementation complete
 - `@log_calls` — implemented
+- `@measure_time` — implemented
 
 
 ## Quick example
@@ -56,7 +57,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, and `docs/log_calls.md` for call logging.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, and `docs/measure_time.md` for timing hooks.
 
 ### Retry example
 
@@ -109,6 +110,22 @@ def authenticate(*, username: str, password: str) -> bool:
 ```
 
 `@log_calls` logs start/finish duration and exceptions by default. Argument and result logging are opt-in; use redaction and summaries carefully because logs are where secrets go to become immortal.
+
+### Timing example
+
+```python
+from useful_decorators import TimingInfo, measure_time
+
+
+timings: list[TimingInfo] = []
+
+
+@measure_time(callback=timings.append)
+def rebuild_index() -> None:
+    pass
+```
+
+`@measure_time` records sync and async durations through optional callback, logger, or metrics hooks.
 
 ### Cache example
 

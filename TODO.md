@@ -710,14 +710,21 @@
 - [ ] Consider async-safe result summarizers only if users need asynchronous summarization hooks.
 ### `@measure_time`
 
-- [ ] Design signature.
-- [ ] Add callback support.
-- [ ] Add logger support.
-- [ ] Add metrics hook support.
-- [ ] Add sync tests.
-- [ ] Add async tests.
-- [ ] Add examples.
+- [x] Design signature.
+- [x] Add callback support.
+- [x] Add logger support.
+- [x] Add metrics hook support.
+- [x] Add sync tests.
+- [x] Add async tests.
+- [x] Add examples.
 
+
+### Newly Implied `@measure_time` Follow-Ups
+
+- [ ] Consider structured logger extras for duration/success fields if logging integrations request them.
+- [ ] Consider async callback/metrics hooks only if users need asynchronous timing sinks.
+- [ ] Add executable docs examples for `@measure_time` if timing examples grow.
+- [ ] Consider monotonic-clock source documentation if timing precision questions recur.
 ## 8. Validation and Configuration Decorators Backlog
 
 ### `@validate_types`
