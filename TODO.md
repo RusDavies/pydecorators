@@ -142,7 +142,13 @@
 
 - [ ] Consider exposing refreshed expiry timestamps in disk-cache diagnostics if operators ask for TTL debugging.
 - [ ] Consider documenting fixed-vs-sliding TTL tradeoffs in README if cache behavior questions recur.
-- [ ] Consider request coalescing for duplicate concurrent misses after user feedback.
+- [x] Add request coalescing design for duplicate concurrent misses.
+
+### Newly Implied Request Coalescing Follow-Ups
+
+- [ ] Implement opt-in `coalesce_misses=True` for sync `@cache_result` wrappers if duplicate miss storms become part of the v0.1.0 scope.
+- [ ] Add thread-level tests proving duplicate same-key misses coalesce while different keys continue concurrently if implemented.
+- [ ] Add exception-path tests for coalescing with both `cache_exceptions=False` and `cache_exceptions=True` if implemented.
 
 ### Newly Implied `@cache_result` Backend Follow-Ups
 
