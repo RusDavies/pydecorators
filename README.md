@@ -17,6 +17,7 @@ The initial `v0.1.0` scope is:
 - `@measure_time` — implemented
 - `@validate_types` — implemented
 - `@require_env` — implemented
+- `@circuit_breaker` — implemented
 
 
 ## Quick example
@@ -32,7 +33,7 @@ def old_function() -> str:
 
 ## Development status
 
-Pre-alpha. The project foundation exists and `@deprecated`, `@cache_result`, `@retry`, `@rate_limit`, and async `@timeout` are implemented.
+Pre-alpha. The project foundation exists and the first wave of decorators is implemented, including `@deprecated`, `@cache_result`, `@retry`, `@rate_limit`, async `@timeout`, `@log_calls`, `@measure_time`, `@validate_types`, `@require_env`, and `@circuit_breaker`.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
 
@@ -59,7 +60,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, and `docs/require_env.md` for environment checks.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, `docs/require_env.md` for environment checks, and `docs/circuit_breaker.md` for circuit-breaker behavior.
 
 ### Retry example
 
@@ -154,6 +155,25 @@ def call_service() -> str:
 ```
 
 `@require_env` checks variables at call time, so tests and deployment systems can patch environment state after import.
+
+### Circuit-breaker example
+
+```python
+from useful_decorators import CircuitBreakerOpen, circuit_breaker
+
+
+@circuit_breaker(failure_threshold=2, reset_timeout=10)
+def call_vendor_api() -> str:
+    return "ok"
+
+
+try:
+    call_vendor_api()
+except CircuitBreakerOpen:
+    pass
+```
+
+`@circuit_breaker` is an in-process breaker with closed, open, and half-open states. Useful, not magic. Architecture remains annoyingly undefeated.
 
 ### Cache example
 

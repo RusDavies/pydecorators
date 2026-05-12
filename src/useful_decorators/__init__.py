@@ -15,6 +15,7 @@ from useful_decorators.cache_result import (
     PickleCacheSerializer,
     cache_result,
 )
+from useful_decorators.circuit_breaker import CircuitBreakerOpen, CircuitState, circuit_breaker
 from useful_decorators.deprecated import deprecated
 from useful_decorators.exceptions import (
     CacheBackendClosedError,
@@ -42,6 +43,8 @@ __all__ = [
     "CacheKeyError",
     "CacheSerializationError",
     "CacheSerializer",
+    "CircuitBreakerOpen",
+    "CircuitState",
     "ConfigurationError",
     "DiskCacheBackend",
     "DiskCacheDropEvent",
@@ -54,6 +57,7 @@ __all__ = [
     "TimingInfo",
     "UsefulDecoratorsError",
     "cache_result",
+    "circuit_breaker",
     "deprecated",
     "log_calls",
     "measure_time",

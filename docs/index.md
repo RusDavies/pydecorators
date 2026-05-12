@@ -19,6 +19,7 @@ Start here when navigating the Useful Decorators documentation.
 - [`@measure_time`](measure_time.md) — timing decorator behavior, callback/logger/metrics hooks, and `TimingInfo`.
 - [`@validate_types`](validate_types.md) — lightweight runtime type validation behavior, supported annotations, and limitations.
 - [`@require_env`](require_env.md) — call-time environment variable requirements, validators, and script examples.
+- [`@circuit_breaker`](circuit_breaker.md) — in-process circuit breaker states, reset behavior, filters, and service-client examples.
 
 ## Cache backend docs
 
