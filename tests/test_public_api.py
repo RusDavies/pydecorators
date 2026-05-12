@@ -24,6 +24,7 @@ def test_public_decorators_are_exported_via_all() -> None:
         "cache_result",
         "deprecated",
         "log_calls",
+        "measure_time",
         "rate_limit",
         "retry",
         "timeout",

@@ -236,7 +236,7 @@ def test_readme_python_code_blocks_parse() -> None:
 
     code_blocks = readme_python_code_blocks()
 
-    assert len(code_blocks) == 7
+    assert len(code_blocks) == 8
     for code_block in code_blocks:
         ast.parse(code_block)
 
@@ -256,6 +256,8 @@ def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> Non
         "@timeout(seconds=2)",
         "from useful_decorators import log_calls",
         '@log_calls(include_args=True, redact_args={"password"})',
+        "from useful_decorators import TimingInfo, measure_time",
+        "@measure_time(callback=timings.append)",
         "from useful_decorators import cache_result",
         "@cache_result(maxsize=128)",
         "from useful_decorators import DiskCacheBackend, cache_result",
