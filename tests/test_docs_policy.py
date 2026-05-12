@@ -533,3 +533,81 @@ def test_external_link_checker_fails_for_invalid_ignore_pattern_shape(
 
     assert result.returncode == 1
     assert "ignore pattern must be an HTTP(S) URL pattern" in result.stderr
+
+
+def test_external_link_checker_finds_unmatched_ignore_patterns() -> None:
+    checker = load_external_link_checker_module()
+    links_by_file = {
+        Path("README.md"): [
+            "https://example.com/docs",
+            "https://vendor.example.com/reference/cache",
+        ]
+    }
+
+    assert (
+        checker.unmatched_ignore_patterns(
+            ["https://example.com/*", "https://vendor.example.com/reference/*"],
+            links_by_file,
+        )
+        == []
+    )
+    assert checker.unmatched_ignore_patterns(
+        ["https://missing.example.com/*", "https://example.com/*"],
+        links_by_file,
+    ) == ["https://missing.example.com/*"]
+
+
+def test_external_link_checker_allows_empty_or_comment_only_ignore_file(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[checked](https://example.com/docs)\n")
+    (tmp_path / ".external-links-ignore").write_text("# Template only.\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "syntax-checked 1 external HTTP(S) link(s)" in result.stdout
+
+
+def test_external_link_checker_fails_for_stale_ignore_pattern(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[checked](https://example.com/docs)\n")
+    (tmp_path / ".external-links-ignore").write_text(
+        "# Former unstable vendor docs URL.\nhttps://missing.example.com/*\n"
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert "ignore pattern does not match any current docs link" in result.stderr
+    assert "https://missing.example.com/*" in result.stderr

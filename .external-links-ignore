@@ -6,3 +6,4 @@
 # Keep this file small and explain any real ignores in the commit that adds them.
 # Every real ignore pattern must be preceded by a reason comment.
 # Ignore patterns must use http:// or https:// and include a host.
+# Ignore patterns must match at least one current external docs link.
