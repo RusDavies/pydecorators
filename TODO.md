@@ -855,9 +855,10 @@
 - [x] Add local wheel dogfood harness.
 - [x] Add realistic decorator-composition dogfood scenario.
 - [x] Run dogfood scenario from an installed wheel.
-- [ ] Dogfood in a real non-demo local project before public release.
-- [ ] Record API/documentation annoyances from real usage.
+- [x] Dogfood in a real non-demo local project before public release.
+- [x] Record API/documentation annoyances from real usage.
 - [ ] Resolve or explicitly defer dogfood findings before TestPyPI.
+- [ ] Add decorator-composition guidance based on dogfood wrapper-order findings.
 
 ## 14. Future Ideas
 
