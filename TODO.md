@@ -564,19 +564,33 @@
 
 - [ ] Add public exception examples for reserved future decorators once implemented.
 - [x] Add README link to public exception docs once centralized exception reference exists.
-- [ ] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
+- [x] Add lifecycle guidance to disk backend design docs for service shutdown hooks.
 - [x] Add note that decorator-bound disk backends should outlive decorated function use.
-- [ ] Document recommended cache file location/permissions for CLI and service use.
-- [ ] Add stress/smoke test for concurrent disk backend reads and writes.
-- [ ] Decide whether disk backend should expose cache vacuum/compaction maintenance.
+- [x] Document recommended cache file location/permissions for CLI and service use.
+- [x] Add stress/smoke test for concurrent disk backend reads and writes.
+- [x] Decide whether disk backend should expose cache vacuum/compaction maintenance.
 - [x] Add reusable backend conformance tests for cached exception behavior, TTL, LRU, clear, and stats.
-- [ ] Design `RedisCacheBackend` as optional dependency extra.
+- [x] Design `RedisCacheBackend` as optional dependency extra.
 - [x] Add backend conformance test suite reusable by memory/disk/redis backends.
 
 ### Newly Implied Backend Conformance Follow-Ups
 
-- [ ] Document backend conformance expectations for future backend contributors.
+- [x] Document backend conformance expectations for future backend contributors.
 - [ ] Add Redis backend to conformance suite when Redis backend exists.
+
+### Newly Implied Disk Backend Lifecycle Follow-Ups
+
+- [ ] Consider adding an executable service-shutdown example if a web-framework example is added.
+- [ ] Consider adding platform-specific cache-directory helpers only if path selection becomes repeated application code.
+
+### Newly Implied Disk Concurrency Smoke Follow-Ups
+
+- [ ] Consider a heavier long-running disk concurrency stress test outside default CI if SQLite locking bugs appear.
+
+### Newly Implied Redis Backend Design Follow-Ups
+
+- [ ] Decide Redis key prefix and stats-key naming before implementing `RedisCacheBackend`.
+- [ ] Add Redis extra dependency import-failure tests when the optional backend is implemented.
 - [ ] Reduce duplicate backend behavior tests now covered by the conformance suite.
 
 ## 4. `@retry`

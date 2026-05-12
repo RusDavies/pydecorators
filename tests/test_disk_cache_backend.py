@@ -1,4 +1,5 @@
 import sqlite3
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from pathlib import Path
 
@@ -505,3 +506,26 @@ def test_decorator_bound_disk_backend_fails_after_context_manager_exit(tmp_path:
 
     with pytest.raises(CacheBackendClosedError, match="cache backend is closed"):
         add_one(1)
+
+
+def test_disk_cache_backend_smoke_concurrent_reads_and_writes(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", maxsize=128)
+
+    def write_then_read(index: int) -> int:
+        key = f"key-{index % 8}"
+        backend.set_value(key, index)
+        entry = backend.get(key)
+        assert entry is not None
+        assert isinstance(entry.payload, int)
+        return entry.payload
+
+    try:
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            results = list(executor.map(write_then_read, range(64)))
+
+        assert len(results) == 64
+        info = backend.info()
+        assert info.hits == 64
+        assert info.currsize <= 8
+    finally:
+        backend.close()
