@@ -22,6 +22,14 @@ from tests.docs_policy_helpers import (
 pytestmark = pytest.mark.docs_policy
 
 
+def readme_python_code_blocks() -> list[str]:
+    return re.findall(
+        r"```python\n(.*?)\n```",
+        Path("README.md").read_text(),
+        flags=re.DOTALL,
+    )
+
+
 def load_external_link_checker_module() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
         "check_external_links", "scripts/check_external_links.py"
@@ -221,6 +229,47 @@ def test_contributing_documents_docs_file_update_checklist() -> None:
         "TODO.md",
     ]:
         assert required in contributing
+
+
+def test_readme_python_code_blocks_parse() -> None:
+    import ast
+
+    code_blocks = readme_python_code_blocks()
+
+    assert len(code_blocks) == 3
+    for code_block in code_blocks:
+        ast.parse(code_block)
+
+
+def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> None:
+    code_blocks = readme_python_code_blocks()
+    joined_blocks = "\n\n".join(code_blocks)
+
+    for required in [
+        "from useful_decorators import deprecated",
+        "@deprecated(",
+        "from useful_decorators import cache_result",
+        "@cache_result(maxsize=128)",
+        "from useful_decorators import DiskCacheBackend, cache_result",
+        "DiskCacheBackend(",
+        '@cache_result(backend=backend, namespace="users")',
+        "finally:",
+        "backend.close()",
+    ]:
+        assert required in joined_blocks
+
+
+def test_readme_disk_cache_code_block_matches_lifecycle_guidance() -> None:
+    disk_cache_block = next(
+        block for block in readme_python_code_blocks() if "DiskCacheBackend" in block
+    )
+
+    assert "backend = DiskCacheBackend" in disk_cache_block
+    assert 'namespace="users"' in disk_cache_block
+    assert "try:" in disk_cache_block
+    assert "finally:" in disk_cache_block
+    assert disk_cache_block.index("try:") < disk_cache_block.index("finally:")
+    assert disk_cache_block.index("finally:") < disk_cache_block.index("backend.close()")
 
 
 def test_readme_links_to_core_docs_pages() -> None:
