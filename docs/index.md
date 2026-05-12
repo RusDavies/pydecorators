@@ -38,6 +38,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`log_calls_examples.py`](examples/log_calls_examples.py)
 - [`rate_limit_examples.py`](examples/rate_limit_examples.py)
 - [`timeout_examples.py`](examples/timeout_examples.py)
+- [`validate_types_examples.py`](examples/validate_types_examples.py)
 
 These examples are exercised by the test suite so documentation drift gets caught before it mutates into folklore.
 

@@ -44,3 +44,11 @@ Async functions are supported with the same argument and optional return validat
 ## Limitations
 
 `@validate_types` is not a schema validator and not a security boundary. It does not validate nested container contents, protocols, typed dictionaries, literals, callables, generics in depth, constrained values, data coercion, or user-defined validation rules. Use Pydantic, attrs validators, dataclasses plus explicit checks, or domain-specific validation when that level of enforcement matters.
+
+
+## Executable examples
+
+Copy-pasteable examples live in `docs/examples/validate_types_examples.py` and are
+covered by `tests/test_docs_examples.py`. They demonstrate argument checks,
+optional return validation, and async support while keeping the shallow-validation
+limitations explicit.
