@@ -632,27 +632,35 @@
 
 ## 5. `@rate_limit`
 
-- [ ] Design signature.
-  - [ ] `calls`
-  - [ ] `period`
-  - [ ] `key`
-  - [ ] `mode`: raise or block
-  - [ ] `clock`
-  - [ ] `sleep`
-- [ ] Decide token bucket vs sliding window implementation.
-- [ ] Implement global rate limit.
-- [ ] Implement key-based rate limit.
-- [ ] Implement raise mode.
-- [ ] Implement blocking mode.
-- [ ] Implement async support.
-- [ ] Define `RateLimitExceeded` exception.
-- [ ] Add tests for allowed calls.
-- [ ] Add tests for exceeded calls.
-- [ ] Add tests for window reset.
-- [ ] Add tests for key-based isolation.
-- [ ] Add tests with fake clock/sleep.
-- [ ] Add README example.
-- [ ] Add per-decorator docs.
+- [x] Design signature.
+  - [x] `calls`
+  - [x] `period`
+  - [x] `key`
+  - [x] `mode`: raise or block
+  - [x] `clock`
+  - [x] `sleep`
+- [x] Decide token bucket vs sliding window implementation.
+- [x] Implement global rate limit.
+- [x] Implement key-based rate limit.
+- [x] Implement raise mode.
+- [x] Implement blocking mode.
+- [x] Implement async support.
+- [x] Define `RateLimitExceeded` exception.
+- [x] Add tests for allowed calls.
+- [x] Add tests for exceeded calls.
+- [x] Add tests for window reset.
+- [x] Add tests for key-based isolation.
+- [x] Add tests with fake clock/sleep.
+- [x] Add README example.
+- [x] Add per-decorator docs.
+
+### Newly Implied `@rate_limit` Follow-Ups
+
+- [ ] Add tests for concurrent sync callers sharing a rate-limit bucket.
+- [ ] Consider a structured `RateLimitExceeded` retry-after attribute if callers need machine-readable delays.
+- [ ] Add idempotency and distributed-limiter caveats before public release.
+- [ ] Consider cleanup of idle keyed buckets if long-running services create unbounded keys.
+- [ ] Add executable docs examples for `@rate_limit` if rate-limit examples grow.
 
 ## 6. `@timeout`
 

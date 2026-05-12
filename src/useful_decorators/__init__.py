@@ -25,6 +25,7 @@ from useful_decorators.exceptions import (
     RateLimitExceeded,
     UsefulDecoratorsError,
 )
+from useful_decorators.rate_limit import rate_limit
 from useful_decorators.retry import retry
 
 __version__ = "0.1.0"
@@ -47,5 +48,6 @@ __all__ = [
     "UsefulDecoratorsError",
     "cache_result",
     "deprecated",
+    "rate_limit",
     "retry",
 ]

@@ -22,6 +22,7 @@ Current public API:
 - `CacheKeyError`
 - `deprecated`
 - `retry`
+- `rate_limit`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
@@ -137,9 +138,13 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 `retry` retries sync and async callables after configured exception types. It is configured-only and supports explicit attempts, delay, exponential backoff, max delay, jitter, exception filtering, a `retry_if` predicate, attempt hooks, and injectable sleep functions for tests. Invalid retry policy raises `ConfigurationError` at decoration time. See `docs/retry.md` for behavior and examples.
 
+### `rate_limit`
+
+`rate_limit` applies in-process sliding-window limits to sync and async callables. It supports global and keyed buckets, raise or block mode, injectable clocks and sleep functions for tests, and raises `RateLimitExceeded` when a call exceeds the allowance in raise mode. See `docs/rate_limit.md` for behavior and examples.
+
 ### `RateLimitExceeded`
 
-`RateLimitExceeded` is reserved for rate-limiting decorators and is raised when a rate-limited call exceeds its configured allowance. It inherits from `UsefulDecoratorsError`.
+`RateLimitExceeded` is raised when a rate-limited call exceeds its configured allowance in raise mode. It inherits from `UsefulDecoratorsError`.
 
 ### `FunctionTimedOut`
 

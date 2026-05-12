@@ -11,7 +11,7 @@ The initial `v0.1.0` scope is:
 - `@deprecated` — implemented
 - `@cache_result` — sync/disk backend implemented
 - `@retry` — implemented
-- `@rate_limit`
+- `@rate_limit` — implemented
 - `@timeout`
 
 
@@ -28,7 +28,7 @@ def old_function() -> str:
 
 ## Development status
 
-Pre-alpha. The project foundation exists and `@deprecated`, `@cache_result`, and `@retry` are implemented.
+Pre-alpha. The project foundation exists and `@deprecated`, `@cache_result`, `@retry`, and `@rate_limit` are implemented.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
 
@@ -55,7 +55,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design and `docs/retry.md` for retry behavior.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, and `docs/rate_limit.md` for rate limiting.
 
 ### Retry example
 
@@ -69,6 +69,19 @@ def call_service() -> str:
 ```
 
 `@retry` supports sync and async functions, exception filtering, predicate-based retry decisions, attempt hooks, jitter, max-delay caps, and injectable sleep functions for fast tests.
+
+### Rate-limit example
+
+```python
+from useful_decorators import rate_limit
+
+
+@rate_limit(calls=10, period=60, key=lambda user_id: user_id)
+def call_user_api(user_id: str) -> str:
+    return "ok"
+```
+
+`@rate_limit` uses an in-process sliding window and supports global or keyed buckets, raise or block mode, async functions, and injectable clocks/sleep functions for tests.
 
 ### Cache example
 
