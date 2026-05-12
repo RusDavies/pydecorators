@@ -38,6 +38,7 @@ Add findings here as dogfood scripts expose sharp edges.
 
 - 2026-05-12: Initial harness added. No API changes required yet; first goal is keeping composition behavior executable from an installed wheel.
 - 2026-05-12: External local-project dogfood against `model-gateway-reliability-mini-lab/gateway_sim.py` passed without API changes. Dynamic wrapping worked, but it reinforced that composition docs should eventually explain decorator order for wrappers that log/retry/measure.
+- 2026-05-12: Resolved the wrapper-order documentation finding by adding `docs/composition.md` and linking it from the docs index and README. No API changes required.
 
 ## Release gate
 
@@ -46,5 +47,5 @@ Before publishing:
 - [ ] Run `python scripts/dogfood_local_wheel.py`.
 - [ ] Run `python scripts/dogfood_external_project.py`.
 - [ ] Review this findings log.
-- [ ] Resolve or explicitly defer any API/documentation issues found during dogfood use.
+- [x] Resolve or explicitly defer any API/documentation issues found during dogfood use.
 - [ ] Re-check `blakemere-decorators` availability on PyPI/TestPyPI.

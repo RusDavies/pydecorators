@@ -8,6 +8,7 @@ Start here when navigating the Useful Decorators documentation.
 - [Public exceptions](exceptions.md) — public exception hierarchy, inheritance, and handling examples.
 - [API design notes](API_DESIGN.md) — broader API design guidance for decorators.
 - [API reference](API_REFERENCE.md) — compact reference for exported decorators, cache APIs, data types, and exceptions.
+- [Decorator composition](composition.md) — practical guidance for stacking wrappers and choosing retry/logging/timing/rate-limit semantics.
 
 ## Decorator docs
 
