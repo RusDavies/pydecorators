@@ -1,4 +1,5 @@
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import pytest
@@ -57,6 +58,24 @@ def test_rate_limit_sliding_window_resets_after_period() -> None:
         limited()
     clock.advance(0.1)
     assert limited() == "ok"
+
+
+def test_rate_limit_sync_callers_share_bucket_across_threads() -> None:
+    clock = MutableClock()
+
+    @rate_limit(calls=2, period=10, clock=clock)
+    def limited(value: int) -> int:
+        return value
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = [executor.submit(limited, value) for value in range(3)]
+
+    successes = sorted(future.result() for future in futures if future.exception() is None)
+    failures = [future.exception() for future in futures if future.exception() is not None]
+
+    assert successes == [0, 1]
+    assert len(failures) == 1
+    assert isinstance(failures[0], RateLimitExceeded)
 
 
 def test_rate_limit_key_isolates_buckets() -> None:
