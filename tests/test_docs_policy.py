@@ -236,7 +236,7 @@ def test_readme_python_code_blocks_parse() -> None:
 
     code_blocks = readme_python_code_blocks()
 
-    assert len(code_blocks) == 5
+    assert len(code_blocks) == 6
     for code_block in code_blocks:
         ast.parse(code_block)
 
@@ -252,6 +252,8 @@ def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> Non
         "@retry(attempts=3, delay=0.25, backoff=2, exceptions=ConnectionError)",
         "from useful_decorators import rate_limit",
         "@rate_limit(calls=10, period=60, key=lambda user_id: user_id)",
+        "from useful_decorators import timeout",
+        "@timeout(seconds=2)",
         "from useful_decorators import cache_result",
         "@cache_result(maxsize=128)",
         "from useful_decorators import DiskCacheBackend, cache_result",

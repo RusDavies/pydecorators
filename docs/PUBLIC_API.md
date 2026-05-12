@@ -23,6 +23,7 @@ Current public API:
 - `deprecated`
 - `retry`
 - `rate_limit`
+- `timeout`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
@@ -146,6 +147,10 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 `RateLimitExceeded` is raised when a rate-limited call exceeds its configured allowance in raise mode. It inherits from `UsefulDecoratorsError`.
 
+### `timeout`
+
+`timeout` applies an async deadline using `asyncio.wait_for`. It supports `seconds`, optional custom messages, and custom exception types. Synchronous functions are rejected with `ConfigurationError` until a safe sync strategy is deliberately designed. See `docs/timeout.md` for behavior and examples.
+
 ### `FunctionTimedOut`
 
-`FunctionTimedOut` is reserved for timeout decorators and is raised when a decorated function exceeds its configured timeout. It inherits from `TimeoutError` and `UsefulDecoratorsError`.
+`FunctionTimedOut` is raised when a decorated async function exceeds its configured timeout. It inherits from `TimeoutError` and `UsefulDecoratorsError`.

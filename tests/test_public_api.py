@@ -20,6 +20,6 @@ def test_all_exports_existing_attributes() -> None:
 
 
 def test_public_decorators_are_exported_via_all() -> None:
-    public_decorators = {"cache_result", "deprecated", "rate_limit", "retry"}
+    public_decorators = {"cache_result", "deprecated", "rate_limit", "retry", "timeout"}
 
     assert public_decorators <= set(useful_decorators.__all__)
