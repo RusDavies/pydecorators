@@ -179,3 +179,12 @@ def test_validate_types_documentation_examples_execute() -> None:
     assert "argument 'value' expected int" in examples.argument_error_example()
     assert_example_result(examples.return_validation_example(), "ready")
     assert_example_result(asyncio.run(examples.async_validation_example()), "user:anonymous")
+
+
+def test_require_env_documentation_examples_execute() -> None:
+    examples = load_docs_example("require_env_examples")
+
+    assert_example_result(examples.required_variables_example(), "called")
+    assert "API_TOKEN" in examples.missing_variable_example()
+    assert "failed validation" in examples.validator_example()
+    assert_example_result(asyncio.run(examples.async_require_env_example()), "refreshed")

@@ -44,3 +44,10 @@ def call_regional_service() -> None:
 ```
 
 Async functions are supported with the same call-time checks.
+
+
+## Executable examples
+
+Copy-pasteable examples live in `docs/examples/require_env_examples.py` and are
+covered by `tests/test_docs_examples.py`. They demonstrate required variables,
+validator failures, and async call-time checks with an injected environment.
