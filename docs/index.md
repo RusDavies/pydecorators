@@ -15,6 +15,7 @@ Start here when navigating the Useful Decorators documentation.
 - [`@retry`](retry.md) — retry decorator behavior, backoff, filtering, hooks, and async support.
 - [`@rate_limit`](rate_limit.md) — rate-limit decorator behavior, sliding-window policy, keyed buckets, modes, and async support.
 - [`@timeout`](timeout.md) — async timeout decorator behavior, cancellation semantics, and sync limitations.
+- [`@log_calls`](log_calls.md) — call logging decorator behavior, duration logging, argument/result controls, and security notes.
 
 ## Cache backend docs
 

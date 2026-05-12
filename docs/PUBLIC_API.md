@@ -24,6 +24,7 @@ Current public API:
 - `retry`
 - `rate_limit`
 - `timeout`
+- `log_calls`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
@@ -142,6 +143,10 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 ### `rate_limit`
 
 `rate_limit` applies in-process sliding-window limits to sync and async callables. It supports global and keyed buckets, raise or block mode, injectable clocks and sleep functions for tests, and raises `RateLimitExceeded` when a call exceeds the allowance in raise mode. See `docs/rate_limit.md` for behavior and examples.
+
+### `log_calls`
+
+`log_calls` logs call start, completion duration, optional argument metadata, optional summarized return values, and exceptions for sync and async callables. Argument and result logging are opt-in because logs are a common place to accidentally preserve secrets. See `docs/log_calls.md` for behavior and security notes.
 
 ### `RateLimitExceeded`
 

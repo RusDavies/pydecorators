@@ -25,6 +25,7 @@ from useful_decorators.exceptions import (
     RateLimitExceeded,
     UsefulDecoratorsError,
 )
+from useful_decorators.log_calls import log_calls
 from useful_decorators.rate_limit import rate_limit
 from useful_decorators.retry import retry
 from useful_decorators.timeout import timeout
@@ -49,6 +50,7 @@ __all__ = [
     "UsefulDecoratorsError",
     "cache_result",
     "deprecated",
+    "log_calls",
     "rate_limit",
     "retry",
     "timeout",
