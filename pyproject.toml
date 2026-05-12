@@ -54,6 +54,19 @@ packages = ["src/useful_decorators"]
 
 [tool.hatch.envs.default.scripts]
 docs-policy = "./scripts/docs-policy.sh"
+full-gate = [
+  "./scripts/docs-policy.sh",
+  "ruff check .",
+  "ruff format --check .",
+  "mypy",
+  "python scripts/smoke_imports.py",
+  "python scripts/smoke_examples.py",
+  "pytest",
+  "python -m build",
+  "python scripts/smoke_wheel_install.py",
+  "python scripts/dogfood_local_wheel.py",
+  "python scripts/dogfood_external_project.py",
+]
 
 [tool.ruff]
 line-length = 100
