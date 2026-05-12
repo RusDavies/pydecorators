@@ -196,3 +196,11 @@ def test_circuit_breaker_documentation_examples_execute() -> None:
     assert_example_result(examples.open_circuit_example(), "fallback")
     assert_example_result(examples.half_open_recovery_example(), ["ok", "ok"])
     assert_example_result(asyncio.run(examples.async_circuit_breaker_example()), "async fallback")
+
+
+def test_retry_documentation_examples_execute() -> None:
+    examples = load_docs_example("retry_examples")
+
+    assert_example_result(examples.transient_success_example(), ("ok", [0.25], [1, 2]))
+    assert_example_result(examples.predicate_example(), "permanent invalid request")
+    assert_example_result(asyncio.run(examples.async_retry_example()), ("user", [0.1]))

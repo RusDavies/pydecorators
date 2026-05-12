@@ -71,3 +71,11 @@ def retry_transient(exc: BaseException) -> bool:
 def run_job() -> None:
     ...
 ```
+
+
+## Executable examples
+
+Copy-pasteable examples live in `docs/examples/retry_examples.py` and are covered
+by `tests/test_docs_examples.py`. They demonstrate transient success,
+predicate-rejected exceptions, and async retry with injected sleep functions so
+the examples do not pause the test suite like an obedient little metronome.
