@@ -5,6 +5,18 @@ on:
   pull_request:
 
 jobs:
+  docs-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install package
+        run: python -m pip install -e '.[dev]'
+      - name: Documentation policy tests
+        run: pytest -m docs_policy
+
   test:
     runs-on: ubuntu-latest
     strategy:
