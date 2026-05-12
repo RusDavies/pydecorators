@@ -201,9 +201,41 @@ When `maxsize` is exceeded, the least-recently-used entry is evicted. Cache hits
 
 ## Duplicate concurrent misses
 
-`@cache_result` does not coalesce duplicate concurrent misses in `v0.1.0`. If two threads miss the same key at the same time, both may execute the wrapped function, and the later result may overwrite the earlier cached result.
+By default, `@cache_result` does not coalesce duplicate concurrent misses. If two threads miss the same key at the same time, both may execute the wrapped function, and the later result may overwrite the earlier cached result. This keeps lock scope small and avoids holding the cache lock while user code runs.
 
-This keeps lock scope small and avoids holding the cache lock while user code runs. Request coalescing can be designed later if users need it.
+## Request coalescing design
+
+A future opt-in request coalescing mode should collapse duplicate concurrent misses for the same cache key so only the first caller computes the value and the rest wait for that in-flight computation. The option should be explicit, tentatively `coalesce_misses=True`, because it changes concurrency behavior and can make unrelated callers wait behind slow user code for the same key.
+
+Target semantics for sync functions:
+
+- Coalescing is per generated cache key, after the normal `key` / `typed` / `namespace` behavior has produced a hashable key.
+- The first thread that observes a miss becomes the producer for that key. It executes the wrapped function outside the backend lock.
+- Later threads that miss the same key while the producer is running wait on an in-flight marker rather than executing the wrapped function again.
+- Waiters must re-check the backend after the producer finishes instead of trusting a side-channel result. This keeps backend semantics authoritative for TTL, exception caching, serialization, and custom backends.
+- Coalescing must not block calls for different cache keys.
+- In-flight markers must be removed in a `finally` block so exceptions, cancellations via thread interruption, or unexpected errors do not permanently poison a key.
+
+Exception behavior should follow existing cache semantics:
+
+- If `cache_exceptions=False`, the producer raises to its caller and does not store the exception; waiters should wake, re-check the backend, see a miss, and then one waiter may become the next producer. This avoids broadcasting uncached exceptions as if they were cache entries.
+- If `cache_exceptions=True`, the producer stores the exception using the backend. Waiters wake, re-check, hit the cached exception, and re-raise it through the normal cached-exception path.
+
+Implementation sketch for the sync decorator:
+
+- Keep a wrapper-local dictionary of in-flight keys to `threading.Condition` or `threading.Event` state.
+- Protect that dictionary with its own lock, separate from backend internals.
+- Do the initial backend `get()` before joining/creating an in-flight marker so ordinary hits stay fast.
+- Never hold the in-flight lock while running user code or while calling backend methods that may take their own locks. Lock-order bugs are tiny deadlocks wearing clown shoes.
+- After producer completion, notify all waiters, remove the marker, and let waiters perform the normal cache lookup path.
+
+Non-goals for first coalescing support:
+
+- Async request coalescing. Async caching remains a separate design.
+- Cross-process coalescing for `DiskCacheBackend`. This design is process-local only.
+- Fairness guarantees among many waiters.
+- Cancellation/timeouts for waiting threads beyond normal Python thread behavior.
+- Sharing in-flight markers across multiple wrappers that happen to share a backend. Coalescing should initially be wrapper-local; backend sharing already has enough foot-guns for one barn.
 
 ## Backend direction
 
