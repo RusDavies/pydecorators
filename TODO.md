@@ -689,7 +689,7 @@
 
 ### Newly Implied `@timeout` Follow-Ups
 
-- [ ] Add tests proving timed-out coroutines receive cancellation if timeout cancellation semantics become public guidance.
+- [x] Add tests proving timed-out coroutines receive cancellation.
 - [ ] Consider custom exception constructor compatibility if users pass exception classes requiring non-message arguments.
 - [ ] Add executable docs examples for `@timeout` if async examples grow.
 - [ ] Revisit sync timeout support only with explicit platform/cancellation constraints.
