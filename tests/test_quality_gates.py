@@ -44,3 +44,17 @@ def test_pre_commit_configuration_exists() -> None:
     assert "ruff-pre-commit" in config
     assert "ruff-format" in config
     assert "mirrors-mypy" in config
+
+
+def test_pull_request_template_includes_docs_policy_checkboxes() -> None:
+    text = Path(".github/pull_request_template.md").read_text()
+
+    for required in [
+        "docs/index.md",
+        "tests/test_docs_examples.py",
+        "docs_policy",
+        "./scripts/docs-policy.sh",
+        "RELEASE.md",
+        "TODO.md",
+    ]:
+        assert required in text
