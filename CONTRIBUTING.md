@@ -75,6 +75,18 @@ When adding or changing docs files, use this checklist before calling the slice 
 
 README Python code blocks are extracted by docs policy tests. Keep them syntactically valid and synchronized with the executable examples/policy expectations when changing documented decorator usage.
 
+The README is also expected to link the core documentation path for new users and reviewers:
+
+- `docs/index.md`
+- `docs/PUBLIC_API.md`
+- `docs/API_DESIGN.md`
+- `docs/exceptions.md`
+- `docs/deprecated.md`
+- `docs/cache_result.md`
+- `docs/disk_cache_backend.md`
+
+If that required set changes, update the README and the matching docs policy test in the same branch.
+
 External HTTP(S) links are syntax-checked only. The docs policy tests verify that they have an `http://` or `https://` scheme, a host, and no whitespace, but they do not fetch the network or fail builds because somebody else's server hiccuped. Local links and local Markdown anchors are checked for actual existence.
 
 If a planning/backlog file such as `GOAL.md`, `PLAN.md`, or `TODO.md` becomes user-facing navigation, update the root documentation link policy at the same time.
