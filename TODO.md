@@ -146,9 +146,14 @@
 
 ### Newly Implied Request Coalescing Follow-Ups
 
-- [ ] Implement opt-in `coalesce_misses=True` for sync `@cache_result` wrappers if duplicate miss storms become part of the v0.1.0 scope.
-- [ ] Add thread-level tests proving duplicate same-key misses coalesce while different keys continue concurrently if implemented.
-- [ ] Add exception-path tests for coalescing with both `cache_exceptions=False` and `cache_exceptions=True` if implemented.
+- [x] Implement opt-in `coalesce_misses=True` for sync `@cache_result` wrappers.
+- [x] Add thread-level tests proving duplicate same-key misses coalesce while different keys continue concurrently.
+- [x] Add exception-path tests for coalescing with both `cache_exceptions=False` and `cache_exceptions=True`.
+
+### Newly Implied Request Coalescing Implementation Follow-Ups
+
+- [ ] Consider exposing in-flight wait counters or timing diagnostics if users need visibility into coalesced waits.
+- [ ] Consider adding stress tests for many waiters on one key if coalescing becomes heavily used.
 
 ### Newly Implied `@cache_result` Backend Follow-Ups
 

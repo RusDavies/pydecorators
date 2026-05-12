@@ -10,7 +10,7 @@ from collections.abc import Callable, Hashable
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from threading import RLock
+from threading import Event, RLock
 from typing import Any, Protocol, cast, runtime_checkable
 
 from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
@@ -638,6 +638,7 @@ def cache_result(
     typed: bool = False,
     cache_exceptions: bool = False,
     refresh_ttl_on_hit: bool = False,
+    coalesce_misses: bool = False,
     clock: Clock | None = None,
     backend: CacheBackend | None = None,
     namespace: str | None = None,
@@ -673,16 +674,19 @@ def cache_result(
         def cache_clear() -> None:
             cache_backend.clear()
 
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            cache_key = make_key(cast(tuple[object, ...], args), cast(dict[str, object], kwargs))
-            entry = cache_backend.get(cache_key)
-            if entry is not None:
-                if entry.is_exception:
-                    raise cast(BaseException, entry.payload)
-                return cast(R, entry.payload)
+        in_flight_lock = RLock()
+        in_flight: dict[Hashable, Event] = {}
 
+        def cached_entry_value(entry: _CacheEntry) -> R:
+            if entry.is_exception:
+                raise cast(BaseException, entry.payload)
+            return cast(R, entry.payload)
+
+        def compute_and_store(
+            cache_key: Hashable, args: tuple[object, ...], kwargs: dict[str, object]
+        ) -> R:
             try:
-                result = func(*args, **kwargs)
+                result = func(*cast(Any, args), **cast(Any, kwargs))
             except Exception as exc:
                 if cache_exceptions:
                     cache_backend.set_exception(cache_key, exc)
@@ -690,6 +694,44 @@ def cache_result(
 
             cache_backend.set_value(cache_key, result)
             return result
+
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            cache_key = make_key(cast(tuple[object, ...], args), cast(dict[str, object], kwargs))
+            entry = cache_backend.get(cache_key)
+            if entry is not None:
+                return cached_entry_value(entry)
+            if not coalesce_misses:
+                return compute_and_store(
+                    cache_key, cast(tuple[object, ...], args), cast(dict[str, object], kwargs)
+                )
+
+            while True:
+                with in_flight_lock:
+                    in_flight_event = in_flight.get(cache_key)
+                    if in_flight_event is None:
+                        in_flight_event = Event()
+                        in_flight[cache_key] = in_flight_event
+                        producer = True
+                    else:
+                        producer = False
+
+                if producer:
+                    try:
+                        return compute_and_store(
+                            cache_key,
+                            cast(tuple[object, ...], args),
+                            cast(dict[str, object], kwargs),
+                        )
+                    finally:
+                        with in_flight_lock:
+                            if in_flight.get(cache_key) is in_flight_event:
+                                in_flight.pop(cache_key, None)
+                            in_flight_event.set()
+
+                in_flight_event.wait()
+                entry = cache_backend.get(cache_key)
+                if entry is not None:
+                    return cached_entry_value(entry)
 
         wrapped = mirror_metadata(wrapper, func)
         wrapped_with_cache_api = cast(Any, wrapped)
