@@ -92,9 +92,19 @@ python scripts/dogfood_local_wheel.py
 python scripts/dogfood_external_project.py
 ```
 
-## Public API and contributing
+## Documentation
 
-See `docs/index.md` for the documentation index, `docs/PUBLIC_API.md` for the public API policy, `docs/API_DESIGN.md` for broader API design notes, `docs/composition.md` for decorator stacking guidance, `docs/exceptions.md` for public exception behavior, `docs/security_hardening.md` for cache/logging/validation safety guidance, and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
+Start with `docs/index.md`, then use the focused pages when you need specifics:
+
+- `docs/PUBLIC_API.md` — public API and compatibility policy
+- `docs/API_DESIGN.md` — broader API design notes
+- `docs/API_REFERENCE.md` — compact public API reference
+- `docs/composition.md` — decorator stacking guidance
+- `docs/exceptions.md` — public exception behavior
+- `docs/security_hardening.md` — cache/logging/validation safety guidance
+- `CONTRIBUTING.md` — new-decorator and documentation-maintenance checklist
+
+Executable documentation examples live under `docs/examples/`.
 
 ## Release process
 

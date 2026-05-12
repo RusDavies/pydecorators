@@ -553,7 +553,7 @@
 ### Newly Implied README Core Docs Policy Follow-Ups
 
 - [x] Consider documenting the README core-doc link set in CONTRIBUTING if the required list grows.
-- [ ] Consider grouping README documentation links into a dedicated Documentation section if the homepage grows longer.
+- [x] Consider grouping README documentation links into a dedicated Documentation section if the homepage grows longer.
 - [x] Add tests that all public exceptions appear in public API docs.
 
 ### Newly Implied Public Exception Policy Follow-Ups
