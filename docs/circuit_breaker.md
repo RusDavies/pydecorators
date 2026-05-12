@@ -52,3 +52,10 @@ except CircuitBreakerOpen:
 ## Limitations
 
 This is an in-process circuit breaker. It is not shared across processes, containers, or hosts. For distributed systems, pair it with service-level timeouts, retries, backoff, and observability. Software reliability: one decorator helps; it does not replace architecture, no matter how much we squint at it.
+
+
+## Executable examples
+
+Copy-pasteable examples live in `docs/examples/circuit_breaker_examples.py` and are
+covered by `tests/test_docs_examples.py`. They demonstrate open-circuit fallback,
+half-open recovery, and async use with an injectable clock for deterministic output.
