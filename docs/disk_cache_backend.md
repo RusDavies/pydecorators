@@ -404,6 +404,22 @@ Design constraints:
 
 Pre-implementation tests should cover aggregate reports excluding per-row data, preserving safe-mode no-preview behavior, surfacing truncation, and not mutating cache stats or recency state.
 
+## Inspection report retention and deletion guidance
+
+Generated inspection reports can outlive the cache files they summarize. A disposable local cache may become a durable artifact once copied into CI logs, issue attachments, chat transcripts, ticket systems, or support bundles. Treat generated reports as artifacts with their own retention policy.
+
+Retention guidance:
+
+- Prefer generating reports into caller-controlled paths, not hidden library-managed locations.
+- Support-bundle tooling should document where reports are written and when they should be deleted.
+- CI examples should avoid uploading inspection reports by default; if uploaded, retention should be short and access-controlled.
+- Support workflows should delete local report files after transfer or after the debugging window closes.
+- Reports should include creation time and safe-mode/preview-mode metadata so stale artifacts are easier to identify.
+- Preview-enabled reports should be treated like sensitive data exports and should have stricter retention than aggregate/no-preview reports.
+- The library should not silently phone home, upload, or retain inspection reports. External transfer remains the caller’s responsibility.
+
+Pre-implementation tests should cover docs/examples that avoid automatic uploads, label report sensitivity, and show caller-owned output paths rather than hidden default report directories.
+
 Pre-implementation tests should cover documentation and examples that label no-preview reports as lower-risk but still sensitive. If a future CLI/support-bundle command is added, tests should assert its default output excludes previews and includes a sensitivity warning.
 
 Pre-implementation tests should cover:

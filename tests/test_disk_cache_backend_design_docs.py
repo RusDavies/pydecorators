@@ -305,3 +305,23 @@ def test_disk_cache_backend_design_doc_covers_inspection_sensitivity_warnings() 
         "absence of “safe for public sharing” language",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_inspection_report_retention() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Inspection report retention and deletion guidance",
+        "Generated inspection reports can outlive the cache files",
+        "CI logs",
+        "ticket systems",
+        "retention policy",
+        "caller-controlled paths",
+        "where reports are written",
+        "CI examples should avoid uploading inspection reports by default",
+        "delete local report files after transfer",
+        "creation time and safe-mode/preview-mode metadata",
+        "Preview-enabled reports should be treated like sensitive data exports",
+        "should not silently phone home, upload, or retain inspection reports",
+    ]:
+        assert required in text
