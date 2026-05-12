@@ -3,7 +3,7 @@ requires = ["hatchling>=1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "useful-decorators"
+name = "blakemere-decorators"
 version = "0.1.0"
 description = "A focused library of useful Python decorators for reliability, caching, rate limiting, timeouts, and developer ergonomics."
 readme = "README.md"
@@ -44,9 +44,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/RusDavies/useful-decorators"
-Repository = "https://github.com/RusDavies/useful-decorators"
-Issues = "https://github.com/RusDavies/useful-decorators/issues"
+Homepage = "https://github.com/RusDavies/blakemere-decorators"
+Repository = "https://github.com/RusDavies/blakemere-decorators"
+Issues = "https://github.com/RusDavies/blakemere-decorators/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/useful_decorators"]

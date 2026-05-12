@@ -14,7 +14,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-USER_AGENT = "useful-decorators-link-checker/0.1"
+USER_AGENT = "blakemere-decorators-link-checker/0.1"
 DEFAULT_IGNORE_FILE = ".external-links-ignore"
 
 

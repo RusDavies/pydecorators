@@ -1,6 +1,6 @@
 # RELEASE.md — Release Checklist
 
-Use this checklist before publishing `useful-decorators` releases. The goal is to make releases boring, repeatable, and hard to mess up. Revolutionary concept, apparently.
+Use this checklist before publishing `blakemere-decorators` releases. The goal is to make releases boring, repeatable, and hard to mess up. Revolutionary concept, apparently.
 
 ## Release scope
 
@@ -145,7 +145,7 @@ For first release, use TestPyPI before PyPI.
 
 ## Package name availability
 
-As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project, so the first public release needs a new distribution name before TestPyPI/PyPI publishing. Do not publish over an unrelated existing project name; pick a new name, update `pyproject.toml`, and re-run the release checklist.
+As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project. Russ chose `blakemere-decorators` as the replacement distribution name, and PyPI/TestPyPI returned 404 Not Found for that name when checked before updating `pyproject.toml`. Re-check availability immediately before publishing because package names are mutable external state, annoyingly.
 
 ## Tagging convention
 
