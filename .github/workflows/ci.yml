@@ -31,3 +31,5 @@ jobs:
         run: pytest
       - name: Build package
         run: python -m build
+      - name: Wheel install smoke test
+        run: python scripts/smoke_wheel_install.py

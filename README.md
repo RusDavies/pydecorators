@@ -69,6 +69,7 @@ python scripts/smoke_imports.py
 python scripts/smoke_examples.py
 pytest
 python -m build
+python scripts/smoke_wheel_install.py
 ```
 
 `pytest` enforces coverage for `useful_decorators` with terminal and XML coverage reports.

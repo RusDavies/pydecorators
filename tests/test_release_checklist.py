@@ -12,6 +12,7 @@ def test_release_checklist_exists_and_mentions_required_gates() -> None:
         "mypy",
         "pytest",
         "python -m build",
+        "python scripts/smoke_wheel_install.py",
         "TestPyPI",
         "PyPI",
     ]:
@@ -77,6 +78,18 @@ def test_release_checklist_documents_optional_external_link_checker() -> None:
     assert "--verbose" in script_text
     assert "--retries" in script_text
     assert "--backoff" in script_text
+
+
+def test_release_checklist_documents_package_name_and_tagging() -> None:
+    text = Path("RELEASE.md").read_text()
+
+    assert "## Package name availability" in text
+    assert "useful-decorators" in text
+    assert "already occupied" in text
+    assert "new distribution name" in text
+    assert "## Tagging convention" in text
+    assert "vMAJOR.MINOR.PATCH" in text
+    assert "git tag -a v0.1.0" in text
 
 
 def test_release_checklist_documents_persistent_cache_compatibility() -> None:

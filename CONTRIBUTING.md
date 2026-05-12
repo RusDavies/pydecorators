@@ -35,6 +35,7 @@ python scripts/smoke_imports.py
 python scripts/smoke_examples.py
 pytest
 python -m build
+python scripts/smoke_wheel_install.py
 ```
 
 The project also ships optional pre-commit hooks. Install them with `pre-commit install` if you want local lint/format/type checks before commits. This is optional because surprise Git hooks are how productivity gets mugged in an alley.
