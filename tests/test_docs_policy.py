@@ -676,3 +676,29 @@ def test_external_link_checker_fails_for_stale_ignore_pattern(
     assert result.returncode == 1
     assert "ignore pattern does not match any current docs link" in result.stderr
     assert "https://missing.example.com/*" in result.stderr
+
+
+def test_retry_docs_include_idempotency_guidance() -> None:
+    text = Path("docs/retry.md").read_text()
+
+    for required in [
+        "## Idempotency guidance",
+        "idempotency key",
+        "payments",
+        "email sending",
+        "duplicate attempts",
+    ]:
+        assert required in text
+
+
+def test_rate_limit_docs_include_side_effect_and_distributed_caveats() -> None:
+    text = Path("docs/rate_limit.md").read_text()
+
+    for required in [
+        "## Idempotency and side effects",
+        "does not make an operation idempotent",
+        "distributed system",
+        "separate in-memory bucket",
+        "retry-after",
+    ]:
+        assert required in text
