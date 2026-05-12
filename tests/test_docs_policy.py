@@ -416,6 +416,36 @@ def test_external_link_checker_does_not_retry_non_retryable_failures(
     assert sleeps == []
 
 
+def test_external_link_checker_caps_retry_backoff(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    checker = load_external_link_checker_module()
+    attempts = 0
+    sleeps: list[float] = []
+
+    def fake_check_url_once(url: str, timeout: float) -> tuple[bool, str, bool]:
+        nonlocal attempts
+        attempts += 1
+        if attempts < 4:
+            return False, "temporary outage", True
+        return True, "200", False
+
+    monkeypatch.setattr(checker, "check_url_once", fake_check_url_once)
+
+    ok, detail = checker.check_url(
+        "https://example.com",
+        timeout=3.0,
+        retries=3,
+        backoff=0.5,
+        max_backoff=0.75,
+        sleep=sleeps.append,
+    )
+
+    assert ok
+    assert detail == "200"
+    assert sleeps == [0.5, 0.75, 0.75]
+
+
 def test_external_link_checker_reports_verbose_attempt_details(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

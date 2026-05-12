@@ -162,6 +162,7 @@ def check_url(
     timeout: float,
     retries: int,
     backoff: float,
+    max_backoff: float | None = None,
     sleep: Callable[[float], None] = time.sleep,
     report_attempt: Callable[[str], None] | None = None,
 ) -> tuple[bool, str]:
@@ -180,7 +181,10 @@ def check_url(
         last_detail = detail
         if not retryable or attempt == attempts - 1:
             break
-        sleep(backoff * (2**attempt))
+        retry_delay = backoff * (2**attempt)
+        if max_backoff is not None:
+            retry_delay = min(retry_delay, max_backoff)
+        sleep(retry_delay)
 
     return False, f"{last_detail} after {attempt_number} attempt(s)"
 
@@ -200,6 +204,12 @@ def main() -> int:
         type=float,
         default=0.5,
         help="initial retry backoff seconds; doubles after each transient failure",
+    )
+    parser.add_argument(
+        "--max-backoff",
+        type=float,
+        default=5.0,
+        help="maximum retry backoff seconds for transient failures",
     )
     parser.add_argument(
         "--syntax-only",
@@ -273,6 +283,7 @@ def main() -> int:
                 args.timeout,
                 args.retries,
                 args.backoff,
+                args.max_backoff,
                 report_attempt=reporter,
             )
             if not ok:
