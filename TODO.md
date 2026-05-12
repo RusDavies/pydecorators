@@ -222,7 +222,13 @@
 - [ ] Consider adding `DiskCachePreviewContext` only if `inspect_entries()` enters public scope.
 - [ ] Consider tracking redaction failure counts in a future inspection report.
 - [ ] Consider documenting whether built-in redaction policies run before or after caller-provided redactors if both are ever supported.
-- [ ] Consider documenting a no-previews mode for support bundles and CI artifacts if inspection tooling is added.
+- [x] Document no-previews mode for support bundles and CI artifacts if inspection tooling is added.
+
+### Newly Implied No-Preview Safe Mode Follow-Ups
+
+- [ ] Consider making any future inspection CLI default to no-preview safe mode.
+- [ ] Consider adding tests that safe mode never invokes preview redactors if inspection tooling is implemented.
+- [ ] Consider documenting support-bundle metadata sensitivity even when previews are disabled.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
 

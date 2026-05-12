@@ -205,3 +205,23 @@ def test_disk_cache_backend_design_doc_covers_preview_redactor_callback_design()
         "keeps redaction separate from serializer logic",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_no_preview_safe_mode() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## No-preview support bundle and CI mode",
+        "support bundles",
+        "CI artifacts",
+        "include_payload_preview=False",
+        "must not include payload preview text",
+        "raw payload bytes",
+        "serialized cache keys",
+        "deserialized values",
+        "should not invoke `preview_redactor`",
+        "lower-risk, not risk-free",
+        "--include-payload-preview",
+        "safe mode never calls caller-provided redactors",
+    ]:
+        assert required in text

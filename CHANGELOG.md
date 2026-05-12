@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- No-preview support bundle/CI guidance for future disk-cache inspection tooling.
 - `preview_redactor` callback design guidance for future disk-cache inspection previews.
 - Payload preview redaction guidance for future disk-cache inspection tooling.
 - Bounded payload preview policy guidance for future disk-cache inspection APIs.

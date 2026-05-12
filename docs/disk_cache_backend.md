@@ -287,6 +287,36 @@ Redaction posture:
 - Inspection output should not be logged automatically by the library. Callers own where diagnostic reports go.
 - Documentation should warn against enabling previews in shared logs, support bundles, CI artifacts, public bug reports, screenshots, or chat pastebins unless the payload domain is known safe. Yes, this includes pastebins. Especially pastebins.
 
+## No-preview support bundle and CI mode
+
+If inspection tooling is added, it should have a safe mode intended for support bundles, CI artifacts, issue templates, and automated diagnostics. That mode should include structural cache metadata while excluding payload previews entirely.
+
+Tentative call shape:
+
+```python
+report = backend.inspect_entries(
+    include_payload_preview=False,
+    preview_redactor=None,
+)
+```
+
+Safe-mode expectations:
+
+- `include_payload_preview=False` should be the default and the recommended setting for support bundles, CI artifacts, public issues, screenshots, chat transcripts, and automated diagnostic uploads.
+- Safe-mode reports may include counts, serializer content types, payload byte sizes, exception flags, expiry presence, and truncation/report pagination metadata.
+- Safe-mode reports must not include payload preview text, raw payload bytes, serialized cache keys, or deserialized values.
+- Safe-mode should not invoke `preview_redactor`; there is no preview to redact.
+- Documentation should describe safe-mode output as lower-risk, not risk-free. Serializer content types, row counts, and payload sizes can still reveal application behavior. Tiny metadata can still wear a trench coat.
+- Any future CLI should use safe mode by default and require an explicit flag such as `--include-payload-preview` before printing previews.
+
+Pre-implementation tests should cover:
+
+- support/CI safe mode omits preview fields or sets them to `None`
+- safe mode never calls caller-provided redactors
+- safe mode includes enough non-payload metadata for useful diagnostics
+- future CLI/default examples do not enable previews by default
+- docs warn that metadata is lower-risk but not automatically non-sensitive
+
 ## `preview_redactor` callback design
 
 If payload previews become part of `DiskCacheBackend.inspect_entries()`, redaction should be caller-owned and explicit. A callback gives applications a place to apply domain-specific policy without pretending the library can magically recognize every secret shaped like a cursed potato.
