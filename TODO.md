@@ -803,7 +803,7 @@
 
 ### Newly Implied Documentation Follow-Ups
 
-- [ ] Expand API reference with exact parameter defaults if public signatures change before release.
+- [x] Expand API reference with exact parameter defaults if public signatures change before release.
 - [x] Add a decorator-composition guide if users ask about stacking order.
 - [ ] Add executable README snippets for every first-release decorator if the examples are promoted beyond smoke-test coverage.
 - [x] Add a security hardening page if cache/logging/validation warnings keep growing.
