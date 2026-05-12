@@ -151,3 +151,22 @@ def test_log_calls_documentation_examples_execute() -> None:
     async_messages = asyncio.run(examples.async_logging_example())
     assert any("refresh_user started" in message for message in async_messages)
     assert any("refresh_user finished" in message for message in async_messages)
+
+
+def test_measure_time_documentation_examples_execute() -> None:
+    examples = load_docs_example("measure_time_examples")
+
+    result, info = examples.callback_example()
+    assert_example_result(result, "ready")
+    assert_example_result(info.function, "callback_example.<locals>.load_report")
+    assert_example_result(info.duration, 0.25)
+    assert_example_result(info.success, True)
+
+    assert_example_result(
+        examples.metrics_hook_example(),
+        [("metrics_hook_example.<locals>.rebuild_cache", 0.5, True)],
+    )
+
+    async_info = asyncio.run(examples.async_timing_example())
+    assert_example_result(async_info.duration, 0.125)
+    assert_example_result(async_info.success, True)
