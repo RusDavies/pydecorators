@@ -68,7 +68,7 @@ def markdown_heading_anchor(heading: str) -> str:
     anchor = re.sub(r"[^a-z0-9 _-]", "", anchor)
     anchor = anchor.replace(" ", "-")
     anchor = re.sub(r"-+", "-", anchor)
-    return anchor
+    return anchor.strip("-")
 
 
 def markdown_heading_anchors(path: Path) -> set[str]:
