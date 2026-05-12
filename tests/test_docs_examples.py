@@ -222,3 +222,10 @@ def test_composition_documentation_examples_execute() -> None:
         asyncio.run(examples.timeout_outside_retry_example()),
         "whole operation timed out",
     )
+
+
+def test_retry_idempotency_documentation_examples_execute() -> None:
+    examples = load_docs_example("retry_idempotency_examples")
+
+    assert_example_result(examples.idempotency_key_example(), ("charge:5000:invoice-123", 3))
+    assert_example_result(examples.retry_read_example(), "ready")
