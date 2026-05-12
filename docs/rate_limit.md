@@ -55,3 +55,11 @@ If the protected dependency has its own retry-after or quota headers, prefer fee
 ## Notes
 
 This is an in-process rate limiter. It is suitable for scripts, local tools, tests, and single-process services. It is not a distributed quota system. Multiple processes or hosts each have their own counters unless a future shared backend is added.
+
+
+## Executable examples
+
+Copy-pasteable examples live in `docs/examples/rate_limit_examples.py` and are
+covered by `tests/test_docs_examples.py`. They use an injectable clock and sleep
+function so raise-mode, keyed-bucket, and block-mode behavior can be demonstrated
+without real waiting.

@@ -666,7 +666,7 @@
 - [ ] Consider a structured `RateLimitExceeded` retry-after attribute if callers need machine-readable delays.
 - [x] Add idempotency and distributed-limiter caveats before public release.
 - [ ] Consider cleanup of idle keyed buckets if long-running services create unbounded keys.
-- [ ] Add executable docs examples for `@rate_limit` if rate-limit examples grow.
+- [x] Add executable docs examples for `@rate_limit`.
 
 ## 6. `@timeout`
 
