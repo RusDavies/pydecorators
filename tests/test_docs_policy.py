@@ -297,19 +297,29 @@ def test_readme_disk_cache_code_block_matches_lifecycle_guidance() -> None:
     assert disk_cache_block.index("finally:") < disk_cache_block.index("backend.close()")
 
 
+README_CORE_DOC_LINKS = [
+    "docs/index.md",
+    "docs/PUBLIC_API.md",
+    "docs/API_DESIGN.md",
+    "docs/exceptions.md",
+    "docs/deprecated.md",
+    "docs/cache_result.md",
+    "docs/disk_cache_backend.md",
+]
+
+
 def test_readme_links_to_core_docs_pages() -> None:
     readme = Path("README.md").read_text()
 
-    for required_link in [
-        "docs/index.md",
-        "docs/PUBLIC_API.md",
-        "docs/API_DESIGN.md",
-        "docs/exceptions.md",
-        "docs/deprecated.md",
-        "docs/cache_result.md",
-        "docs/disk_cache_backend.md",
-    ]:
+    for required_link in README_CORE_DOC_LINKS:
         assert required_link in readme
+
+
+def test_contributing_documents_readme_core_doc_links() -> None:
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    for required_link in README_CORE_DOC_LINKS:
+        assert required_link in contributing
 
 
 def test_contributing_documents_docs_index_inclusion_rule() -> None:
