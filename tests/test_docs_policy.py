@@ -702,3 +702,12 @@ def test_rate_limit_docs_include_side_effect_and_distributed_caveats() -> None:
         "retry-after",
     ]:
         assert required in text
+
+
+def test_docs_example_link_labels_match_filenames() -> None:
+    docs_index = Path("docs/index.md").read_text()
+    example_links = re.findall(r"\[`([^`]+)`\]\((examples/[^)]+\.py)\)", docs_index)
+
+    assert example_links
+    for label, target in example_links:
+        assert label == Path(target).name
