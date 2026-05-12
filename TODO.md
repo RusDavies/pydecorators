@@ -692,15 +692,22 @@
 
 ### `@log_calls`
 
-- [ ] Design signature.
-- [ ] Add argument redaction support.
-- [ ] Add return value redaction/summarization.
-- [ ] Add exception logging.
-- [ ] Add duration logging.
-- [ ] Add sync tests.
-- [ ] Add async tests.
-- [ ] Add security docs.
+- [x] Design signature.
+- [x] Add argument redaction support.
+- [x] Add return value redaction/summarization.
+- [x] Add exception logging.
+- [x] Add duration logging.
+- [x] Add sync tests.
+- [x] Add async tests.
+- [x] Add security docs.
 
+
+### Newly Implied `@log_calls` Follow-Ups
+
+- [ ] Consider supporting positional argument redaction by parameter name using `inspect.signature` if users request it.
+- [ ] Consider structured log record extras for function name, duration, and outcome if logging integrations need machine-readable fields.
+- [ ] Add executable docs examples for `@log_calls` if logging examples grow.
+- [ ] Consider async-safe result summarizers only if users need asynchronous summarization hooks.
 ### `@measure_time`
 
 - [ ] Design signature.

@@ -13,6 +13,7 @@ The initial `v0.1.0` scope is:
 - `@retry` — implemented
 - `@rate_limit` — implemented
 - `@timeout` — async implementation complete
+- `@log_calls` — implemented
 
 
 ## Quick example
@@ -55,7 +56,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, and `docs/timeout.md` for async timeout behavior.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, and `docs/log_calls.md` for call logging.
 
 ### Retry example
 
@@ -95,6 +96,19 @@ async def fetch_user(user_id: str) -> str:
 ```
 
 `@timeout` currently supports async functions using `asyncio.wait_for`. Sync functions are rejected deliberately until a safe, well-documented sync timeout strategy exists.
+
+### Logging example
+
+```python
+from useful_decorators import log_calls
+
+
+@log_calls(include_args=True, redact_args={"password"})
+def authenticate(*, username: str, password: str) -> bool:
+    return bool(username and password)
+```
+
+`@log_calls` logs start/finish duration and exceptions by default. Argument and result logging are opt-in; use redaction and summaries carefully because logs are where secrets go to become immortal.
 
 ### Cache example
 
