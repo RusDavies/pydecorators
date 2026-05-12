@@ -217,7 +217,12 @@
 ### Newly Implied Disk Persistence Docs Follow-Ups
 
 - [ ] Add subprocess-level persistence example coverage if process-boundary behavior becomes user-facing release guidance.
-- [ ] Consider documenting namespace/key stability expectations more prominently for persistent cache reuse.
+- [x] Consider documenting namespace/key stability expectations more prominently for persistent cache reuse.
+
+### Newly Implied Disk Namespace Stability Follow-Ups
+
+- [ ] Consider adding a README note about namespace/key stability if persistent disk caching becomes a headline feature.
+- [ ] Consider adding cache schema/version namespace guidance before a public release.
 - [x] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
 
 ### Newly Implied Disk Lifecycle Docs Follow-Ups

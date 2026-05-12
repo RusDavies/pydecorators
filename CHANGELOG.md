@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `DiskCacheBackend` namespace/key stability documentation.
 - `DiskCacheBackend` persistence documentation example coverage.
 - Stale ignore-pattern validation for the optional external documentation link checker.
 - HTTP(S) URL-shape validation for external link ignore patterns.
