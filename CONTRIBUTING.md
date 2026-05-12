@@ -105,7 +105,11 @@ Run documentation policy checks with:
 
 ```bash
 ./scripts/docs-policy.sh
+# or, when using Hatch locally:
+hatch run docs-policy
 ```
+
+The Hatch alias intentionally delegates to the same script so local and CI documentation checks do not drift.
 
 ## Root documentation links
 

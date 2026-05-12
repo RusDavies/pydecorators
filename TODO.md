@@ -460,8 +460,9 @@
 
 ### Newly Implied Docs Policy Command Follow-Ups
 
+- [ ] Add additional Hatch aliases only if release/test command repetition gets annoying.
 - [ ] Revisit planning-doc navigation policy only if TODO/PLAN become public website pages.
-- [ ] Consider adding a package-manager alias for the docs policy script if project tooling grows beyond plain Python scripts.
+- [x] Add a package-manager alias for the docs policy script.
 - [x] Add CI job split for documentation policy tests.
 - [ ] Consider making docs-policy job path-filtered if CI time becomes annoying.
 - [x] Consider splitting documentation policy tests out of `test_public_api_policy.py`.

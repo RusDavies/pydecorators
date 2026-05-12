@@ -52,6 +52,9 @@ Issues = "https://github.com/RusDavies/blakemere-decorators/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["src/useful_decorators"]
 
+[tool.hatch.envs.default.scripts]
+docs-policy = "./scripts/docs-policy.sh"
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
