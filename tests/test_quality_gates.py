@@ -59,3 +59,12 @@ def test_pull_request_template_includes_docs_policy_checkboxes() -> None:
         "TODO.md",
     ]:
         assert required in text
+
+
+def test_pyproject_exposes_docs_policy_hatch_alias() -> None:
+    pyproject = Path("pyproject.toml").read_text()
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    assert "[tool.hatch.envs.default.scripts]" in pyproject
+    assert 'docs-policy = "./scripts/docs-policy.sh"' in pyproject
+    assert "hatch run docs-policy" in contributing
