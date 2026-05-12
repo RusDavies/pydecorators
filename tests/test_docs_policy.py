@@ -798,3 +798,14 @@ def test_contributing_documents_planning_doc_navigation_boundary() -> None:
     assert "planning/backlog files" in contributing
     assert "deliberately promoted to user-facing documentation" in contributing
     assert "not required to link the docs index" in contributing
+
+
+def test_timeout_docs_explain_custom_exception_constructor_contract() -> None:
+    text = Path("docs/timeout.md").read_text()
+
+    for required in [
+        "constructible with a single message string",
+        "require additional",
+        "constructor arguments are not supported",
+    ]:
+        assert required in text

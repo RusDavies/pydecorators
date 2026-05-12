@@ -19,6 +19,11 @@ async def fetch_user(user_id: str) -> dict[str, object]:
 
 Invalid configuration raises `ConfigurationError` at decoration time.
 
+Custom exception types must be constructible with a single message string, for example
+`CustomTimeout("operation timed out")`. Exception classes that require additional
+constructor arguments are not supported by `@timeout`; wrap them in a simple timeout
+exception type instead of relying on unusual constructor signatures.
+
 ## Async behavior
 
 The first implementation is intentionally async-only and uses `asyncio.wait_for`. If the wrapped coroutine exceeds the deadline, `@timeout` raises `FunctionTimedOut` by default. The underlying coroutine is cancelled by `asyncio.wait_for` according to normal asyncio semantics.
