@@ -205,7 +205,13 @@
 
 - [ ] Implement `DiskCacheBackend.inspect_entries()` only if stable inspection tooling becomes part of public scope.
 - [ ] Consider adding redacted key digests such as `key_sha256` if operators need to correlate rows without exposing serialized keys.
-- [ ] Consider adding bounded payload preview policy tests before implementing any inspection API.
+- [x] Add bounded payload preview policy design/tests before implementing any inspection API.
+
+### Newly Implied Bounded Payload Preview Follow-Ups
+
+- [ ] Implement payload preview helper tests only if `DiskCacheBackend.inspect_entries()` enters public scope.
+- [ ] Consider making preview byte limits configurable only within a hard maximum.
+- [ ] Consider documenting redaction expectations if previews may contain sensitive cached data.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
 
 ### Newly Implied Disk Schema Metadata Follow-Ups
