@@ -10,7 +10,7 @@ For stability rules, see [Public API policy](PUBLIC_API.md). For exception inher
 
 Emit a deprecation warning when a sync or async function is called. Supports bare and configured usage. See [`@deprecated`](deprecated.md).
 
-### `cache_result(...)`
+### `cache_result(*, ttl=None, maxsize=128, key=None, typed=False, cache_exceptions=False, refresh_ttl_on_hit=False, coalesce_misses=False, clock=None, backend=None, namespace=None)`
 
 Cache sync function results in memory or a configured backend. Supports TTL, maxsize/LRU behavior, custom key functions, namespaces, cached exceptions, miss coalescing, and memory/disk backends. Async callables are rejected until async cache semantics are deliberately designed. See [`@cache_result`](cache_result.md).
 
@@ -26,7 +26,7 @@ Apply an in-process sliding-window rate limit to sync or async callables. See [`
 
 Apply an async timeout using `asyncio.wait_for`. Sync callables are rejected. See [`@timeout`](timeout.md).
 
-### `log_calls(...)`
+### `log_calls(*, logger=None, level=logging.INFO, include_args=False, include_result=False, redact_args=(), summarize_result=None, log_exceptions=True, clock=None)`
 
 Log start, finish duration, optional arguments, optional result summaries, and exceptions for sync or async callables. See [`@log_calls`](log_calls.md).
 
@@ -48,11 +48,11 @@ Reject calls to repeatedly failing sync or async dependencies until a reset time
 
 ## Cache APIs
 
-### `MemoryCacheBackend`
+### `MemoryCacheBackend(*, ttl=None, maxsize=128, refresh_ttl_on_hit=False, clock=None)`
 
 Default in-process cache backend for `cache_result`.
 
-### `DiskCacheBackend`
+### `DiskCacheBackend(path, *, ttl=None, maxsize=128, refresh_ttl_on_hit=False, serializer=None, on_drop=None, clock=None, busy_timeout_ms=5000, wal=True)`
 
 SQLite-backed persistent cache backend for trusted local cache files. See [`DiskCacheBackend`](disk_cache_backend.md).
 
@@ -64,7 +64,7 @@ Protocol for cache backends.
 
 Protocol for persistent/distributed cache payload serializers.
 
-### `PickleCacheSerializer`
+### `PickleCacheSerializer(*, protocol=pickle.HIGHEST_PROTOCOL)`
 
 Default trusted-local serializer for disk cache payloads.
 
