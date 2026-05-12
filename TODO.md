@@ -370,7 +370,12 @@
 
 ### Newly Implied External Link Ignore Pattern Follow-Ups
 
-- [ ] Consider validating that external link ignore patterns match at least one current docs link if the ignore file gets real entries.
+- [x] Consider validating that external link ignore patterns match at least one current docs link if the ignore file gets real entries.
+
+### Newly Implied External Link Stale Ignore Follow-Ups
+
+- [ ] Consider adding an explicit `--allow-stale-ignores` escape hatch if release maintenance ever needs to stage ignore entries before docs changes.
+- [ ] Consider showing the matching docs link for each ignore pattern in verbose mode if the ignore file grows.
 - [ ] Consider documenting wildcard semantics for `.external-links-ignore` in a dedicated maintenance doc if the checker grows further.
 - [ ] Consider adding expiration dates for ignored external links if the ignore list grows.
 - [x] Consider reporting ignored external links in verbose mode during release checks.
