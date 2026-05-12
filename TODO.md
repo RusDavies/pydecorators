@@ -817,8 +817,9 @@
 
 ### Newly Implied Quality Follow-Ups
 
-- [ ] Consider uploading coverage XML from CI if repository hosting/reporting is configured.
-- [ ] Add clean-wheel smoke test in an isolated venv before release.
+- [x] Upload coverage XML from CI as a workflow artifact.
+- [x] Add clean-wheel smoke test in an isolated venv before release.
+- [ ] Consider adding coverage summary comments if pull-request reporting becomes useful.
 - [ ] Consider running pre-commit in CI only if hook runtime stays modest.
 - [ ] Add a quality-gates docs page if gate explanations outgrow README/CONTRIBUTING/RELEASE.
 ## 12. Release Backlog
