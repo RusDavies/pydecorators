@@ -94,7 +94,7 @@ python scripts/dogfood_external_project.py
 
 ## Public API and contributing
 
-See `docs/index.md` for the documentation index, `docs/PUBLIC_API.md` for the public API policy, `docs/API_DESIGN.md` for broader API design notes, `docs/composition.md` for decorator stacking guidance, `docs/exceptions.md` for public exception behavior, and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
+See `docs/index.md` for the documentation index, `docs/PUBLIC_API.md` for the public API policy, `docs/API_DESIGN.md` for broader API design notes, `docs/composition.md` for decorator stacking guidance, `docs/exceptions.md` for public exception behavior, `docs/security_hardening.md` for cache/logging/validation safety guidance, and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
 
 ## Release process
 
@@ -118,6 +118,8 @@ See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for r
 - `@circuit_breaker`: stop hammering a failing dependency until a reset window opens.
 
 ## Security and operational notes
+
+See `docs/security_hardening.md` for the centralized hardening checklist.
 
 - Treat `DiskCacheBackend` files as trusted local data. The default pickle serializer must not load untrusted cache databases.
 - Do not put disk cache files in world-writable directories.

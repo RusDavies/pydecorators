@@ -806,7 +806,7 @@
 - [ ] Expand API reference with exact parameter defaults if public signatures change before release.
 - [x] Add a decorator-composition guide if users ask about stacking order.
 - [ ] Add executable README snippets for every first-release decorator if the examples are promoted beyond smoke-test coverage.
-- [ ] Add a security hardening page if cache/logging/validation warnings keep growing.
+- [x] Add a security hardening page if cache/logging/validation warnings keep growing.
 ## 11. Quality Backlog
 
 - [x] Add unit test coverage target.
