@@ -232,7 +232,7 @@
 
 - [ ] Consider CLI help-text tests if a disk-cache inspection command is implemented.
 - [ ] Consider JSON-output safe-default tests if inspection CLI output becomes machine-readable.
-- [ ] Consider an explicit warning-channel policy before adding quiet/scripted inspection modes.
+- [x] Add explicit warning-channel policy before adding quiet/scripted inspection modes.
 - [ ] Consider adding tests that safe mode never invokes preview redactors if inspection tooling is implemented.
 - [x] Document support-bundle metadata sensitivity even when previews are disabled.
 
@@ -245,7 +245,13 @@
 - [ ] Consider implementing `DiskCacheAggregateInspectionReport` only if support-bundle tooling enters public scope.
 - [ ] Consider aggregate truncation tests if inspection scans gain row limits.
 - [ ] Consider documenting aggregate timestamp ranges as diagnostics rather than audit evidence.
-- [ ] Consider sensitivity-warning tests if a future inspection CLI emits support bundles.
+- [x] Add sensitivity-warning design/tests for future inspection CLI support bundles.
+
+### Newly Implied Inspection Warning Follow-Ups
+
+- [ ] Consider adding a `sensitivity_warning` field to any future machine-readable inspection report.
+- [ ] Consider tests that preview-enabled CLI output uses stronger warnings than aggregate-only output.
+- [ ] Consider documenting approved quiet-mode warning channels before adding scripted inspection output.
 - [ ] Consider retention/deletion guidance for generated cache inspection reports if support tooling is added.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.

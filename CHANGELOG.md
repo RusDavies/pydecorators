@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Inspection sensitivity-warning design guidance for future disk-cache support tooling.
 - Inspection CLI safe-default design guidance for future disk-cache tooling.
 - Aggregate-only disk-cache inspection report design guidance for future support bundles.
 - Support-bundle metadata sensitivity guidance for no-preview disk-cache inspection reports.

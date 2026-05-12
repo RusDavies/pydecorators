@@ -287,3 +287,21 @@ def test_disk_cache_backend_design_doc_covers_inspection_cli_safe_defaults() -> 
         "never mutate cache stats, TTL, LRU state, or maintenance state",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_inspection_sensitivity_warnings() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Inspection sensitivity-warning design",
+        "sensitivity warning by default",
+        "sensitivity_warning",
+        "Preview-enabled output should use stronger wording",
+        "Quiet/scripted modes should require an explicit flag",
+        "metadata can reveal behavior even without payload previews",
+        "should not claim that redaction or no-preview mode makes output safe for public posting",
+        "text warnings",
+        "JSON warning fields",
+        "absence of “safe for public sharing” language",
+    ]:
+        assert required in text
