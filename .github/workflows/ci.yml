@@ -29,6 +29,12 @@ jobs:
         run: python scripts/smoke_examples.py
       - name: Tests
         run: pytest
+      - name: Upload coverage XML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.python-version }}
+          path: coverage.xml
+          if-no-files-found: error
       - name: Build package
         run: python -m build
       - name: Wheel install smoke test
