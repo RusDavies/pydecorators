@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- `DiskCacheBackend(on_drop=...)` diagnostics for rows dropped because of serializer mismatches or corrupt payloads.
 - `JsonCacheSerializer` for simple JSON-compatible persistent cache payloads.
 - README Python code-block extraction and sync policy tests.
 - Release checklist guidance for persistent disk-cache migration and clearing.

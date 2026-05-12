@@ -198,7 +198,12 @@
 
 ### Newly Implied Disk Corrupt-Row Follow-Ups
 
-- [ ] Add optional diagnostics/log hook for disk backend dropped corrupt rows.
+- [x] Add optional diagnostics/log hook for disk backend dropped corrupt rows.
+
+### Newly Implied Disk Drop Diagnostics Follow-Ups
+
+- [ ] Consider exposing structured dropped-row counters in `CacheInfo` or a disk-specific diagnostics API after user feedback.
+- [ ] Consider allowing operators to opt into raising instead of dropping corrupt rows if strict cache integrity becomes useful.
 - [ ] Add disk backend integrity-check/maintenance helper design.
 - [x] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
 

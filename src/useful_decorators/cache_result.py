@@ -36,6 +36,17 @@ class CacheInfo:
     currsize: int
 
 
+@dataclass(frozen=True, slots=True)
+class DiskCacheDropEvent:
+    """Diagnostic event for a disk-cache row dropped during lookup."""
+
+    key: Hashable
+    reason: str
+    expected_serializer_content_type: str
+    actual_serializer_content_type: str | None = None
+    exception: BaseException | None = None
+
+
 @dataclass(slots=True)
 class _CacheEntry:
     """Internal cache entry for values or cached exceptions."""
@@ -253,6 +264,7 @@ class DiskCacheBackend:
         ttl: float | None = None,
         maxsize: int | None = 128,
         serializer: CacheSerializer | None = None,
+        on_drop: Callable[[DiskCacheDropEvent], object] | None = None,
         clock: Clock | None = None,
         busy_timeout_ms: int = 5_000,
         wal: bool = True,
@@ -269,6 +281,7 @@ class DiskCacheBackend:
         self._maxsize = maxsize
         self._key_serializer = PickleCacheSerializer()
         self._serializer = serializer or PickleCacheSerializer()
+        self._on_drop = on_drop
         self._clock = clock or monotonic
         self._busy_timeout_ms = busy_timeout_ms
         self._wal = wal
@@ -357,14 +370,25 @@ class DiskCacheBackend:
                     self._connection.execute(
                         "DELETE FROM cache_entries WHERE key = ?", (serialized_key,)
                     )
+                    self._report_dropped_row(
+                        key,
+                        reason="serializer_content_type_mismatch",
+                        actual_serializer_content_type=serializer_content_type,
+                    )
                     self._record_miss()
                     return None
 
                 try:
                     deserialized_payload = self._deserialize_payload(payload)
-                except CacheSerializationError:
+                except CacheSerializationError as exc:
                     self._connection.execute(
                         "DELETE FROM cache_entries WHERE key = ?", (serialized_key,)
+                    )
+                    self._report_dropped_row(
+                        key,
+                        reason="payload_deserialization_error",
+                        actual_serializer_content_type=serializer_content_type,
+                        exception=exc,
                     )
                     self._record_miss()
                     return None
@@ -457,6 +481,26 @@ class DiskCacheBackend:
 
     def _record_hit(self) -> None:
         self._connection.execute("UPDATE cache_stats SET hits = hits + 1 WHERE id = 1")
+
+    def _report_dropped_row(
+        self,
+        key: Hashable,
+        *,
+        reason: str,
+        actual_serializer_content_type: str | None = None,
+        exception: BaseException | None = None,
+    ) -> None:
+        if self._on_drop is None:
+            return
+        event = DiskCacheDropEvent(
+            key=key,
+            reason=reason,
+            expected_serializer_content_type=self.serializer_content_type,
+            actual_serializer_content_type=actual_serializer_content_type,
+            exception=exception,
+        )
+        with suppress(Exception):
+            self._on_drop(event)
 
     def _record_miss(self) -> None:
         self._connection.execute("UPDATE cache_stats SET misses = misses + 1 WHERE id = 1")

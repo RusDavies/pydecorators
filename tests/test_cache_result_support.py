@@ -3,6 +3,7 @@ import pytest
 from useful_decorators import (
     CacheInfo,
     CacheKeyError,
+    DiskCacheDropEvent,
     JsonCacheSerializer,
     MemoryCacheBackend,
     PickleCacheSerializer,
@@ -29,6 +30,23 @@ def test_cache_info_is_immutable() -> None:
         assert isinstance(exc, (AttributeError, TypeError))
     else:  # pragma: no cover - defensive; frozen dataclass should prevent this
         raise AssertionError("CacheInfo should be immutable")
+
+
+def test_disk_cache_drop_event_public_shape() -> None:
+    error = ValueError("bad row")
+    event = DiskCacheDropEvent(
+        key="key",
+        reason="payload_deserialization_error",
+        expected_serializer_content_type="application/python-pickle",
+        actual_serializer_content_type="application/python-pickle",
+        exception=error,
+    )
+
+    assert event.key == "key"
+    assert event.reason == "payload_deserialization_error"
+    assert event.expected_serializer_content_type == "application/python-pickle"
+    assert event.actual_serializer_content_type == "application/python-pickle"
+    assert event.exception is error
 
 
 def test_cache_entry_internal_shape() -> None:

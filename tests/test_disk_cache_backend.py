@@ -285,6 +285,98 @@ def test_disk_cache_backend_treats_serializer_content_type_mismatch_as_miss(tmp_
         second.close()
 
 
+def test_disk_cache_backend_reports_serializer_content_type_mismatch_drop(
+    tmp_path: Path,
+) -> None:
+    from useful_decorators import DiskCacheDropEvent
+
+    events: list[DiskCacheDropEvent] = []
+    db_path = tmp_path / "cache.sqlite3"
+    first = DiskCacheBackend(db_path)
+    first.set_value("key", {"value": 1})
+    first.close()
+
+    second = DiskCacheBackend(
+        db_path,
+        serializer=JsonLikeSerializer(),
+        on_drop=events.append,
+    )
+    try:
+        assert second.get("key") is None
+
+        assert events == [
+            DiskCacheDropEvent(
+                key="key",
+                reason="serializer_content_type_mismatch",
+                expected_serializer_content_type="application/x-test-json-like",
+                actual_serializer_content_type="application/python-pickle",
+            )
+        ]
+    finally:
+        second.close()
+
+
+def test_disk_cache_backend_reports_corrupt_payload_drop(tmp_path: Path) -> None:
+    from useful_decorators import DiskCacheDropEvent
+
+    events: list[DiskCacheDropEvent] = []
+    db_path = tmp_path / "cache.sqlite3"
+    backend = DiskCacheBackend(db_path)
+    serialized_key = backend._serialize_key("key")
+    backend.close()
+
+    with closing(sqlite3.connect(db_path)) as connection:
+        connection.execute(
+            """
+            INSERT INTO cache_entries (
+                key, payload, is_exception, expires_at, last_accessed, created_at,
+                serializer_content_type
+            )
+            VALUES (?, ?, 0, NULL, 100, 100, ?)
+            """,
+            (serialized_key, b"not a pickle payload", "application/python-pickle"),
+        )
+        connection.commit()
+
+    backend = DiskCacheBackend(db_path, on_drop=events.append)
+    try:
+        assert backend.get("key") is None
+
+        assert len(events) == 1
+        [event] = events
+        assert event.key == "key"
+        assert event.reason == "payload_deserialization_error"
+        assert event.expected_serializer_content_type == "application/python-pickle"
+        assert event.actual_serializer_content_type == "application/python-pickle"
+        assert event.exception is not None
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_drop_hook_failures_do_not_break_cache_miss(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "cache.sqlite3"
+    first = DiskCacheBackend(db_path)
+    first.set_value("key", {"value": 1})
+    first.close()
+
+    def broken_hook(event: object) -> None:
+        raise RuntimeError("diagnostic sink failed")
+
+    second = DiskCacheBackend(
+        db_path,
+        serializer=JsonLikeSerializer(),
+        on_drop=broken_hook,
+    )
+    try:
+        assert second.get("key") is None
+        assert second.info().misses == 1
+        assert second.info().currsize == 0
+    finally:
+        second.close()
+
+
 def test_cache_result_works_with_disk_cache_backend(tmp_path: Path) -> None:
     from useful_decorators import cache_result
 
@@ -323,6 +415,7 @@ def test_disk_cache_backend_treats_corrupt_payload_as_miss(tmp_path: Path) -> No
             """,
             (serialized_key, b"not a pickle payload", "application/python-pickle"),
         )
+        connection.commit()
 
     backend = DiskCacheBackend(db_path)
     try:

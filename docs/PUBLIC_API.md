@@ -9,6 +9,7 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 Current public API:
 
 - `DiskCacheBackend`
+- `DiskCacheDropEvent`
 - `CacheBackendClosedError`
 - `CacheSerializationError`
 - `PickleCacheSerializer`

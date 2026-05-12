@@ -35,6 +35,7 @@ class DiskCacheBackend:
         ttl: float | None = None,
         maxsize: int | None = 128,
         serializer: CacheSerializer | None = None,
+        on_drop: Callable[[DiskCacheDropEvent], object] | None = None,
         clock: Clock | None = None,
         busy_timeout_ms: int = 5_000,
         wal: bool = True,
@@ -45,6 +46,7 @@ class DiskCacheBackend:
 - `ttl`: optional entry lifetime in seconds.
 - `maxsize`: optional maximum entry count.
 - `serializer`: payload serializer; defaults to `PickleCacheSerializer`.
+- `on_drop`: optional diagnostic hook called with `DiskCacheDropEvent` when a stored row is dropped during lookup because of a serializer content-type mismatch or payload deserialization failure.
 - `clock`: injectable monotonic-ish clock for deterministic tests.
 - `busy_timeout_ms`: SQLite busy timeout in milliseconds; defaults to `5000`.
 - `wal`: whether to request SQLite WAL journal mode; defaults to `True`.
