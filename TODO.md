@@ -538,7 +538,7 @@
 ### Newly Implied Duplicate Anchor Handling Follow-Ups
 
 - [ ] Consider documenting Markdown anchor compatibility assumptions if linking rules become user-facing.
-- [ ] Add helper coverage for non-ASCII headings if docs start using them.
+- [x] Add helper coverage for non-ASCII headings if docs start using them.
 - [x] Consider centralizing Markdown link parsing helpers for docs policy tests.
 - [x] Add docs contribution note explaining when a docs page should be added to the index.
 

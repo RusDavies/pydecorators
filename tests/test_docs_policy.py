@@ -331,6 +331,10 @@ def test_markdown_heading_anchor_helper_matches_expected_slug_shape() -> None:
     )
 
 
+def test_markdown_heading_anchor_helper_handles_non_ascii_headings() -> None:
+    assert markdown_heading_anchor("Café naïve façade — 版本") == "caf-nave-faade"
+
+
 def test_markdown_heading_anchors_include_duplicate_heading_suffixes(tmp_path: Path) -> None:
     markdown_file = tmp_path / "duplicate-headings.md"
     markdown_file.write_text("# Examples\n## Details\n## Examples\n### Examples\n## Details\n")
