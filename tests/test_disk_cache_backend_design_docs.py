@@ -268,3 +268,22 @@ def test_disk_cache_backend_design_doc_covers_aggregate_inspection_report_design
         "should not update hits, misses, TTL, LRU, or `last_accessed`",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_inspection_cli_safe_defaults() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Inspection CLI safe default design",
+        "default output should be aggregate-only and no-preview",
+        "--rows",
+        "--include-payload-preview",
+        "Default command output should use the aggregate-only report",
+        "Row-level output should require an explicit flag",
+        "Payload previews should require a second explicit flag",
+        "JSON output should preserve the same safe defaults",
+        "Machine-readable does not mean less sensitive",
+        "CLI help text should label row-level output and previews as potentially sensitive",
+        "never mutate cache stats, TTL, LRU state, or maintenance state",
+    ]:
+        assert required in text

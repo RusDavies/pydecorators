@@ -309,6 +309,30 @@ Safe-mode expectations:
 - Documentation should describe safe-mode output as lower-risk, not risk-free. Serializer content types, row counts, and payload sizes can still reveal application behavior. Tiny metadata can still wear a trench coat.
 - Any future CLI should use safe mode by default and require an explicit flag such as `--include-payload-preview` before printing previews.
 
+## Inspection CLI safe default design
+
+If a disk-cache inspection CLI is added, its default output should be aggregate-only and no-preview. Users should have to make an explicit, noisy choice before printing row-level metadata or payload previews.
+
+Tentative command posture:
+
+```bash
+python -m useful_decorators inspect-cache path/to/cache.sqlite3
+python -m useful_decorators inspect-cache path/to/cache.sqlite3 --rows --no-payload-preview
+python -m useful_decorators inspect-cache path/to/cache.sqlite3 --rows --include-payload-preview
+```
+
+CLI design constraints:
+
+- Default command output should use the aggregate-only report.
+- Row-level output should require an explicit flag such as `--rows`.
+- Payload previews should require a second explicit flag such as `--include-payload-preview`.
+- `--include-payload-preview` should print a warning unless a future `--quiet-sensitive-warning`/machine-readable mode has a documented replacement warning channel.
+- JSON output should preserve the same safe defaults as text output. Machine-readable does not mean less sensitive; it just means easier to leak at scale.
+- CLI help text should label row-level output and previews as potentially sensitive.
+- The CLI should never mutate cache stats, TTL, LRU state, or maintenance state during inspection.
+
+Pre-implementation tests should cover default aggregate/no-preview output, row output requiring `--rows`, preview output requiring `--include-payload-preview`, sensitivity warnings, JSON safe defaults, and no mutation during CLI inspection.
+
 ## Support-bundle metadata sensitivity
 
 No-preview safe mode removes payload text, but it does not make inspection output public-safe by magic. Metadata can still reveal how an application behaves, what it caches, how often entries are reused, and whether errors or specific serializer families are present. Treat support-bundle inspection reports as potentially sensitive operational diagnostics.

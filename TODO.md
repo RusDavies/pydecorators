@@ -226,7 +226,13 @@
 
 ### Newly Implied No-Preview Safe Mode Follow-Ups
 
-- [ ] Consider making any future inspection CLI default to no-preview safe mode.
+- [x] Document future inspection CLI defaulting to aggregate/no-preview safe mode.
+
+### Newly Implied Inspection CLI Safe Default Follow-Ups
+
+- [ ] Consider CLI help-text tests if a disk-cache inspection command is implemented.
+- [ ] Consider JSON-output safe-default tests if inspection CLI output becomes machine-readable.
+- [ ] Consider an explicit warning-channel policy before adding quiet/scripted inspection modes.
 - [ ] Consider adding tests that safe mode never invokes preview redactors if inspection tooling is implemented.
 - [x] Document support-bundle metadata sensitivity even when previews are disabled.
 
