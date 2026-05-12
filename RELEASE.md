@@ -91,6 +91,7 @@ python scripts/smoke_imports.py
 python scripts/smoke_examples.py
 pytest
 python -m build
+python scripts/smoke_wheel_install.py
 ```
 
 Then confirm:
@@ -103,9 +104,18 @@ Then confirm:
 - [ ] Tests pass.
 - [ ] Coverage remains above the configured floor and reports are generated.
 - [ ] Package build succeeds.
+- [ ] Clean-wheel install smoke test passes.
 - [ ] Built artifacts are not committed accidentally.
 
 ## Install smoke tests
+
+Run:
+
+```bash
+python scripts/smoke_wheel_install.py
+```
+
+Then confirm:
 
 - [ ] Create a clean virtual environment.
 - [ ] Install the built wheel locally.
@@ -132,3 +142,18 @@ For first release, use TestPyPI before PyPI.
 - [ ] Create a GitHub release if the repository is public.
 - [ ] Add post-release follow-up items to `TODO.md`.
 - [ ] Start the next `CHANGELOG.md` section.
+
+## Package name availability
+
+As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project, so the first public release needs a new distribution name before TestPyPI/PyPI publishing. Do not publish over an unrelated existing project name; pick a new name, update `pyproject.toml`, and re-run the release checklist.
+
+## Tagging convention
+
+Use annotated release tags in the form `vMAJOR.MINOR.PATCH`, for example:
+
+```bash
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+Create the tag only after the release branch is merged, local verification passes, and the package name decision is final.

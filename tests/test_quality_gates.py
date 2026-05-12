@@ -21,6 +21,7 @@ def test_ci_runs_quality_gates_and_smoke_tests() -> None:
         "python scripts/smoke_examples.py",
         "pytest",
         "python -m build",
+        "python scripts/smoke_wheel_install.py",
     ]:
         assert required in ci
 
@@ -28,6 +29,7 @@ def test_ci_runs_quality_gates_and_smoke_tests() -> None:
 def test_smoke_scripts_exist() -> None:
     assert Path("scripts/smoke_imports.py").exists()
     assert Path("scripts/smoke_examples.py").exists()
+    assert Path("scripts/smoke_wheel_install.py").exists()
 
 
 def test_pre_commit_configuration_exists() -> None:

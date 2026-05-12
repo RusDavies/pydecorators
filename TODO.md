@@ -822,24 +822,31 @@
 - [ ] Add a quality-gates docs page if gate explanations outgrow README/CONTRIBUTING/RELEASE.
 ## 12. Release Backlog
 
-- [ ] Confirm PyPI package name availability.
-- [ ] Add package metadata.
-- [ ] Add project URLs.
-- [ ] Add classifiers.
-- [ ] Add license file.
-- [ ] Add versioning strategy.
+- [x] Confirm PyPI package name availability.
+- [x] Add package metadata.
+- [x] Add project URLs.
+- [x] Add classifiers.
+- [x] Add license file.
+- [x] Add versioning strategy.
 - [x] Add release checklist.
 
 ### Newly Implied Release Checklist Follow-Ups
 
-- [ ] Add clean-venv local wheel install smoke test script.
+- [x] Add clean-venv local wheel install smoke test script.
 - [ ] Add TestPyPI/PyPI publishing instructions once package credentials and repository location are finalized.
-- [ ] Add git tag naming convention for releases.
-- [ ] Build package locally.
-- [ ] Test install from local wheel.
+- [x] Add git tag naming convention for releases.
+- [x] Build package locally.
+- [x] Test install from local wheel.
 - [ ] Publish test release to TestPyPI.
 - [ ] Publish `v0.1.0` to PyPI when ready.
 
+
+### Newly Implied Release Blockers / Follow-Ups
+
+- [ ] Choose a new PyPI distribution name because `useful-decorators` is already occupied on PyPI.
+- [ ] Update `pyproject.toml` package name after Russ chooses the distribution name.
+- [ ] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
+- [ ] Add trusted publishing / API token instructions once the repository and package name are final.
 ## 13. Future Ideas
 
 - [ ] Optional Redis-backed cache.
