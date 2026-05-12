@@ -28,6 +28,7 @@ def test_public_decorators_are_exported_via_all() -> None:
         "rate_limit",
         "retry",
         "timeout",
+        "validate_types",
     }
 
     assert public_decorators <= set(useful_decorators.__all__)

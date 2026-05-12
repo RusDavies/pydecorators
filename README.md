@@ -15,6 +15,7 @@ The initial `v0.1.0` scope is:
 - `@timeout` — async implementation complete
 - `@log_calls` — implemented
 - `@measure_time` — implemented
+- `@validate_types` — implemented
 
 
 ## Quick example
@@ -57,7 +58,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, and `docs/measure_time.md` for timing hooks.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, and `docs/validate_types.md` for lightweight runtime type validation.
 
 ### Retry example
 
@@ -126,6 +127,19 @@ def rebuild_index() -> None:
 ```
 
 `@measure_time` records sync and async durations through optional callback, logger, or metrics hooks.
+
+### Type-validation example
+
+```python
+from useful_decorators import validate_types
+
+
+@validate_types(validate_return=True)
+def double(value: int) -> int:
+    return value * 2
+```
+
+`@validate_types` provides lightweight, shallow runtime checks for simple annotations. It is not a full schema validator; sometimes the boring warning label is the difference between a tool and a liability.
 
 ### Cache example
 

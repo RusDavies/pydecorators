@@ -27,6 +27,7 @@ Current public API:
 - `log_calls`
 - `measure_time`
 - `TimingInfo`
+- `validate_types`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
@@ -157,6 +158,10 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 ### `TimingInfo`
 
 `TimingInfo` is the immutable dataclass emitted to `measure_time(callback=...)`. It exposes `function`, `duration`, `success`, and optional `exception`.
+
+### `validate_types`
+
+`validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins, `Any`, and optional/union types. It is intentionally not a full schema-validation system. See `docs/validate_types.md` for behavior and limitations.
 
 ### `RateLimitExceeded`
 
