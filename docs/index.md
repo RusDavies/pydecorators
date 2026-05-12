@@ -12,6 +12,7 @@ Start here when navigating the Useful Decorators documentation.
 
 - [`@deprecated`](deprecated.md) — deprecation decorator behavior and examples.
 - [`@cache_result`](cache_result.md) — cache decorator behavior, backend semantics, serializer design, and lifecycle notes.
+- [`@retry`](retry.md) — retry decorator behavior, backoff, filtering, hooks, and async support.
 
 ## Cache backend docs
 

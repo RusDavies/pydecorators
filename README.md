@@ -9,8 +9,8 @@ The goal is to provide small, typed, well-tested decorators that work in scripts
 The initial `v0.1.0` scope is:
 
 - `@deprecated` — implemented
-- `@cache_result` — sync core implemented
-- `@retry`
+- `@cache_result` — sync/disk backend implemented
+- `@retry` — implemented
 - `@rate_limit`
 - `@timeout`
 
@@ -28,7 +28,7 @@ def old_function() -> str:
 
 ## Development status
 
-Pre-alpha. The project foundation exists and `@deprecated` is implemented.
+Pre-alpha. The project foundation exists and `@deprecated`, `@cache_result`, and `@retry` are implemented.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
 
@@ -55,7 +55,20 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the planned cache decorator design.
+See `docs/cache_result.md` for the cache decorator design and `docs/retry.md` for retry behavior.
+
+### Retry example
+
+```python
+from useful_decorators import retry
+
+
+@retry(attempts=3, delay=0.25, backoff=2, exceptions=ConnectionError)
+def call_service() -> str:
+    return "ok"
+```
+
+`@retry` supports sync and async functions, exception filtering, predicate-based retry decisions, attempt hooks, jitter, max-delay caps, and injectable sleep functions for fast tests.
 
 ### Cache example
 
