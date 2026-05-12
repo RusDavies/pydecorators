@@ -184,3 +184,24 @@ def test_disk_cache_backend_design_doc_covers_preview_redaction_expectations() -
         "redaction failures do not expose the original unredacted payload",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_preview_redactor_callback_design() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## `preview_redactor` callback design",
+        "DiskCachePreviewContext",
+        "PreviewRedactor",
+        "already bounded/decoded preview string",
+        "Returning `None` suppresses the preview",
+        "should not receive serialized keys",
+        "run after truncation and basic decoding",
+        "redaction failure marker/count",
+        "not return the original unredacted preview",
+        "redactor replacement text is returned",
+        "redactor exceptions suppress previews",
+        "redactor is not called for rows without previews",
+        "keeps redaction separate from serializer logic",
+    ]:
+        assert required in text

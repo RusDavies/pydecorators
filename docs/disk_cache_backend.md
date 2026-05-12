@@ -287,6 +287,51 @@ Redaction posture:
 - Inspection output should not be logged automatically by the library. Callers own where diagnostic reports go.
 - Documentation should warn against enabling previews in shared logs, support bundles, CI artifacts, public bug reports, screenshots, or chat pastebins unless the payload domain is known safe. Yes, this includes pastebins. Especially pastebins.
 
+## `preview_redactor` callback design
+
+If payload previews become part of `DiskCacheBackend.inspect_entries()`, redaction should be caller-owned and explicit. A callback gives applications a place to apply domain-specific policy without pretending the library can magically recognize every secret shaped like a cursed potato.
+
+Tentative callback shape:
+
+```python
+@dataclass(frozen=True)
+class DiskCachePreviewContext:
+    serializer_content_type: str
+    payload_size_bytes: int
+    payload_preview_truncated: bool
+    is_exception: bool
+
+PreviewRedactor = Callable[[str, DiskCachePreviewContext], str | None]
+
+report = backend.inspect_entries(
+    include_payload_preview=True,
+    preview_redactor=redact_preview,
+)
+```
+
+Callback semantics:
+
+- The callback receives the already bounded/decoded preview string, never raw payload bytes.
+- Returning a string uses that value as the preview.
+- Returning `None` suppresses the preview for that row.
+- The callback receives metadata only; it should not receive serialized keys.
+- The callback should run after truncation and basic decoding so it cannot accidentally request unbounded payload material.
+- Redaction must preserve separate metadata such as `payload_preview_truncated`, `payload_size_bytes`, and `serializer_content_type`.
+- If the callback raises, the safe default should be to suppress that row preview and record a redaction failure marker/count, not return the original unredacted preview.
+- The library should not call redactors for pickle/binary rows that have no preview under the bounded preview policy.
+
+Pre-implementation tests should cover:
+
+- redactor receives bounded preview text and metadata
+- redactor replacement text is returned
+- redactor `None` suppresses preview
+- redactor exceptions suppress previews without exposing original content
+- redactor cannot access serialized keys through context
+- truncation metadata survives redactor replacement/suppression
+- redactor is not called for rows without previews
+
+This design deliberately keeps redaction separate from serializer logic. Serializers define how values become bytes; inspection preview policy defines whether bytes are safely summarized; redactors define application-specific disclosure rules. Mixing those together creates a feature smoothie with security garnish.
+
 Before implementing preview redaction, add tests for at least these cases:
 
 - previews are omitted by default
