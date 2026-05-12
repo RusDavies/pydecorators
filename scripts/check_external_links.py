@@ -163,12 +163,18 @@ def check_url(
     retries: int,
     backoff: float,
     sleep: Callable[[float], None] = time.sleep,
+    report_attempt: Callable[[str], None] | None = None,
 ) -> tuple[bool, str]:
     attempts = max(1, retries + 1)
     last_detail = "not checked"
 
     for attempt in range(attempts):
+        attempt_number = attempt + 1
         ok, detail, retryable = check_url_once(url, timeout)
+        if report_attempt is not None:
+            outcome = "ok" if ok else "failed"
+            retry_note = " retryable" if retryable and not ok else ""
+            report_attempt(f"attempt {attempt_number}/{attempts}: {outcome}{retry_note}: {detail}")
         if ok:
             return True, detail
         last_detail = detail
@@ -176,7 +182,7 @@ def check_url(
             break
         sleep(backoff * (2**attempt))
 
-    return False, f"{last_detail} after {attempt + 1} attempt(s)"
+    return False, f"{last_detail} after {attempt_number} attempt(s)"
 
 
 def main() -> int:
@@ -256,7 +262,19 @@ def main() -> int:
                 continue
             if args.syntax_only:
                 continue
-            ok, detail = check_url(link, args.timeout, args.retries, args.backoff)
+            reporter = None
+            if args.verbose:
+
+                def reporter(message: str, docs_file: Path = docs_file, link: str = link) -> None:
+                    print(f"{docs_file}: {link}: {message}")
+
+            ok, detail = check_url(
+                link,
+                args.timeout,
+                args.retries,
+                args.backoff,
+                report_attempt=reporter,
+            )
             if not ok:
                 failures.append(f"{docs_file}: unreachable external link ({detail}): {link}")
 

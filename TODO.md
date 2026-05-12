@@ -504,7 +504,7 @@
 
 ### Newly Implied External Link Checker Retry Follow-Ups
 
-- [ ] Consider reporting per-attempt retry details in verbose mode if manual release checks become hard to diagnose.
+- [x] Report per-attempt retry details in verbose mode for manual release checks.
 - [ ] Consider capping maximum retry backoff if higher retry counts are introduced.
 - [x] Add external link checker allowlist/ignore file if intentionally unstable third-party URLs appear.
 

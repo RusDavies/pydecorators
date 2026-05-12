@@ -416,6 +416,41 @@ def test_external_link_checker_does_not_retry_non_retryable_failures(
     assert sleeps == []
 
 
+def test_external_link_checker_reports_verbose_attempt_details(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    checker = load_external_link_checker_module()
+    attempts = 0
+    sleeps: list[float] = []
+    reports: list[str] = []
+
+    def fake_check_url_once(url: str, timeout: float) -> tuple[bool, str, bool]:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            return False, "HTTP Error 503: Service Unavailable", True
+        return True, "200", False
+
+    monkeypatch.setattr(checker, "check_url_once", fake_check_url_once)
+
+    ok, detail = checker.check_url(
+        "https://example.com",
+        timeout=3.0,
+        retries=1,
+        backoff=0.25,
+        sleep=sleeps.append,
+        report_attempt=reports.append,
+    )
+
+    assert ok
+    assert detail == "200"
+    assert sleeps == [0.25]
+    assert reports == [
+        "attempt 1/2: failed retryable: HTTP Error 503: Service Unavailable",
+        "attempt 2/2: ok: 200",
+    ]
+
+
 def test_external_link_checker_loads_ignore_patterns(tmp_path: Path) -> None:
     checker = load_external_link_checker_module()
     ignore_file = tmp_path / "external-links.ignore"
