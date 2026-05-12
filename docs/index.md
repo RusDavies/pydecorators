@@ -37,6 +37,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`public_exception_examples.py`](examples/public_exception_examples.py)
 - [`require_env_examples.py`](examples/require_env_examples.py)
 - [`retry_examples.py`](examples/retry_examples.py)
+- [`retry_idempotency_examples.py`](examples/retry_idempotency_examples.py)
 - [`circuit_breaker_examples.py`](examples/circuit_breaker_examples.py)
 - [`composition_examples.py`](examples/composition_examples.py)
 - [`log_calls_examples.py`](examples/log_calls_examples.py)

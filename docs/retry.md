@@ -79,3 +79,11 @@ Copy-pasteable examples live in `docs/examples/retry_examples.py` and are covere
 by `tests/test_docs_examples.py`. They demonstrate transient success,
 predicate-rejected exceptions, and async retry with injected sleep functions so
 the examples do not pause the test suite like an obedient little metronome.
+
+
+## Executable idempotency examples
+
+Side-effecting retry recipes live in `docs/examples/retry_idempotency_examples.py`
+and are covered by `tests/test_docs_examples.py`. The examples keep the important
+rule concrete: retry reads freely, but retry mutations only when the operation
+has a real duplicate-prevention mechanism such as an idempotency key.
