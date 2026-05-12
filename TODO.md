@@ -748,7 +748,7 @@
 
 - [ ] Consider deep container validation only if users need it and limitations can stay clear.
 - [ ] Consider support for `Literal` and `Annotated` if lightweight validation use cases require them.
-- [ ] Add executable docs examples for `@validate_types` if validation examples grow.
+- [x] Add executable docs examples for `@validate_types`.
 - [ ] Consider a package-specific validation exception only if callers need to distinguish validation failures from ordinary `TypeError`.
 ### `@require_env`
 

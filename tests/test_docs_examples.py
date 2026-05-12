@@ -170,3 +170,12 @@ def test_measure_time_documentation_examples_execute() -> None:
     async_info = asyncio.run(examples.async_timing_example())
     assert_example_result(async_info.duration, 0.125)
     assert_example_result(async_info.success, True)
+
+
+def test_validate_types_documentation_examples_execute() -> None:
+    examples = load_docs_example("validate_types_examples")
+
+    assert_example_result(examples.argument_validation_example(), "hello Ada!")
+    assert "argument 'value' expected int" in examples.argument_error_example()
+    assert_example_result(examples.return_validation_example(), "ready")
+    assert_example_result(asyncio.run(examples.async_validation_example()), "user:anonymous")
