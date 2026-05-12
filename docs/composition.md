@@ -133,3 +133,11 @@ The second form can run much longer overall because each retry gets a fresh time
 ## Dogfood finding
 
 The local dogfood harness and external-project dogfood both worked without API changes. The main finding was documentation, not code: wrapper order needs to be explicit because `@retry`, `@rate_limit`, `@log_calls`, `@measure_time`, `@timeout`, and `@circuit_breaker` all have reasonable-but-different behavior depending on where they sit in the stack.
+
+
+## Executable examples
+
+Copy-pasteable stacking examples live in `docs/examples/composition_examples.py`
+and are covered by `tests/test_docs_examples.py`. They exercise whole-operation
+timing, one-logical-call logging, circuit-breaker placement, and async timeout
+placement so composition guidance stays executable instead of ornamental.

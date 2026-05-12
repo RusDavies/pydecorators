@@ -38,6 +38,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`require_env_examples.py`](examples/require_env_examples.py)
 - [`retry_examples.py`](examples/retry_examples.py)
 - [`circuit_breaker_examples.py`](examples/circuit_breaker_examples.py)
+- [`composition_examples.py`](examples/composition_examples.py)
 - [`log_calls_examples.py`](examples/log_calls_examples.py)
 - [`rate_limit_examples.py`](examples/rate_limit_examples.py)
 - [`timeout_examples.py`](examples/timeout_examples.py)
