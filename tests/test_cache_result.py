@@ -1,4 +1,7 @@
 from collections.abc import Hashable
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier, Event, Lock
+from time import sleep
 from typing import Any, cast
 
 import pytest
@@ -516,4 +519,110 @@ def test_custom_key_function_controls_namespace_separation() -> None:
 
     assert value(1) == "value:1"
     assert value(1) == "value:1"
+    assert calls == 1
+
+
+def test_cache_result_can_coalesce_duplicate_concurrent_misses() -> None:
+    calls = 0
+    started = Event()
+    release = Event()
+
+    @cache_result(coalesce_misses=True)
+    def slow_value(key: str) -> str:
+        nonlocal calls
+        calls += 1
+        started.set()
+        assert release.wait(timeout=5)
+        return f"value:{key}"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(slow_value, "same")
+        assert started.wait(timeout=5)
+        second = executor.submit(slow_value, "same")
+        sleep(0.05)
+        assert calls == 1
+        release.set()
+
+        assert first.result(timeout=5) == "value:same"
+        assert second.result(timeout=5) == "value:same"
+
+    assert calls == 1
+
+
+def test_cache_result_coalescing_does_not_block_different_keys() -> None:
+    barrier = Barrier(2)
+    calls: list[int] = []
+    calls_lock = Lock()
+
+    @cache_result(coalesce_misses=True)
+    def slow_value(key: int) -> int:
+        with calls_lock:
+            calls.append(key)
+        barrier.wait(timeout=5)
+        return key * 10
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(slow_value, 1)
+        second = executor.submit(slow_value, 2)
+
+        assert first.result(timeout=5) == 10
+        assert second.result(timeout=5) == 20
+
+    assert sorted(calls) == [1, 2]
+
+
+def test_cache_result_coalescing_does_not_broadcast_uncached_exceptions() -> None:
+    calls = 0
+    started = Event()
+    release = Event()
+
+    @cache_result(coalesce_misses=True)
+    def fails(key: str) -> str:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            started.set()
+            assert release.wait(timeout=5)
+        raise ValueError(f"boom {calls}: {key}")
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(fails, "same")
+        assert started.wait(timeout=5)
+        second = executor.submit(fails, "same")
+        sleep(0.05)
+        release.set()
+
+        with pytest.raises(ValueError, match="boom 1: same"):
+            first.result(timeout=5)
+        with pytest.raises(ValueError, match="boom 2: same"):
+            second.result(timeout=5)
+
+    assert calls == 2
+
+
+def test_cache_result_coalescing_reuses_cached_exceptions_when_enabled() -> None:
+    calls = 0
+    started = Event()
+    release = Event()
+
+    @cache_result(coalesce_misses=True, cache_exceptions=True)
+    def fails(key: str) -> str:
+        nonlocal calls
+        calls += 1
+        started.set()
+        assert release.wait(timeout=5)
+        raise ValueError(f"boom: {key}")
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(fails, "same")
+        assert started.wait(timeout=5)
+        second = executor.submit(fails, "same")
+        sleep(0.05)
+        release.set()
+
+        with pytest.raises(ValueError, match="boom: same"):
+            first.result(timeout=5)
+        with pytest.raises(ValueError, match="boom: same"):
+            second.result(timeout=5)
+
     assert calls == 1

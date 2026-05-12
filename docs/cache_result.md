@@ -205,9 +205,9 @@ By default, `@cache_result` does not coalesce duplicate concurrent misses. If tw
 
 ## Request coalescing design
 
-A future opt-in request coalescing mode should collapse duplicate concurrent misses for the same cache key so only the first caller computes the value and the rest wait for that in-flight computation. The option should be explicit, tentatively `coalesce_misses=True`, because it changes concurrency behavior and can make unrelated callers wait behind slow user code for the same key.
+`coalesce_misses=True` collapses duplicate concurrent misses for the same cache key so only the first caller computes the value and the rest wait for that in-flight computation. The option is explicit because it changes concurrency behavior and can make callers wait behind slow user code for the same key.
 
-Target semantics for sync functions:
+Implemented sync semantics:
 
 - Coalescing is per generated cache key, after the normal `key` / `typed` / `namespace` behavior has produced a hashable key.
 - The first thread that observes a miss becomes the producer for that key. It executes the wrapped function outside the backend lock.
@@ -228,6 +228,8 @@ Implementation sketch for the sync decorator:
 - Do the initial backend `get()` before joining/creating an in-flight marker so ordinary hits stay fast.
 - Never hold the in-flight lock while running user code or while calling backend methods that may take their own locks. Lock-order bugs are tiny deadlocks wearing clown shoes.
 - After producer completion, notify all waiters, remove the marker, and let waiters perform the normal cache lookup path.
+
+Use request coalescing when many threads may stampede the same slow cache key. Leave it disabled when duplicate work is cheap and waiting behind a slow producer would be worse than recomputing.
 
 Non-goals for first coalescing support:
 
