@@ -343,3 +343,60 @@ def test_disk_cache_backend_design_doc_covers_timestamp_diagnostics_not_audit() 
         "best-effort cache diagnostics",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_lifecycle_shutdown_guidance() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Lifecycle and shutdown guidance",
+        "owns an open SQLite connection",
+        "CLI tools",
+        "finally",
+        "Long-running services",
+        "application startup",
+        "service shutdown hook",
+        "ASGI lifespan shutdown handler",
+        "Decorator-bound backends",
+        "CacheBackendClosedError",
+        "Closing is idempotent",
+    ]:
+        assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_cache_file_location_permissions() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Cache file location and permissions",
+        "disposable local artifacts",
+        "CLI tools",
+        "~/.cache/<app>/cache.sqlite3",
+        "Services",
+        "/var/cache/<app>/",
+        "not world-writable",
+        "owner-only permissions",
+        "Do not accept cache database files from untrusted users",
+        "SQLite sidecar files (`-wal`, `-shm`)",
+        "support bundle",
+    ]:
+        assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_vacuum_compaction_decision() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Vacuum and compaction decision",
+        "should not run SQLite `VACUUM` automatically",
+        "get()",
+        "set_value()",
+        "set_exception()",
+        "clear()",
+        "info()",
+        "backend.maintain(vacuum=True)",
+        "explicit operator-controlled compaction",
+        "space reclamation separate from correctness",
+        "whether compaction ran",
+    ]:
+        assert required in text

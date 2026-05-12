@@ -289,6 +289,46 @@ The default implementation is `PickleCacheSerializer`, which can round-trip ordi
 
 Serializer failures should raise `CacheSerializationError`. `PickleCacheSerializer` and `JsonCacheSerializer` wrap serialization and deserialization failures in that package-specific exception.
 
+
+## Backend conformance expectations
+
+Every backend should implement the same `CacheBackend` contract before it is documented as supported. At minimum, a backend must pass the reusable conformance suite for:
+
+- get() returning `None` for misses and `_CacheEntry` for hits
+- `set_value()` replacing previous values for the same key
+- `set_exception()` preserving cached exception payloads
+- TTL expiry behavior and miss accounting
+- max-size/LRU eviction semantics where the backend exposes `maxsize`
+- `clear()` removing entries and resetting statistics
+- `info()` returning `CacheInfo` with hits, misses, maxsize, and current size
+- thread-safe access for the backend's documented concurrency model
+
+Backend-specific tests are still required for storage details, serializer boundaries, operational tuning, and failure modes. The conformance suite is the floor, not the tiny decorative ceiling.
+
+Future contributors adding a backend should first add a fixture/factory to the conformance tests, then add storage-specific tests around persistence, network or filesystem behavior, and cleanup.
+
+## Redis backend optional-extra design
+
+A future `RedisCacheBackend` should be an optional dependency extra, not part of the default install. Suggested packaging shape:
+
+```toml
+[project.optional-dependencies]
+redis = ["redis>=5"]
+```
+
+Public import guidance should make the optional nature clear: installing `useful-decorators[redis]` enables Redis support, while the base package remains standard-library-only plus its existing local backends.
+
+Design constraints for a first Redis backend:
+
+- Use the same CacheBackend semantics as memory and disk backends, proven through the conformance suite.
+- Use `CacheSerializer` for payloads, with a clear pickle trust-boundary warning for shared Redis deployments.
+- Require an explicit namespace/prefix. Shared Redis instances make accidental key collisions too easy to leave to optimism and duct tape.
+- Prefer Redis TTL primitives for expiry, while keeping `CacheInfo` honest about any statistics limitations.
+- Document that Redis availability, network latency, authentication, TLS, eviction policy, and server-side persistence are operator-owned concerns.
+- Do not add Redis as a hard dependency for users who only need in-process or SQLite caching.
+
+The Redis backend should remain a design item until there is a concrete user need or release scope decision.
+
 ## Disk backend implementation
 
 `DiskCacheBackend` implements the `CacheBackend` protocol using SQLite. It supports value and exception storage, TTL expiry, LRU maxsize eviction, persistent entries across backend instances, `clear()`, `info()`, context-manager cleanup, and package-specific `CacheBackendClosedError` failures after `close()`.

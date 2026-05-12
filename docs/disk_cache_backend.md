@@ -608,6 +608,46 @@ with DiskCacheBackend(".cache/tool.sqlite3", ttl=60, maxsize=16) as backend:
 Do not wrap a decorator-bound backend in a short `with` block unless all decorated calls happen before the block exits. Once the context manager closes the backend, later decorated calls will fail with `CacheBackendClosedError`.
 
 
+
+## Lifecycle and shutdown guidance
+
+A `DiskCacheBackend` owns an open SQLite connection. The owner that creates the backend is responsible for closing it deliberately. `__del__` is only best-effort cleanup for forgotten instances; it is not a lifecycle strategy.
+
+Recommended patterns:
+
+- CLI tools: create the backend near command startup and close it in a `finally` block after all cached work completes.
+- Short scoped scripts: use `with DiskCacheBackend(...) as backend:` only when all direct backend operations happen inside the block.
+- Long-running services: create the backend during application startup and close it from the normal service shutdown hook, such as an ASGI lifespan shutdown handler, framework teardown callback, or process signal cleanup path.
+- Decorator-bound backends: keep the backend alive for at least as long as the decorated function can be called. Do not create a decorator-bound backend inside a short request handler or temporary context manager unless calls cannot escape that scope.
+
+Closing is idempotent. After close, `get()`, `set_value()`, `set_exception()`, `clear()`, and `info()` should fail with `CacheBackendClosedError` rather than silently reopening the database. That makes lifecycle mistakes noisy, which is merciful compared with discovering them through haunted cache misses in production.
+
+## Cache file location and permissions
+
+Cache files are disposable local artifacts, but their contents may still be sensitive. Pick paths and permissions as if cached payloads, exception messages, keys, and timing metadata could reveal application behavior.
+
+Recommended locations:
+
+- CLI tools: use a user-owned cache directory such as `~/.cache/<app>/cache.sqlite3` on Linux, or the platform equivalent chosen by the application. Avoid the current working directory unless the tool explicitly documents that behavior.
+- Services: use an application-owned state/cache directory such as `/var/cache/<app>/` or a private runtime volume. Keep it separate from web roots, public artifact directories, and backup/export paths that are not intended to contain cache data.
+- Tests/examples: use temporary directories or project-local `.cache/` paths that are ignored by version control.
+
+Permission guidance:
+
+- Create parent directories as user/service-account owned and not world-writable.
+- Prefer owner-only permissions for service cache directories when payloads may contain user, tenant, credential-adjacent, or business-sensitive data.
+- Do not accept cache database files from untrusted users. With `PickleCacheSerializer`, an attacker-controlled cache file is a code-execution risk.
+- Treat SQLite sidecar files (`-wal`, `-shm`) as part of the cache and apply the same directory protection, cleanup, and retention expectations.
+- If a cache file is copied into a support bundle, report, or CI artifact, apply the same sensitivity review as inspection output.
+
+## Vacuum and compaction decision
+
+`DiskCacheBackend` should not run SQLite `VACUUM` automatically from normal cache operations. Ordinary `get()`, `set_value()`, `set_exception()`, `clear()`, and `info()` calls should stay predictable and should not suddenly perform a potentially expensive compaction step or require stronger database locks.
+
+The preferred design is explicit operator-controlled compaction through the future maintenance helper: `backend.maintain(vacuum=True)`. That keeps space reclamation separate from correctness. Expired-row pruning and corrupt-row dropping may remove rows, but reclaiming file space is a maintenance choice, not a hidden side quest.
+
+If implemented, vacuum reporting should include whether compaction ran, whether it was skipped, and any SQLite error surfaced to the caller. It should not silently ignore failures that operators asked to run deliberately.
+
 ## Persistence across backend instances
 
 `DiskCacheBackend` stores cache entries in SQLite, so a later backend instance using the same database path can reuse entries written by an earlier backend instance. This is useful for CLIs, local tools, and service restarts where cache data is disposable but still worth keeping between runs.
