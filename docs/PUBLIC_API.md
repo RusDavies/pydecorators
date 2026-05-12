@@ -12,6 +12,7 @@ Current public API:
 - `CacheBackendClosedError`
 - `CacheSerializationError`
 - `PickleCacheSerializer`
+- `JsonCacheSerializer`
 - `CacheSerializer`
 - `CacheBackend`
 - `MemoryCacheBackend`
@@ -94,6 +95,10 @@ Example: calling a cached function with an unhashable list argument raises `Cach
 ### `PickleCacheSerializer`
 
 `PickleCacheSerializer` is the default Python-object serializer intended for trusted local caches. Pickle data must not be loaded from untrusted sources.
+
+### `JsonCacheSerializer`
+
+`JsonCacheSerializer` serializes simple JSON-compatible values as UTF-8 `application/json` bytes for lower-risk or cross-language cache payloads. It is intended for values such as `None`, booleans, numbers, strings, lists, and dictionaries with string keys; it does not preserve arbitrary Python object types. It rejects non-finite numbers and wraps JSON serialization/deserialization failures in `CacheSerializationError`.
 
 ### `CacheSerializationError`
 

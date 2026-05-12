@@ -164,7 +164,12 @@
 ### Newly Implied Serializer Follow-Ups
 
 - [x] Decide whether serializer failures need a package-specific exception type.
-- [ ] Add JSON serializer design option for cross-language/simple-value caches.
+- [x] Add JSON serializer design option for cross-language/simple-value caches.
+
+### Newly Implied JSON Serializer Follow-Ups
+
+- [ ] Consider a documented serializer recipe for datetimes/bytes if users need JSON plus common Python scalar adapters.
+- [ ] Consider adding a docs example that stores JSON cache rows inspected directly with SQLite once CLI/user-facing cache inspection matters.
 - [x] Document pickle trust-boundary warning in disk/Redis backend docs.
 - [x] Design `DiskCacheBackend` storage strategy, likely SQLite.
 

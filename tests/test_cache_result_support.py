@@ -1,6 +1,12 @@
 import pytest
 
-from useful_decorators import CacheInfo, CacheKeyError, MemoryCacheBackend, PickleCacheSerializer
+from useful_decorators import (
+    CacheInfo,
+    CacheKeyError,
+    JsonCacheSerializer,
+    MemoryCacheBackend,
+    PickleCacheSerializer,
+)
 from useful_decorators.cache_result import _CacheEntry
 from useful_decorators.exceptions import UsefulDecoratorsError
 
@@ -74,6 +80,50 @@ def test_pickle_cache_serializer_round_trips_python_objects() -> None:
 
     assert serializer.loads(serializer.dumps(payload)) == payload
     assert serializer.content_type == "application/python-pickle"
+
+
+def test_json_cache_serializer_round_trips_json_compatible_values() -> None:
+    serializer = JsonCacheSerializer()
+    payload = {"name": "café", "numbers": [1, 2, 3], "nested": {"ok": True}}
+
+    serialized = serializer.dumps(payload)
+
+    assert serialized == b'{"name":"caf\xc3\xa9","numbers":[1,2,3],"nested":{"ok":true}}'
+    assert serializer.loads(serialized) == payload
+    assert serializer.content_type == "application/json"
+
+
+def test_json_cache_serializer_implements_serializer_protocol() -> None:
+    from useful_decorators import CacheSerializer
+
+    assert isinstance(JsonCacheSerializer(), CacheSerializer)
+
+
+def test_json_cache_serializer_wraps_serialization_failures() -> None:
+    from useful_decorators import CacheSerializationError
+
+    serializer = JsonCacheSerializer()
+
+    with pytest.raises(CacheSerializationError, match="failed to serialize cache value"):
+        serializer.dumps({"not-json": object()})
+
+
+def test_json_cache_serializer_rejects_non_finite_numbers() -> None:
+    from useful_decorators import CacheSerializationError
+
+    serializer = JsonCacheSerializer()
+
+    with pytest.raises(CacheSerializationError, match="failed to serialize cache value"):
+        serializer.dumps(float("nan"))
+
+
+def test_json_cache_serializer_wraps_deserialization_failures() -> None:
+    from useful_decorators import CacheSerializationError
+
+    serializer = JsonCacheSerializer()
+
+    with pytest.raises(CacheSerializationError, match="failed to deserialize cache value"):
+        serializer.loads(b"not json")
 
 
 def test_pickle_cache_serializer_implements_serializer_protocol() -> None:

@@ -8,7 +8,7 @@ The goal is a durable cache for CLIs, scripts, local tools, and single-host serv
 
 ```python
 from pathlib import Path
-from useful_decorators import DiskCacheBackend, PickleCacheSerializer
+from useful_decorators import DiskCacheBackend, JsonCacheSerializer, PickleCacheSerializer
 
 backend = DiskCacheBackend(
     path=Path(".cache/useful-decorators.sqlite3"),
@@ -87,7 +87,10 @@ Reason: generated keys are Python tuples containing marker objects, argument val
 
 ## Payload serialization
 
-Payloads use the configured `CacheSerializer`.
+Payloads use the configured `CacheSerializer`. The built-in serializers are:
+
+- `PickleCacheSerializer`: the default Python-object serializer for trusted local cache files.
+- `JsonCacheSerializer`: UTF-8 JSON for simple JSON-compatible values when payloads should be easier to inspect or consume from other languages. It does not preserve arbitrary Python object types.
 
 - Successful values store `is_exception=0`.
 - Cached exceptions store `is_exception=1`.
@@ -145,7 +148,31 @@ Docs for `DiskCacheBackend` must warn:
 
 - Do not use cache files from untrusted sources.
 - Do not place cache DBs in world-writable directories.
-- Prefer a custom JSON serializer for simple cross-language or lower-risk payloads once available.
+- Prefer `JsonCacheSerializer` for simple JSON-compatible payloads that should avoid pickle or be easier to inspect from other languages.
+
+## JSON payload serializer
+
+Use `JsonCacheSerializer` when cached values are JSON-compatible and do not need Python object identity or custom classes preserved:
+
+```python
+from pathlib import Path
+
+from useful_decorators import DiskCacheBackend, JsonCacheSerializer, cache_result
+
+backend = DiskCacheBackend(
+    Path(".cache/useful-decorators.sqlite3"),
+    serializer=JsonCacheSerializer(),
+)
+
+
+@cache_result(backend=backend, namespace="users-json:v1")
+def load_user_profile(user_id: str) -> dict[str, object]:
+    return {"id": user_id, "display_name": "Ada"}
+```
+
+JSON serialization is stricter than pickle. It supports ordinary JSON values (`None`, booleans, finite numbers, strings, lists, and dictionaries with string keys), rejects non-finite numbers such as `NaN`, and does not preserve tuples, exceptions, custom classes, bytes, datetimes, or other Python-specific objects. Avoid `cache_exceptions=True` with `JsonCacheSerializer` unless the exception payloads are converted by a custom wrapper/serializer first.
+
+Changing between `PickleCacheSerializer` and `JsonCacheSerializer` changes `serializer_content_type`; existing rows written with the old content type are treated as misses and removed rather than being deserialized with the wrong serializer.
 
 ## Non-goals for first implementation
 

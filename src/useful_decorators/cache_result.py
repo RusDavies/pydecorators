@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import pickle
 import sqlite3
 from collections import OrderedDict
@@ -104,6 +105,39 @@ class PickleCacheSerializer:
         try:
             return pickle.loads(data)
         except Exception as exc:
+            raise CacheSerializationError("failed to deserialize cache value") from exc
+
+
+class JsonCacheSerializer:
+    """JSON serializer for simple cross-language cache payloads.
+
+    This serializer is intended for JSON-compatible values such as ``None``,
+    booleans, numbers, strings, lists, and dictionaries with string keys. It is
+    less Python-specific than pickle, but it does not preserve arbitrary Python
+    object types.
+    """
+
+    content_type = "application/json"
+
+    def dumps(self, value: object) -> bytes:
+        """Serialize a JSON-compatible value to UTF-8 JSON bytes."""
+
+        try:
+            return json.dumps(
+                value,
+                allow_nan=False,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        except (TypeError, ValueError) as exc:
+            raise CacheSerializationError("failed to serialize cache value") from exc
+
+    def loads(self, data: bytes) -> object:
+        """Deserialize UTF-8 JSON bytes."""
+
+        try:
+            return json.loads(data.decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise CacheSerializationError("failed to deserialize cache value") from exc
 
 
