@@ -597,7 +597,7 @@
 
 - [ ] Decide Redis key prefix and stats-key naming before implementing `RedisCacheBackend`.
 - [ ] Add Redis extra dependency import-failure tests when the optional backend is implemented.
-- [ ] Reduce duplicate backend behavior tests now covered by the conformance suite.
+- [x] Reduce duplicate backend behavior tests now covered by the conformance suite.
 
 ## 4. `@retry`
 
