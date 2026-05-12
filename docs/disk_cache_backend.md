@@ -231,4 +231,15 @@ For persistent cache reuse, treat cache keys as part of the on-disk compatibilit
 - If you provide a custom `key` function, keep its output stable across releases and process restarts. A changed custom key function can orphan old cache rows.
 - Changing serializers, payload types, or cache value schemas may make old rows disposable. Use `clear()` or a new namespace when old persistent values should not be reused.
 
+## Cache versioning and schema changes
+
+Before public release, treat persistent disk-cache reuse as a compatibility surface. If a cached value's meaning, payload shape, serializer, or trust boundary changes, do not silently reuse rows written by older code. Pick one of these strategies deliberately:
+
+- Prefer a versioned namespace for long-lived persistent caches, such as `users:v1` or `ai-responses:v2`. Bump the namespace when cached value semantics or schemas change incompatibly.
+- Use `cache_clear()` or backend `clear()` during upgrades when the entire cache should be discarded in place.
+- Document any intentional reuse across versions when old rows are still valid.
+- Avoid making custom `key` functions depend on unstable implementation details unless you also version the namespace.
+
+The first implementation does not provide automatic schema migrations for cached payloads. Namespace versioning is the boring, explicit escape hatch. Boring is good here; haunted cache archaeology is not a feature.
+
 Close each backend instance when its owner is done with it. See `docs/examples/disk_cache_backend_examples.py` for the executable persistence example used by the documentation test suite.

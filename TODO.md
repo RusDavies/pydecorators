@@ -222,7 +222,12 @@
 ### Newly Implied Disk Namespace Stability Follow-Ups
 
 - [ ] Consider adding a README note about namespace/key stability if persistent disk caching becomes a headline feature.
-- [ ] Consider adding cache schema/version namespace guidance before a public release.
+- [x] Consider adding cache schema/version namespace guidance before a public release.
+
+### Newly Implied Disk Cache Versioning Follow-Ups
+
+- [ ] Consider adding a formal cache-versioning recipe to README if persistent cache reuse becomes part of the public quickstart.
+- [ ] Consider adding migration/clear guidance to RELEASE.md before the first public release.
 - [x] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
 
 ### Newly Implied Disk Lifecycle Docs Follow-Ups
