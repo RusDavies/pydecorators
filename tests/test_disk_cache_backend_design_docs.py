@@ -120,3 +120,26 @@ def test_disk_cache_backend_design_doc_covers_inspection_api_design() -> None:
         "stay a design note until a real user or release requirement needs it",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_schema_metadata_design() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Disk-cache schema metadata table design",
+        "cache_metadata",
+        "schema_version",
+        "created_by",
+        "created_with_version",
+        "updated_with_version",
+        "disk-cache container format",
+        "Payload compatibility still belongs to namespaces",
+        "Unknown future major schema versions should fail closed",
+        "explicit, tested migration code",
+        "same initialization/migration transaction",
+        "Non-goals for the first metadata table",
+        "payload schema migration",
+        "serializer migration",
+        "remains a design note",
+    ]:
+        assert required in text

@@ -421,4 +421,42 @@ Before public release, treat persistent disk-cache reuse as a compatibility surf
 
 The first implementation does not provide automatic schema migrations for cached payloads. Namespace versioning is the boring, explicit escape hatch. Boring is good here; haunted cache archaeology is not a feature.
 
+## Disk-cache schema metadata table design
+
+If a future release promises disk-cache file compatibility across package versions, add a small metadata table before making that promise. The metadata table should make compatibility checks explicit instead of inferring meaning from table shape, column presence, or vibes.
+
+Tentative schema:
+
+```sql
+CREATE TABLE IF NOT EXISTS cache_metadata (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+```
+
+Initial rows could include:
+
+- `schema_version`: integer string for the SQLite schema contract, starting at `1`.
+- `created_by`: package name, such as `useful-decorators`.
+- `created_with_version`: package version that initialized the file, for diagnostics only.
+- `updated_with_version`: last package version that opened or migrated the file, for diagnostics only.
+
+Design constraints:
+
+- Schema metadata is about the disk-cache container format, not cached payload schemas. Payload compatibility still belongs to namespaces, serializers, and application-owned value semantics.
+- Unknown future major schema versions should fail closed with a clear `ConfigurationError` or disk-cache-specific exception rather than silently reading rows with the wrong assumptions.
+- Older known schema versions may be migrated only by explicit, tested migration code. No best-effort table poking in constructors.
+- Metadata writes should happen in the same initialization/migration transaction as schema changes. Half-upgraded cache files are how gremlins get promoted.
+- Diagnostics may expose metadata through a future inspection API, but callers should not need to query `cache_metadata` directly.
+
+Non-goals for the first metadata table:
+
+- payload schema migration
+- serializer migration
+- cross-host locking semantics
+- user data durability guarantees
+- semver promises for every SQLite implementation detail
+
+Until file compatibility is a public promise, this remains a design note. Current caches are disposable local caches; clearing or versioning namespaces is still the preferred answer for incompatible changes.
+
 Close each backend instance when its owner is done with it. See `docs/examples/disk_cache_backend_examples.py` for the executable persistence example used by the documentation test suite.
