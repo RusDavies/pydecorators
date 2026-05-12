@@ -186,6 +186,22 @@ JSON serialization is stricter than pickle. It supports ordinary JSON values (`N
 
 Changing between `PickleCacheSerializer` and `JsonCacheSerializer` changes `serializer_content_type`; existing rows written with the old content type are treated as misses and removed rather than being deserialized with the wrong serializer.
 
+## Inspecting JSON cache rows with SQLite
+
+When `DiskCacheBackend` uses `JsonCacheSerializer`, payload bytes are UTF-8 JSON and can be inspected with ordinary SQLite tools. This is useful for debugging local caches or confirming what a simple cross-language consumer would see.
+
+The cache key is still an internal pickle-serialized Python key, so inspect payload columns for debugging rather than treating the SQLite file as a stable application database. Cache rows are disposable implementation details, not a public storage schema with a tiny hat.
+
+Example SQL:
+
+```sql
+SELECT payload, serializer_content_type
+FROM cache_entries
+LIMIT 1;
+```
+
+Executable example: `docs/examples/disk_cache_backend_examples.py::inspect_json_cache_row_example` writes a JSON payload with `JsonCacheSerializer`, opens the SQLite file directly, reads `payload` and `serializer_content_type`, and verifies the stored payload is ordinary compact JSON such as `{"id":"user-123","active":true}` with content type `application/json`.
+
 ## JSON adapter recipe for datetimes and bytes
 
 `JsonCacheSerializer` intentionally supports only ordinary JSON-compatible values. If cached payloads need common Python scalar adapters such as `datetime` or `bytes`, write a custom `CacheSerializer` with an explicit tagged representation instead of silently teaching the built-in serializer Python-specific tricks.

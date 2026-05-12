@@ -87,6 +87,20 @@ def test_json_datetime_bytes_serializer_documentation_example_executes(
     assert digest == b"abc123"
 
 
+def test_json_cache_row_inspection_documentation_example_executes(
+    tmp_path: Path,
+) -> None:
+    examples = load_docs_example("disk_cache_backend_examples")
+
+    payload, content_type, filename = examples.inspect_json_cache_row_example(
+        tmp_path / "inspect-json-cache.sqlite3"
+    )
+
+    assert payload == '{"id":"user-123","active":true}'
+    assert content_type == "application/json"
+    assert filename == "inspect-json-cache.sqlite3"
+
+
 def test_public_exception_documentation_examples_execute() -> None:
     examples = load_docs_example("public_exception_examples")
 
