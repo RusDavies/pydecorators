@@ -223,4 +223,12 @@ Do not wrap a decorator-bound backend in a short `with` block unless all decorat
 
 `DiskCacheBackend` stores cache entries in SQLite, so a later backend instance using the same database path can reuse entries written by an earlier backend instance. This is useful for CLIs, local tools, and service restarts where cache data is disposable but still worth keeping between runs.
 
-Use the same generated key inputs, including the same `namespace`, when you expect reuse across backend instances. Close each backend instance when its owner is done with it. See `docs/examples/disk_cache_backend_examples.py` for the executable persistence example used by the documentation test suite.
+For persistent cache reuse, treat cache keys as part of the on-disk compatibility contract:
+
+- Use a stable `namespace` for each logical cache. Changing the namespace intentionally creates a separate cache key space.
+- Keep call arguments and keyword names stable for values you expect to reuse. The default key is derived from the function call inputs plus `namespace`; different inputs are different cache entries.
+- Keep `typed=True` consistent. Switching it changes whether argument types participate in generated keys.
+- If you provide a custom `key` function, keep its output stable across releases and process restarts. A changed custom key function can orphan old cache rows.
+- Changing serializers, payload types, or cache value schemas may make old rows disposable. Use `clear()` or a new namespace when old persistent values should not be reused.
+
+Close each backend instance when its owner is done with it. See `docs/examples/disk_cache_backend_examples.py` for the executable persistence example used by the documentation test suite.

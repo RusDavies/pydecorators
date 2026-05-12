@@ -19,3 +19,20 @@ def test_disk_cache_backend_design_doc_covers_required_decisions() -> None:
         "pickle",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_persistent_key_stability() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "For persistent cache reuse",
+        "on-disk compatibility contract",
+        "stable `namespace`",
+        "Changing the namespace intentionally creates a separate cache key space",
+        "call arguments and keyword names stable",
+        "`typed=True` consistent",
+        "custom `key` function",
+        "orphan old cache rows",
+        "Use `clear()` or a new namespace",
+    ]:
+        assert required in text
