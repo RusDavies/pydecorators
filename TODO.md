@@ -798,7 +798,7 @@
 ### Newly Implied Documentation Follow-Ups
 
 - [ ] Expand API reference with exact parameter defaults if public signatures change before release.
-- [ ] Add a decorator-composition guide if users ask about stacking order.
+- [x] Add a decorator-composition guide if users ask about stacking order.
 - [ ] Add executable README snippets for every first-release decorator if the examples are promoted beyond smoke-test coverage.
 - [ ] Add a security hardening page if cache/logging/validation warnings keep growing.
 ## 11. Quality Backlog
@@ -848,6 +848,7 @@
 - [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
 - [ ] Add trusted publishing / API token instructions once the repository and package name are final.
 - [ ] Re-check `blakemere-decorators` availability immediately before final publish.
+- [ ] Add executable composition examples if users need copy-paste stacking recipes.
 
 ## 13. Dogfood Backlog
 
@@ -857,8 +858,8 @@
 - [x] Run dogfood scenario from an installed wheel.
 - [x] Dogfood in a real non-demo local project before public release.
 - [x] Record API/documentation annoyances from real usage.
-- [ ] Resolve or explicitly defer dogfood findings before TestPyPI.
-- [ ] Add decorator-composition guidance based on dogfood wrapper-order findings.
+- [x] Resolve or explicitly defer dogfood findings before TestPyPI.
+- [x] Add decorator-composition guidance based on dogfood wrapper-order findings.
 
 ## 14. Future Ideas
 

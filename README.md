@@ -48,7 +48,7 @@ def call_service() -> str:
     return "ok"
 ```
 
-Then read the per-decorator docs before stacking decorators together. Decorator soup is still soup, even when typed.
+Then read the per-decorator docs and `docs/composition.md` before stacking decorators together. Decorator soup is still soup, even when typed.
 
 ## Development status
 
@@ -94,7 +94,7 @@ python scripts/dogfood_external_project.py
 
 ## Public API and contributing
 
-See `docs/index.md` for the documentation index, `docs/PUBLIC_API.md` for the public API policy, `docs/API_DESIGN.md` for broader API design notes, `docs/exceptions.md` for public exception behavior, and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
+See `docs/index.md` for the documentation index, `docs/PUBLIC_API.md` for the public API policy, `docs/API_DESIGN.md` for broader API design notes, `docs/composition.md` for decorator stacking guidance, `docs/exceptions.md` for public exception behavior, and `CONTRIBUTING.md` for the new-decorator checklist. Executable documentation examples live under `docs/examples/`.
 
 ## Release process
 
@@ -102,7 +102,7 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, `docs/require_env.md` for environment checks, `docs/circuit_breaker.md` for circuit-breaker behavior, and `docs/API_REFERENCE.md` for a compact API reference.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, `docs/require_env.md` for environment checks, `docs/circuit_breaker.md` for circuit-breaker behavior, `docs/composition.md` for stacking guidance, and `docs/API_REFERENCE.md` for a compact API reference.
 
 ## Decorator overview
 
