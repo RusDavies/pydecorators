@@ -3,6 +3,10 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
+DOCS_INDEX_EXEMPTIONS = {
+    Path("docs/index.md"),
+}
+
 
 def asserted_example_function_calls(test_path: Path) -> set[str]:
     tree = ast.parse(test_path.read_text())
