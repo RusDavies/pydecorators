@@ -257,6 +257,31 @@ Design constraints:
 - It should have explicit `limit`/pagination behavior so accidental inspection does not scan huge cache files by default.
 - It should return structured data suitable for a future CLI, not preformatted log text.
 
+## Bounded payload preview policy design
+
+Any future inspection API that exposes payload previews must be deliberately boring and safe. Previewing cache rows is for operator/debugging visibility, not for reconstructing cached values or bypassing serializer boundaries.
+
+Proposed default policy:
+
+- `include_payload_preview=False` by default for the first public inspection API. Callers must opt in.
+- `payload_preview_max_bytes=256` by default, with a documented upper bound such as `4096` bytes.
+- Truncation should happen by bytes before display formatting, and the result should include `payload_preview_truncated: bool` so callers do not mistake previews for complete payloads.
+- UTF-8 JSON serializers may decode previews with `errors="replace"` after byte truncation. Invalid UTF-8 should never fail inspection.
+- Binary, pickle, and unknown serializers should not be deserialized for previews. They should return `payload_preview=None` plus payload size/content-type metadata, or a small marker such as `<binary payload: 128 bytes>`.
+- Pickle previews must never call `pickle.loads()`. The whole point is to avoid accidentally turning a diagnostic endpoint into a haunted object launcher.
+- Previews should not include serialized cache keys. If key correlation is needed later, use a redacted digest such as `key_sha256`.
+- Preview generation should be side-effect free and should not update `last_accessed`, hits, misses, TTL, or LRU state.
+- Preview output should be documented as diagnostic-only and excluded from compatibility promises about exact formatting.
+
+Before implementing `inspect_entries()`, add tests for at least these policy cases:
+
+- JSON payload shorter than the limit previews as UTF-8 text.
+- JSON payload longer than the limit is byte-truncated and marked truncated.
+- Invalid UTF-8 does not raise during preview generation.
+- Pickle payloads are not deserialized and return no preview or a binary marker.
+- Inspection does not change cache stats, expiry, or last-accessed state.
+- A configured maximum prevents callers from requesting unbounded previews.
+
 Non-goals for the first inspection API:
 
 - cross-process live monitoring

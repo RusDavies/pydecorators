@@ -143,3 +143,24 @@ def test_disk_cache_backend_design_doc_covers_schema_metadata_design() -> None:
         "remains a design note",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_bounded_preview_policy() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Bounded payload preview policy design",
+        "include_payload_preview=False",
+        "payload_preview_max_bytes=256",
+        "4096",
+        "payload_preview_truncated",
+        'errors="replace"',
+        "Invalid UTF-8 should never fail inspection",
+        "Binary, pickle, and unknown serializers should not be deserialized",
+        "Pickle previews must never call `pickle.loads()`",
+        "should not update `last_accessed`, hits, misses, TTL, or LRU state",
+        "JSON payload longer than the limit is byte-truncated",
+        "Inspection does not change cache stats",
+        "prevents callers from requesting unbounded previews",
+    ]:
+        assert required in text
