@@ -227,7 +227,12 @@
 ### Newly Implied Disk Cache Versioning Follow-Ups
 
 - [ ] Consider adding a formal cache-versioning recipe to README if persistent cache reuse becomes part of the public quickstart.
-- [ ] Consider adding migration/clear guidance to RELEASE.md before the first public release.
+- [x] Consider adding migration/clear guidance to RELEASE.md before the first public release.
+
+### Newly Implied Release Cache Compatibility Follow-Ups
+
+- [ ] Consider adding a release-note template for persistent cache compatibility once public releases begin.
+- [ ] Consider adding a package-level helper for recommended cache namespace/version strings if examples start repeating them.
 - [x] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
 
 ### Newly Implied Disk Lifecycle Docs Follow-Ups
