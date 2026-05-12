@@ -402,6 +402,21 @@ Design constraints:
 - Aggregate inspection should be read-only and should not update hits, misses, TTL, LRU, or `last_accessed`.
 - Any future CLI support-bundle command should prefer this aggregate report by default.
 
+## Aggregate timestamp diagnostics are not audit evidence
+
+Aggregate inspection timestamp ranges are intended to help answer rough debugging questions: “does this cache contain old rows?”, “are entries expiring?”, and “was this cache recently active?” They are not audit logs, access records, or compliance evidence.
+
+Timestamp guidance:
+
+- `earliest_created_at` and `latest_created_at` are cache-row creation ranges, not proof of when the underlying business event happened.
+- `earliest_expires_at` and `latest_expires_at` describe current cache expiry policy, not data retention policy.
+- `last_accessed`-style aggregate ranges, if added later, describe cache recency mechanics and may change due to implementation details such as LRU updates.
+- Clock sources may be injectable for tests and may not be wall-clock-synchronized across processes.
+- Cache clearing, namespace changes, migrations, and manual SQLite edits can erase or distort timestamp history.
+- Documentation and future CLI labels should call these fields diagnostics, not audit timestamps.
+
+Pre-implementation tests should assert docs/help text avoid audit/compliance wording for aggregate timestamp ranges and describe them as best-effort cache diagnostics.
+
 Pre-implementation tests should cover aggregate reports excluding per-row data, preserving safe-mode no-preview behavior, surfacing truncation, and not mutating cache stats or recency state.
 
 ## Inspection report retention and deletion guidance

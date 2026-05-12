@@ -325,3 +325,21 @@ def test_disk_cache_backend_design_doc_covers_inspection_report_retention() -> N
         "should not silently phone home, upload, or retain inspection reports",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_timestamp_diagnostics_not_audit() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Aggregate timestamp diagnostics are not audit evidence",
+        "rough debugging questions",
+        "not audit logs",
+        "not proof of when the underlying business event happened",
+        "current cache expiry policy, not data retention policy",
+        "cache recency mechanics",
+        "Clock sources may be injectable",
+        "Cache clearing, namespace changes, migrations, and manual SQLite edits",
+        "diagnostics, not audit timestamps",
+        "best-effort cache diagnostics",
+    ]:
+        assert required in text

@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Aggregate timestamp diagnostic guidance for future disk-cache inspection reports.
 - Inspection report retention/deletion guidance for future disk-cache support artifacts.
 - Inspection sensitivity-warning design guidance for future disk-cache support tooling.
 - Inspection CLI safe-default design guidance for future disk-cache tooling.
