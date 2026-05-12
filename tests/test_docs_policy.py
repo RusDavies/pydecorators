@@ -6,6 +6,7 @@ from types import ModuleType
 import pytest
 
 from tests.docs_policy_helpers import (
+    asserted_example_function_calls,
     docs_index_local_links,
     docs_index_markdown_links,
     is_external_http_link,
@@ -81,13 +82,12 @@ def test_docs_examples_are_exercised_by_docs_example_tests() -> None:
 def test_public_docs_example_functions_have_assertions() -> None:
     explicitly_exempt = {Path("docs/examples/__init__.py")}
     example_files = sorted(set(Path("docs/examples").glob("*.py")) - explicitly_exempt)
-    docs_example_tests = Path("tests/test_docs_examples.py").read_text()
+    asserted_calls = asserted_example_function_calls(Path("tests/test_docs_examples.py"))
 
     for example_path in example_files:
         module_name = example_path.stem
         for function_name in public_example_functions(example_path):
-            expected_call = f"examples.{function_name}("
-            assert expected_call in docs_example_tests, (
+            assert function_name in asserted_calls, (
                 f"missing assertion call for {module_name}.{function_name}"
             )
 

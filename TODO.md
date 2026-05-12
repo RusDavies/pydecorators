@@ -413,7 +413,7 @@
 ### Newly Implied Docs Example Assertion Policy Follow-Ups
 
 - [ ] Extend docs example assertion policy if examples add public classes with public methods.
-- [ ] Consider AST-based assertion detection if string matching becomes too loose.
+- [x] Consider AST-based assertion detection if string matching becomes too loose.
 - [x] Add a naming convention note for executable docs examples.
 
 ### Newly Implied Docs Example Naming Follow-Ups
