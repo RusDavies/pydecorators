@@ -711,3 +711,25 @@ def test_docs_example_link_labels_match_filenames() -> None:
     assert example_links
     for label, target in example_links:
         assert label == Path(target).name
+
+
+def test_planning_docs_are_not_user_navigation_docs_by_default() -> None:
+    planning_docs = [Path("GOAL.md"), Path("PLAN.md"), Path("TODO.md")]
+    root_navigation_docs = {
+        Path("README.md"),
+        Path("CONTRIBUTING.md"),
+        Path("RELEASE.md"),
+    }
+
+    for planning_doc in planning_docs:
+        assert planning_doc not in root_navigation_docs
+        assert "[Documentation Index](docs/index.md)" not in planning_doc.read_text()
+        assert "[docs index](docs/index.md)" not in planning_doc.read_text()
+
+
+def test_contributing_documents_planning_doc_navigation_boundary() -> None:
+    contributing = Path("CONTRIBUTING.md").read_text()
+
+    assert "planning/backlog files" in contributing
+    assert "deliberately promoted to user-facing documentation" in contributing
+    assert "not required to link the docs index" in contributing
