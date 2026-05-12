@@ -273,6 +273,29 @@ Proposed default policy:
 - Preview generation should be side-effect free and should not update `last_accessed`, hits, misses, TTL, or LRU state.
 - Preview output should be documented as diagnostic-only and excluded from compatibility promises about exact formatting.
 
+## Payload preview redaction expectations
+
+Payload previews can expose cached return values, and cached return values may contain secrets, personal data, tokens, credentials, customer records, or proprietary content. Any future inspection API must treat previews as sensitive diagnostic output, not harmless metadata.
+
+Redaction posture:
+
+- Previews should be opt-in at the API call site and clearly documented as potentially sensitive.
+- The library should not promise automatic secret detection. Generic redaction misses too much and creates fake safety.
+- If redaction support is added, it should be explicit and caller-controlled, such as a `preview_redactor` callable or named redaction policy.
+- Built-in redaction, if any, should be conservative and limited to obvious JSON object keys such as `password`, `secret`, `token`, `api_key`, `authorization`, and `cookie`. It should never be the only safety boundary.
+- Redaction should happen after bounded decoding/truncation policy is applied, and should preserve the `payload_preview_truncated` signal.
+- Inspection output should not be logged automatically by the library. Callers own where diagnostic reports go.
+- Documentation should warn against enabling previews in shared logs, support bundles, CI artifacts, public bug reports, screenshots, or chat pastebins unless the payload domain is known safe. Yes, this includes pastebins. Especially pastebins.
+
+Before implementing preview redaction, add tests for at least these cases:
+
+- previews are omitted by default
+- opt-in previews are marked sensitive in docs/API naming
+- obvious JSON secret keys are redacted when a built-in policy is enabled
+- caller-provided redactors can replace or suppress previews
+- truncation state survives redaction
+- redaction failures do not expose the original unredacted payload by accident
+
 Before implementing `inspect_entries()`, add tests for at least these policy cases:
 
 - JSON payload shorter than the limit previews as UTF-8 text.
