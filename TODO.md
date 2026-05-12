@@ -848,7 +848,8 @@
 - [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
 - [x] Add trusted publishing / API token instructions once the repository and package name are final.
 - [ ] Re-check `blakemere-decorators` availability immediately before final publish.
-- [ ] Add a release workflow for trusted publishing once GitHub environment names are confirmed.
+- [ ] Configure GitHub protected environments `testpypi` and `pypi` before running release workflow.
+- [x] Add a release workflow for trusted publishing once GitHub environment names are confirmed.
 - [ ] Add executable composition examples if users need copy-paste stacking recipes.
 
 ## 13. Dogfood Backlog
