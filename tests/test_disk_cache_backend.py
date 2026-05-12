@@ -224,6 +224,40 @@ def test_disk_cache_backend_expires_entries(tmp_path: Path) -> None:
         backend.close()
 
 
+def test_disk_cache_backend_can_refresh_ttl_on_hit(tmp_path: Path) -> None:
+    clock = MutableClock()
+    backend = DiskCacheBackend(
+        tmp_path / "cache.sqlite3",
+        ttl=10,
+        refresh_ttl_on_hit=True,
+        clock=clock,
+    )
+    try:
+        backend.set_value("key", "value")
+        clock.advance(9)
+        assert backend.get("key") is not None
+        clock.advance(9)
+        assert backend.get("key") is not None
+        clock.advance(10)
+        assert backend.get("key") is None
+        assert backend.info().misses == 1
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_does_not_refresh_ttl_on_hit_by_default(tmp_path: Path) -> None:
+    clock = MutableClock()
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", ttl=10, clock=clock)
+    try:
+        backend.set_value("key", "value")
+        clock.advance(9)
+        assert backend.get("key") is not None
+        clock.advance(1)
+        assert backend.get("key") is None
+    finally:
+        backend.close()
+
+
 def test_disk_cache_backend_evicts_lru_entries(tmp_path: Path) -> None:
     clock = MutableClock()
     backend = DiskCacheBackend(tmp_path / "cache.sqlite3", maxsize=2, clock=clock)

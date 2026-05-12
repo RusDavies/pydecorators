@@ -165,6 +165,7 @@ class MemoryCacheBackend:
         *,
         ttl: float | None = None,
         maxsize: int | None = 128,
+        refresh_ttl_on_hit: bool = False,
         clock: Clock | None = None,
     ) -> None:
         if ttl is not None and ttl <= 0:
@@ -174,6 +175,7 @@ class MemoryCacheBackend:
 
         self._ttl = ttl
         self._maxsize = maxsize
+        self._refresh_ttl_on_hit = refresh_ttl_on_hit
         self._clock = clock or monotonic
         self._lock = RLock()
         self._cache: OrderedDict[Hashable, _CacheEntry] = OrderedDict()
@@ -190,6 +192,8 @@ class MemoryCacheBackend:
                     self._cache.pop(key, None)
                 else:
                     self._hits += 1
+                    if self._refresh_ttl_on_hit:
+                        entry.expires_at = self._expires_at()
                     self._cache.move_to_end(key)
                     return entry
             self._misses += 1
@@ -263,6 +267,7 @@ class DiskCacheBackend:
         *,
         ttl: float | None = None,
         maxsize: int | None = 128,
+        refresh_ttl_on_hit: bool = False,
         serializer: CacheSerializer | None = None,
         on_drop: Callable[[DiskCacheDropEvent], object] | None = None,
         clock: Clock | None = None,
@@ -279,6 +284,7 @@ class DiskCacheBackend:
         self.path = Path(path)
         self._ttl = ttl
         self._maxsize = maxsize
+        self._refresh_ttl_on_hit = refresh_ttl_on_hit
         self._key_serializer = PickleCacheSerializer()
         self._serializer = serializer or PickleCacheSerializer()
         self._on_drop = on_drop
@@ -393,14 +399,21 @@ class DiskCacheBackend:
                     self._record_miss()
                     return None
 
+                refreshed_expires_at = (
+                    self._expires_at(now) if self._refresh_ttl_on_hit else expires_at
+                )
                 self._connection.execute(
-                    "UPDATE cache_entries SET last_accessed = ? WHERE key = ?",
-                    (now, serialized_key),
+                    """
+                    UPDATE cache_entries
+                    SET last_accessed = ?, expires_at = ?
+                    WHERE key = ?
+                    """,
+                    (now, refreshed_expires_at, serialized_key),
                 )
                 self._record_hit()
                 return _CacheEntry(
                     deserialized_payload,
-                    expires_at=expires_at,
+                    expires_at=refreshed_expires_at,
                     is_exception=bool(is_exception),
                 )
 
@@ -624,6 +637,7 @@ def cache_result(
     key: Callable[..., Hashable] | None = None,
     typed: bool = False,
     cache_exceptions: bool = False,
+    refresh_ttl_on_hit: bool = False,
     clock: Clock | None = None,
     backend: CacheBackend | None = None,
     namespace: str | None = None,
@@ -637,7 +651,12 @@ def cache_result(
     if namespace is not None and not namespace.strip():
         raise ConfigurationError("namespace must not be empty")
 
-    cache_backend = backend or MemoryCacheBackend(ttl=ttl, maxsize=maxsize, clock=clock)
+    cache_backend = backend or MemoryCacheBackend(
+        ttl=ttl,
+        maxsize=maxsize,
+        refresh_ttl_on_hit=refresh_ttl_on_hit,
+        clock=clock,
+    )
 
     def decorator(func: Callable[P, R]) -> Callable[P, R]:
         if is_async_callable(func):

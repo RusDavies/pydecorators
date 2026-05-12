@@ -92,6 +92,30 @@ def test_memory_cache_backend_implements_cache_backend_protocol() -> None:
     assert isinstance(MemoryCacheBackend(), CacheBackend)
 
 
+def test_memory_cache_backend_can_refresh_ttl_on_hit() -> None:
+    clock = MutableSupportClock()
+    backend = MemoryCacheBackend(ttl=10, refresh_ttl_on_hit=True, clock=clock)
+
+    backend.set_value("key", "value")
+    clock.advance(9)
+    assert backend.get("key") is not None
+    clock.advance(9)
+    assert backend.get("key") is not None
+    clock.advance(10)
+    assert backend.get("key") is None
+
+
+class MutableSupportClock:
+    def __init__(self) -> None:
+        self.now = 0.0
+
+    def __call__(self) -> float:
+        return self.now
+
+    def advance(self, seconds: float) -> None:
+        self.now += seconds
+
+
 def test_pickle_cache_serializer_round_trips_python_objects() -> None:
     serializer = PickleCacheSerializer()
     payload = {"numbers": [1, 2, 3], "nested": {"ok": True}}

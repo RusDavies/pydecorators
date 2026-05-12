@@ -136,7 +136,12 @@
 
 ### Newly Implied `@cache_result` Future Options
 
-- [ ] Consider opt-in sliding TTL refresh mode after user feedback.
+- [x] Add opt-in sliding TTL refresh mode.
+
+### Newly Implied Sliding TTL Follow-Ups
+
+- [ ] Consider exposing refreshed expiry timestamps in disk-cache diagnostics if operators ask for TTL debugging.
+- [ ] Consider documenting fixed-vs-sliding TTL tradeoffs in README if cache behavior questions recur.
 - [ ] Consider request coalescing for duplicate concurrent misses after user feedback.
 
 ### Newly Implied `@cache_result` Backend Follow-Ups

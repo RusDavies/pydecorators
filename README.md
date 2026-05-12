@@ -70,7 +70,7 @@ def expensive_lookup(value: str) -> str:
 
 `@cache_result` uses `MemoryCacheBackend` by default and also includes `DiskCacheBackend` for trusted local persistent caches. Future backend work is planned for Redis storage.
 
-Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend.
+Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend. TTL is fixed from write time by default; pass `refresh_ttl_on_hit=True` to `@cache_result` or a backend when hot entries should use sliding expiry.
 
 For a trusted local persistent cache, create one `DiskCacheBackend`, pass it to `@cache_result`, and close it when your script or service shuts down:
 
