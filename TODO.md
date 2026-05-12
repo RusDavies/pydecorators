@@ -184,7 +184,12 @@
 
 ### Newly Implied JSON Serializer Follow-Ups
 
-- [ ] Consider a documented serializer recipe for datetimes/bytes if users need JSON plus common Python scalar adapters.
+- [x] Add documented serializer recipe for datetimes/bytes with JSON plus common Python scalar adapters.
+
+### Newly Implied JSON Adapter Recipe Follow-Ups
+
+- [ ] Consider promoting the datetime/bytes adapter recipe into a reusable helper only if multiple examples start needing the same tagged format.
+- [ ] Consider adding compatibility tests for adapter tag/version changes if the recipe becomes public API rather than documentation guidance.
 - [ ] Consider adding a docs example that stores JSON cache rows inspected directly with SQLite once CLI/user-facing cache inspection matters.
 - [x] Document pickle trust-boundary warning in disk/Redis backend docs.
 - [x] Design `DiskCacheBackend` storage strategy, likely SQLite.

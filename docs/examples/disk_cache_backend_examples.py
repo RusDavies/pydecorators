@@ -87,3 +87,91 @@ def persistent_disk_cache_example(cache_path: Path) -> tuple[str, str, int]:
         return first, second, _CALLS
     finally:
         second_backend.close()
+
+
+class DateTimeBytesJsonSerializer:
+    """Example JSON serializer that adapts datetimes and bytes explicitly."""
+
+    content_type = "application/json+datetime-bytes-example"
+
+    def dumps(self, value: object) -> bytes:
+        """Serialize a JSON-like value after adapting datetime and bytes values."""
+
+        import base64
+        import json
+        from datetime import datetime
+
+        from useful_decorators import CacheSerializationError
+
+        def encode(item: object) -> object:
+            if isinstance(item, datetime):
+                return {"__type__": "datetime", "value": item.isoformat()}
+            if isinstance(item, bytes):
+                return {
+                    "__type__": "bytes",
+                    "value": base64.b64encode(item).decode("ascii"),
+                }
+            if isinstance(item, list):
+                return [encode(value) for value in item]
+            if isinstance(item, dict):
+                return {key: encode(value) for key, value in item.items()}
+            return item
+
+        try:
+            return json.dumps(
+                encode(value),
+                allow_nan=False,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        except (TypeError, ValueError) as exc:
+            raise CacheSerializationError("failed to serialize cache value") from exc
+
+    def loads(self, data: bytes) -> object:
+        """Deserialize JSON bytes and restore adapted datetime and bytes values."""
+
+        import base64
+        import json
+        from datetime import datetime
+
+        from useful_decorators import CacheSerializationError
+
+        def decode(item: object) -> object:
+            if isinstance(item, list):
+                return [decode(value) for value in item]
+            if isinstance(item, dict):
+                if item.get("__type__") == "datetime":
+                    return datetime.fromisoformat(str(item["value"]))
+                if item.get("__type__") == "bytes":
+                    return base64.b64decode(str(item["value"]).encode("ascii"))
+                return {key: decode(value) for key, value in item.items()}
+            return item
+
+        try:
+            return decode(json.loads(data.decode("utf-8")))
+        except (KeyError, TypeError, ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise CacheSerializationError("failed to deserialize cache value") from exc
+
+
+def json_datetime_bytes_serializer_example(cache_path: Path) -> tuple[object, object]:
+    """Use a custom JSON serializer for datetime and bytes payload values."""
+
+    from datetime import UTC, datetime
+
+    backend = DiskCacheBackend(
+        cache_path,
+        serializer=DateTimeBytesJsonSerializer(),
+    )
+    payload = {
+        "created_at": datetime(2026, 5, 11, 12, 30, tzinfo=UTC),
+        "digest": b"abc123",
+    }
+    try:
+        backend.set_value("artifact", payload)
+        entry = backend.get("artifact")
+        assert entry is not None
+        restored = entry.payload
+        assert isinstance(restored, dict)
+        return restored["created_at"], restored["digest"]
+    finally:
+        backend.close()

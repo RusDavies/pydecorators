@@ -72,6 +72,21 @@ def test_cache_backend_closed_error_documentation_example_executes(tmp_path: Pat
     assert examples.closed_backend_error_example(tmp_path / "closed-cache.sqlite3") == "closed"
 
 
+def test_json_datetime_bytes_serializer_documentation_example_executes(
+    tmp_path: Path,
+) -> None:
+    from datetime import UTC, datetime
+
+    examples = load_docs_example("disk_cache_backend_examples")
+
+    created_at, digest = examples.json_datetime_bytes_serializer_example(
+        tmp_path / "json-adapter-cache.sqlite3"
+    )
+
+    assert created_at == datetime(2026, 5, 11, 12, 30, tzinfo=UTC)
+    assert digest == b"abc123"
+
+
 def test_public_exception_documentation_examples_execute() -> None:
     examples = load_docs_example("public_exception_examples")
 

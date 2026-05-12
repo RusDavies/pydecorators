@@ -285,7 +285,7 @@ class CacheSerializer(Protocol):
 
 The default implementation is `PickleCacheSerializer`, which can round-trip ordinary Python objects for trusted caches. Pickle is unsafe for untrusted data, so disk/Redis backends must document trust boundaries clearly.
 
-`JsonCacheSerializer` is also available for simple JSON-compatible values when payloads should be lower-risk than pickle, easier to inspect, or easier to consume from other languages. It serializes UTF-8 `application/json` bytes and intentionally does not preserve arbitrary Python object types.
+`JsonCacheSerializer` is also available for simple JSON-compatible values when payloads should be lower-risk than pickle, easier to inspect, or easier to consume from other languages. It serializes UTF-8 `application/json` bytes and intentionally does not preserve arbitrary Python object types. For common adapters such as datetimes or bytes, use an explicit custom `CacheSerializer` recipe with a distinct content type instead of relying on implicit magic.
 
 Serializer failures should raise `CacheSerializationError`. `PickleCacheSerializer` and `JsonCacheSerializer` wrap serialization and deserialization failures in that package-specific exception.
 
