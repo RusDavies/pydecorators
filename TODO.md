@@ -339,7 +339,7 @@
 
 ### Newly Implied Disk Persistence Docs Follow-Ups
 
-- [ ] Add subprocess-level persistence example coverage if process-boundary behavior becomes user-facing release guidance.
+- [x] Add subprocess-level persistence example coverage if process-boundary behavior becomes user-facing release guidance.
 - [x] Consider documenting namespace/key stability expectations more prominently for persistent cache reuse.
 
 ### Newly Implied Disk Namespace Stability Follow-Ups

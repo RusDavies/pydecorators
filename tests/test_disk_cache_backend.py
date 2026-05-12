@@ -1,4 +1,6 @@
 import sqlite3
+import subprocess
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing
 from pathlib import Path
@@ -176,6 +178,41 @@ def test_disk_cache_backend_persists_values_across_instances(tmp_path: Path) -> 
         assert entry.payload == "persisted"
     finally:
         second.close()
+
+
+def test_disk_cache_backend_persists_values_across_subprocesses(tmp_path: Path) -> None:
+    db_path = tmp_path / "cache.sqlite3"
+    writer = """
+from pathlib import Path
+from useful_decorators import DiskCacheBackend
+backend = DiskCacheBackend(Path(__CACHE_PATH__))
+try:
+    backend.set_value('key', 'from-subprocess')
+finally:
+    backend.close()
+""".replace("__CACHE_PATH__", repr(str(db_path)))
+    reader = """
+from pathlib import Path
+from useful_decorators import DiskCacheBackend
+backend = DiskCacheBackend(Path(__CACHE_PATH__))
+try:
+    entry = backend.get('key')
+    assert entry is not None
+    print(entry.payload)
+finally:
+    backend.close()
+""".replace("__CACHE_PATH__", repr(str(db_path)))
+
+    subprocess.run([sys.executable, "-c", writer], check=True, cwd=Path.cwd())
+    result = subprocess.run(
+        [sys.executable, "-c", reader],
+        check=True,
+        cwd=Path.cwd(),
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.stdout.strip() == "from-subprocess"
 
 
 def test_disk_cache_backend_can_refresh_ttl_on_hit(tmp_path: Path) -> None:
