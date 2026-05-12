@@ -28,6 +28,24 @@ async def test_timeout_raises_function_timed_out_after_deadline() -> None:
 
 
 @pytest.mark.asyncio
+async def test_timeout_cancels_timed_out_coroutine() -> None:
+    cancelled = asyncio.Event()
+
+    @timeout(seconds=0.01)
+    async def slow() -> None:
+        try:
+            await asyncio.sleep(1)
+        except asyncio.CancelledError:
+            cancelled.set()
+            raise
+
+    with pytest.raises(FunctionTimedOut):
+        await slow()
+
+    assert cancelled.is_set()
+
+
+@pytest.mark.asyncio
 async def test_timeout_uses_custom_message_and_exception() -> None:
     class CustomTimeout(Exception):
         pass
