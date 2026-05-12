@@ -252,7 +252,13 @@
 - [ ] Consider adding a `sensitivity_warning` field to any future machine-readable inspection report.
 - [ ] Consider tests that preview-enabled CLI output uses stronger warnings than aggregate-only output.
 - [ ] Consider documenting approved quiet-mode warning channels before adding scripted inspection output.
-- [ ] Consider retention/deletion guidance for generated cache inspection reports if support tooling is added.
+- [x] Add retention/deletion guidance for generated cache inspection reports if support tooling is added.
+
+### Newly Implied Inspection Report Retention Follow-Ups
+
+- [ ] Consider adding creation-time and mode metadata to any future inspection report artifact.
+- [ ] Consider tests that future CI examples do not upload inspection reports by default.
+- [ ] Consider documenting short retention defaults if support-bundle generation is implemented.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
 
