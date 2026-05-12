@@ -77,3 +77,22 @@ def test_release_checklist_documents_optional_external_link_checker() -> None:
     assert "--verbose" in script_text
     assert "--retries" in script_text
     assert "--backoff" in script_text
+
+
+def test_release_checklist_documents_persistent_cache_compatibility() -> None:
+    text = Path("RELEASE.md").read_text()
+
+    assert "## Persistent cache compatibility" in text
+    for required in [
+        "DiskCacheBackend",
+        "cached value semantics",
+        "payload shapes",
+        "serializers",
+        "trust boundaries",
+        "bump the cache `namespace`",
+        "cache_clear()",
+        "backend `clear()`",
+        "remove the SQLite cache file",
+        "docs/disk_cache_backend.md",
+    ]:
+        assert required in text

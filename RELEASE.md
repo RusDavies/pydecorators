@@ -28,6 +28,15 @@ Use this checklist before publishing `useful-decorators` releases. The goal is t
 - [ ] Confirm public API stability notes are accurate.
 - [ ] Add migration notes for breaking changes, if any.
 
+## Persistent cache compatibility
+
+Before publishing, check whether this release changes persistent `DiskCacheBackend` behavior:
+
+- [ ] Confirm whether cached value semantics, payload shapes, serializers, or trust boundaries changed.
+- [ ] If old persistent rows should not be reused, document the migration path: bump the cache `namespace`, call `cache_clear()`, call backend `clear()`, or tell users to remove the SQLite cache file.
+- [ ] If old rows are still compatible, say so in release notes when persistent disk caching is affected.
+- [ ] Confirm `docs/disk_cache_backend.md` cache versioning guidance is still accurate.
+
 ## Documentation maintenance
 
 Before publishing, treat docs as release artifacts, not garnish. Run:

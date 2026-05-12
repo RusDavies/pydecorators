@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Release checklist guidance for persistent disk-cache migration and clearing.
 - `DiskCacheBackend` cache versioning and schema-change guidance.
 - `DiskCacheBackend` namespace/key stability documentation.
 - `DiskCacheBackend` persistence documentation example coverage.
