@@ -35,6 +35,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`disk_cache_backend_examples.py`](examples/disk_cache_backend_examples.py)
 - [`public_exception_examples.py`](examples/public_exception_examples.py)
 - [`rate_limit_examples.py`](examples/rate_limit_examples.py)
+- [`timeout_examples.py`](examples/timeout_examples.py)
 
 These examples are exercised by the test suite so documentation drift gets caught before it mutates into folklore.
 
