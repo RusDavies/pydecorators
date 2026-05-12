@@ -93,6 +93,7 @@ pytest
 python -m build
 python scripts/smoke_wheel_install.py
 python scripts/dogfood_local_wheel.py
+python scripts/dogfood_external_project.py
 ```
 
 Then confirm:
@@ -131,11 +132,13 @@ Publishing is intentionally paused until local dogfood scenarios have run and fi
 
 ```bash
 python scripts/dogfood_local_wheel.py
+python scripts/dogfood_external_project.py
 ```
 
 Before TestPyPI/PyPI:
 
 - [ ] Dogfood scenarios pass from an installed wheel.
+- [ ] External local-project dogfood passes from an installed wheel.
 - [ ] `DOGFOOD.md` findings are reviewed.
 - [ ] API/documentation issues found during dogfood use are resolved or explicitly deferred.
 

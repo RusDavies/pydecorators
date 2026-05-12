@@ -17,6 +17,7 @@ Run:
 
 ```bash
 python scripts/dogfood_local_wheel.py
+python scripts/dogfood_external_project.py
 ```
 
 The harness:
@@ -29,18 +30,21 @@ The harness:
 ## Dogfood scenarios
 
 - `dogfood/service_client.py`: combines `@require_env`, `@rate_limit`, `@retry`, `@timeout`, `@log_calls`, `@measure_time`, and `@circuit_breaker` in service-client-like sync and async flows.
+- `scripts/dogfood_external_project.py`: runs decorators from the installed wheel against `projects/model-gateway-reliability-mini-lab/gateway_sim.py` without modifying that project.
 
 ## Findings log
 
 Add findings here as dogfood scripts expose sharp edges.
 
 - 2026-05-12: Initial harness added. No API changes required yet; first goal is keeping composition behavior executable from an installed wheel.
+- 2026-05-12: External local-project dogfood against `model-gateway-reliability-mini-lab/gateway_sim.py` passed without API changes. Dynamic wrapping worked, but it reinforced that composition docs should eventually explain decorator order for wrappers that log/retry/measure.
 
 ## Release gate
 
 Before publishing:
 
 - [ ] Run `python scripts/dogfood_local_wheel.py`.
+- [ ] Run `python scripts/dogfood_external_project.py`.
 - [ ] Review this findings log.
 - [ ] Resolve or explicitly defer any API/documentation issues found during dogfood use.
 - [ ] Re-check `blakemere-decorators` availability on PyPI/TestPyPI.

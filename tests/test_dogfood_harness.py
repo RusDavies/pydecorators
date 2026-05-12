@@ -7,12 +7,15 @@ def test_dogfood_plan_documents_release_pause_and_harness() -> None:
     assert "Public publishing is intentionally paused" in text
     assert "blakemere-decorators" in text
     assert "python scripts/dogfood_local_wheel.py" in text
+    assert "python scripts/dogfood_external_project.py" in text
     assert "dogfood/service_client.py" in text
+    assert "model-gateway-reliability-mini-lab" in text
     assert "Release gate" in text
 
 
 def test_dogfood_harness_and_scenarios_exist() -> None:
     assert Path("scripts/dogfood_local_wheel.py").exists()
+    assert Path("scripts/dogfood_external_project.py").exists()
     assert Path("dogfood/service_client.py").exists()
 
 

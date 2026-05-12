@@ -71,6 +71,7 @@ pytest
 python -m build
 python scripts/smoke_wheel_install.py
 python scripts/dogfood_local_wheel.py
+python scripts/dogfood_external_project.py
 ```
 
 `pytest` enforces coverage for `useful_decorators` with terminal and XML coverage reports.
@@ -88,6 +89,7 @@ Publishing is intentionally paused while the package is dogfooded locally. See `
 
 ```bash
 python scripts/dogfood_local_wheel.py
+python scripts/dogfood_external_project.py
 ```
 
 ## Public API and contributing

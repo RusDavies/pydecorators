@@ -37,6 +37,7 @@ pytest
 python -m build
 python scripts/smoke_wheel_install.py
 python scripts/dogfood_local_wheel.py
+python scripts/dogfood_external_project.py
 ```
 
 The project also ships optional pre-commit hooks. Install them with `pre-commit install` if you want local lint/format/type checks before commits. This is optional because surprise Git hooks are how productivity gets mugged in an alley.

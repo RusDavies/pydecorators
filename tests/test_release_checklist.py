@@ -14,6 +14,7 @@ def test_release_checklist_exists_and_mentions_required_gates() -> None:
         "python -m build",
         "python scripts/smoke_wheel_install.py",
         "python scripts/dogfood_local_wheel.py",
+        "python scripts/dogfood_external_project.py",
         "TestPyPI",
         "PyPI",
     ]:
@@ -87,7 +88,9 @@ def test_release_checklist_documents_dogfood_gate() -> None:
     assert "## Dogfood gate" in text
     assert "DOGFOOD.md" in text
     assert "python scripts/dogfood_local_wheel.py" in text
+    assert "python scripts/dogfood_external_project.py" in text
     assert "Dogfood scenarios pass from an installed wheel" in text
+    assert "External local-project dogfood passes from an installed wheel" in text
 
 
 def test_release_checklist_documents_package_name_and_tagging() -> None:
