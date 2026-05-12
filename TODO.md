@@ -190,7 +190,12 @@
 
 - [ ] Consider promoting the datetime/bytes adapter recipe into a reusable helper only if multiple examples start needing the same tagged format.
 - [ ] Consider adding compatibility tests for adapter tag/version changes if the recipe becomes public API rather than documentation guidance.
-- [ ] Consider adding a docs example that stores JSON cache rows inspected directly with SQLite once CLI/user-facing cache inspection matters.
+- [x] Add docs example that stores JSON cache rows inspected directly with SQLite.
+
+### Newly Implied JSON Row Inspection Follow-Ups
+
+- [ ] Consider adding a CLI-style inspection recipe if users ask for operational cache debugging workflows.
+- [ ] Consider documenting which SQLite columns are stable enough for debugging versus internal implementation detail before public release.
 - [x] Document pickle trust-boundary warning in disk/Redis backend docs.
 - [x] Design `DiskCacheBackend` storage strategy, likely SQLite.
 

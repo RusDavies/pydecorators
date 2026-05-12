@@ -175,3 +175,33 @@ def json_datetime_bytes_serializer_example(cache_path: Path) -> tuple[object, ob
         return restored["created_at"], restored["digest"]
     finally:
         backend.close()
+
+
+def inspect_json_cache_row_example(cache_path: Path) -> tuple[str, str, str]:
+    """Inspect a JSON cache row directly through SQLite."""
+
+    import sqlite3
+    from contextlib import closing
+
+    from useful_decorators import JsonCacheSerializer
+
+    backend = DiskCacheBackend(
+        cache_path,
+        serializer=JsonCacheSerializer(),
+    )
+    try:
+        backend.set_value("profile", {"id": "user-123", "active": True})
+    finally:
+        backend.close()
+
+    with closing(sqlite3.connect(cache_path)) as connection:
+        row = connection.execute(
+            """
+            SELECT payload, serializer_content_type
+            FROM cache_entries
+            LIMIT 1
+            """
+        ).fetchone()
+
+    payload, serializer_content_type = row
+    return payload.decode("utf-8"), serializer_content_type, cache_path.name
