@@ -330,6 +330,41 @@ Support-bundle guidance:
 - Document retention expectations for generated support bundles; caches are disposable, but reports can outlive the original cache file in places with worse access control.
 - If a future CLI generates support bundles, it should label reports as potentially sensitive and default to aggregate/no-preview output.
 
+## Aggregate-only inspection report design
+
+If support-bundle tooling is added, start with an aggregate-only report before exposing per-row inspection data. Aggregate reports should answer “is the cache broadly healthy?” without listing individual cached objects.
+
+Tentative aggregate shape:
+
+```python
+@dataclass(frozen=True)
+class DiskCacheAggregateInspectionReport:
+    total_entries: int
+    value_entries: int
+    exception_entries: int
+    expired_entries: int
+    serializer_content_types: Mapping[str, int]
+    total_payload_bytes: int
+    largest_payload_bytes: int | None
+    earliest_created_at: float | None
+    latest_created_at: float | None
+    earliest_expires_at: float | None
+    latest_expires_at: float | None
+    report_truncated: bool
+```
+
+Design constraints:
+
+- Aggregate reports should not include payload previews, raw payload bytes, deserialized values, serialized keys, key digests, or per-row timestamps.
+- Content types should be counted by value, not listed alongside row identifiers.
+- Payload sizes should be aggregated; the largest payload size is useful, but per-row sizes should stay out of broad support reports.
+- Timestamp ranges should be coarse diagnostics, not audit logs.
+- If the cache is too large to scan under a configured limit, `report_truncated=True` should make partial summaries obvious.
+- Aggregate inspection should be read-only and should not update hits, misses, TTL, LRU, or `last_accessed`.
+- Any future CLI support-bundle command should prefer this aggregate report by default.
+
+Pre-implementation tests should cover aggregate reports excluding per-row data, preserving safe-mode no-preview behavior, surfacing truncation, and not mutating cache stats or recency state.
+
 Pre-implementation tests should cover documentation and examples that label no-preview reports as lower-risk but still sensitive. If a future CLI/support-bundle command is added, tests should assert its default output excludes previews and includes a sensitivity warning.
 
 Pre-implementation tests should cover:

@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Aggregate-only disk-cache inspection report design guidance for future support bundles.
 - Support-bundle metadata sensitivity guidance for no-preview disk-cache inspection reports.
 - No-preview support bundle/CI guidance for future disk-cache inspection tooling.
 - `preview_redactor` callback design guidance for future disk-cache inspection previews.
