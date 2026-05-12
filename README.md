@@ -272,7 +272,7 @@ def expensive_lookup(value: str) -> str:
 
 `@cache_result` uses `MemoryCacheBackend` by default and also includes `DiskCacheBackend` for trusted local persistent caches. Future backend work is planned for Redis storage.
 
-Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend. TTL is fixed from write time by default; pass `refresh_ttl_on_hit=True` to `@cache_result` or a backend when hot entries should use sliding expiry. Pass `coalesce_misses=True` to `@cache_result` when duplicate concurrent misses for the same key should share one in-flight computation.
+Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend. TTL is fixed from write time by default; pass `refresh_ttl_on_hit=True` to `@cache_result` or a backend when hot entries should use sliding expiry. Fixed TTL is better for predictable freshness and retention: an entry expires at a known time even if it is popular. Sliding TTL is better for expensive hot data that may stay cached while traffic continues, but it can keep stale or sensitive values alive indefinitely unless you also bound cache size, choose conservative TTLs, and clear caches when semantics change. Pass `coalesce_misses=True` to `@cache_result` when duplicate concurrent misses for the same key should share one in-flight computation.
 
 For a trusted local persistent cache, create one `DiskCacheBackend`, pass it to `@cache_result`, and close it when your script or service shuts down:
 

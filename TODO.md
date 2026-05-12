@@ -142,7 +142,7 @@
 ### Newly Implied Sliding TTL Follow-Ups
 
 - [ ] Consider exposing refreshed expiry timestamps in disk-cache diagnostics if operators ask for TTL debugging.
-- [ ] Consider documenting fixed-vs-sliding TTL tradeoffs in README if cache behavior questions recur.
+- [x] Consider documenting fixed-vs-sliding TTL tradeoffs in README if cache behavior questions recur.
 - [x] Add request coalescing design for duplicate concurrent misses.
 
 ### Newly Implied Request Coalescing Follow-Ups
