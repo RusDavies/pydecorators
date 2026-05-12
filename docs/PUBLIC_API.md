@@ -28,6 +28,8 @@ Current public API:
 - `measure_time`
 - `TimingInfo`
 - `validate_types`
+- `require_env`
+- `EnvRequirementError`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
@@ -162,6 +164,14 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 ### `validate_types`
 
 `validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins, `Any`, and optional/union types. It is intentionally not a full schema-validation system. See `docs/validate_types.md` for behavior and limitations.
+
+### `require_env`
+
+`require_env` checks required environment variables at call time before running sync or async functions. It supports multiple required names, custom validators, and injectable environment mappings for tests. Missing or invalid variables raise `EnvRequirementError`. See `docs/require_env.md` for behavior and examples.
+
+### `EnvRequirementError`
+
+`EnvRequirementError` is raised when a required environment variable is missing or fails validation. It exposes `variable` and `reason` fields.
 
 ### `RateLimitExceeded`
 

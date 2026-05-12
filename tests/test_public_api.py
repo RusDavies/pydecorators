@@ -12,6 +12,7 @@ def test_public_exceptions_are_exported() -> None:
     assert useful_decorators.ConfigurationError is ConfigurationError
     assert useful_decorators.RateLimitExceeded is RateLimitExceeded
     assert useful_decorators.FunctionTimedOut is FunctionTimedOut
+    assert hasattr(useful_decorators, "EnvRequirementError")
 
 
 def test_all_exports_existing_attributes() -> None:
@@ -26,6 +27,7 @@ def test_public_decorators_are_exported_via_all() -> None:
         "log_calls",
         "measure_time",
         "rate_limit",
+        "require_env",
         "retry",
         "timeout",
         "validate_types",
