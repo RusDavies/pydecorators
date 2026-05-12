@@ -848,7 +848,18 @@
 - [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
 - [ ] Add trusted publishing / API token instructions once the repository and package name are final.
 - [ ] Re-check `blakemere-decorators` availability immediately before final publish.
-## 13. Future Ideas
+
+## 13. Dogfood Backlog
+
+- [x] Add dogfood plan and findings log.
+- [x] Add local wheel dogfood harness.
+- [x] Add realistic decorator-composition dogfood scenario.
+- [x] Run dogfood scenario from an installed wheel.
+- [ ] Dogfood in a real non-demo local project before public release.
+- [ ] Record API/documentation annoyances from real usage.
+- [ ] Resolve or explicitly defer dogfood findings before TestPyPI.
+
+## 14. Future Ideas
 
 - [ ] Optional Redis-backed cache.
 - [ ] Optional OpenTelemetry integration.
