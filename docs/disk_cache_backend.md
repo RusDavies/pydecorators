@@ -186,6 +186,23 @@ JSON serialization is stricter than pickle. It supports ordinary JSON values (`N
 
 Changing between `PickleCacheSerializer` and `JsonCacheSerializer` changes `serializer_content_type`; existing rows written with the old content type are treated as misses and removed rather than being deserialized with the wrong serializer.
 
+## JSON adapter recipe for datetimes and bytes
+
+`JsonCacheSerializer` intentionally supports only ordinary JSON-compatible values. If cached payloads need common Python scalar adapters such as `datetime` or `bytes`, write a custom `CacheSerializer` with an explicit tagged representation instead of silently teaching the built-in serializer Python-specific tricks.
+
+Recommended recipe:
+
+- Use a custom `content_type`, such as `application/json+datetime-bytes-example`, so rows written by the adapter are not mixed with plain `JsonCacheSerializer` rows.
+- Convert `datetime` values to tagged ISO 8601 strings, for example `{"__type__": "datetime", "value": "2026-05-11T12:30:00+00:00"}`.
+- Convert `bytes` values to tagged base64 strings, for example `{"__type__": "bytes", "value": "YWJjMTIz"}`.
+- Recursively adapt lists and dictionaries. Keep dictionary keys as strings if other languages need to read the cache rows.
+- Reject unsupported objects with `CacheSerializationError` rather than falling back to `repr()` or other lossy magic.
+- Treat the tag names as part of the payload compatibility contract; change the namespace or content type if the adapter format changes.
+
+Executable example: `docs/examples/disk_cache_backend_examples.py::json_datetime_bytes_serializer_example` defines `DateTimeBytesJsonSerializer`, stores a payload containing a timezone-aware `datetime` and `bytes`, and verifies the restored values match the originals.
+
+This stays as a recipe rather than a built-in serializer for now. Date/time policy is application-specific: timezone handling, naive datetimes, binary encoding choices, and schema compatibility are all places where generic convenience grows little teeth.
+
 ## Non-goals for first implementation
 
 - Cross-process locking guarantees beyond SQLite’s normal locking.
