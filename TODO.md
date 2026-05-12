@@ -631,7 +631,7 @@
 
 - [x] Add tests for deterministic jitter by monkeypatching random source.
 - [ ] Consider richer hook context objects if attempt hooks need delay/exception metadata beyond the current simple signature.
-- [ ] Add retry examples to executable docs examples if retry usage patterns grow.
+- [x] Add retry examples to executable docs examples.
 - [ ] Add executable idempotency examples if users need side-effecting retry recipes.
 - [ ] Consider whether async retry should support async before/after hooks if users request them.
 - [x] Document idempotency guidance for retrying side-effecting functions before public release.
