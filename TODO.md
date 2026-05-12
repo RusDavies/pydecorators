@@ -232,7 +232,13 @@
 
 ### Newly Implied Support Bundle Metadata Follow-Ups
 
-- [ ] Consider aggregate-only inspection report design before adding any support-bundle command.
+- [x] Add aggregate-only inspection report design before adding any support-bundle command.
+
+### Newly Implied Aggregate Inspection Follow-Ups
+
+- [ ] Consider implementing `DiskCacheAggregateInspectionReport` only if support-bundle tooling enters public scope.
+- [ ] Consider aggregate truncation tests if inspection scans gain row limits.
+- [ ] Consider documenting aggregate timestamp ranges as diagnostics rather than audit evidence.
 - [ ] Consider sensitivity-warning tests if a future inspection CLI emits support bundles.
 - [ ] Consider retention/deletion guidance for generated cache inspection reports if support tooling is added.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.

@@ -246,3 +246,25 @@ def test_disk_cache_backend_design_doc_covers_support_bundle_metadata_sensitivit
         "includes a sensitivity warning",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_aggregate_inspection_report_design() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Aggregate-only inspection report design",
+        "DiskCacheAggregateInspectionReport",
+        "total_entries",
+        "serializer_content_types",
+        "total_payload_bytes",
+        "largest_payload_bytes",
+        "report_truncated",
+        "should not include payload previews",
+        "serialized keys",
+        "key digests",
+        "per-row timestamps",
+        "Content types should be counted",
+        "Timestamp ranges should be coarse diagnostics",
+        "should not update hits, misses, TTL, LRU, or `last_accessed`",
+    ]:
+        assert required in text
