@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Payload preview redaction guidance for future disk-cache inspection tooling.
 - Bounded payload preview policy guidance for future disk-cache inspection APIs.
 - Disk-cache schema metadata table design guidance for future file-compatibility promises.
 - Supported cache-inspection API design guidance for future disk-cache tooling.

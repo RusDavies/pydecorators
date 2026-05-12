@@ -211,7 +211,13 @@
 
 - [ ] Implement payload preview helper tests only if `DiskCacheBackend.inspect_entries()` enters public scope.
 - [ ] Consider making preview byte limits configurable only within a hard maximum.
-- [ ] Consider documenting redaction expectations if previews may contain sensitive cached data.
+- [x] Document redaction expectations for payload previews that may contain sensitive cached data.
+
+### Newly Implied Payload Preview Redaction Follow-Ups
+
+- [ ] Consider designing a `preview_redactor` callback before implementing payload previews.
+- [ ] Consider documenting a no-previews mode for support bundles and CI artifacts if inspection tooling is added.
+- [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
 
 ### Newly Implied Disk Schema Metadata Follow-Ups

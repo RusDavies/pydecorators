@@ -164,3 +164,23 @@ def test_disk_cache_backend_design_doc_covers_bounded_preview_policy() -> None:
         "prevents callers from requesting unbounded previews",
     ]:
         assert required in text
+
+
+def test_disk_cache_backend_design_doc_covers_preview_redaction_expectations() -> None:
+    text = Path("docs/disk_cache_backend.md").read_text()
+
+    for required in [
+        "## Payload preview redaction expectations",
+        "cached return values may contain secrets",
+        "Previews should be opt-in",
+        "should not promise automatic secret detection",
+        "preview_redactor",
+        "password",
+        "authorization",
+        "Redaction should happen after bounded decoding/truncation",
+        "Inspection output should not be logged automatically",
+        "support bundles",
+        "pastebins",
+        "redaction failures do not expose the original unredacted payload",
+    ]:
+        assert required in text
