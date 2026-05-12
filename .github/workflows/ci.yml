@@ -23,6 +23,10 @@ jobs:
         run: ruff format --check .
       - name: Mypy
         run: mypy
+      - name: Import smoke test
+        run: python scripts/smoke_imports.py
+      - name: Examples smoke test
+        run: python scripts/smoke_examples.py
       - name: Tests
         run: pytest
       - name: Build package

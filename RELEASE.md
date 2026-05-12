@@ -87,6 +87,8 @@ Run the full local verification gate:
 ruff check .
 ruff format --check .
 mypy
+python scripts/smoke_imports.py
+python scripts/smoke_examples.py
 pytest
 python -m build
 ```
@@ -96,8 +98,10 @@ Then confirm:
 - [ ] Lint passes.
 - [ ] Format check passes.
 - [ ] Type check passes.
+- [ ] Import smoke test passes.
+- [ ] Examples smoke test passes.
 - [ ] Tests pass.
-- [ ] Coverage remains acceptable.
+- [ ] Coverage remains above the configured floor and reports are generated.
 - [ ] Package build succeeds.
 - [ ] Built artifacts are not committed accidentally.
 

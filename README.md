@@ -65,8 +65,19 @@ python -m pip install -e '.[dev]'
 ruff check .
 ruff format --check .
 mypy
+python scripts/smoke_imports.py
+python scripts/smoke_examples.py
 pytest
 python -m build
+```
+
+`pytest` enforces coverage for `useful_decorators` with terminal and XML coverage reports.
+
+Optional local pre-commit hooks are available:
+
+```bash
+pre-commit install
+pre-commit run --all-files
 ```
 
 ## Public API and contributing
