@@ -1,4 +1,5 @@
 import asyncio
+import importlib
 from typing import Any
 
 import pytest
@@ -162,3 +163,51 @@ def test_retry_preserves_metadata() -> None:
 def test_retry_validates_configuration(kwargs: dict[str, Any], message: str) -> None:
     with pytest.raises(ConfigurationError, match=message):
         retry(**kwargs)
+
+
+def test_retry_applies_deterministic_jitter(monkeypatch: pytest.MonkeyPatch) -> None:
+    sleeps: list[float] = []
+    jitter_values = iter([0.25, 0.75])
+    retry_module = importlib.import_module("useful_decorators.retry")
+
+    monkeypatch.setattr(
+        retry_module.random,
+        "uniform",
+        lambda start, stop: next(jitter_values),
+    )
+
+    @retry(attempts=3, delay=1.0, jitter=0.5, sleep=sleeps.append)
+    def always_fails() -> None:
+        raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError, match="boom"):
+        always_fails()
+
+    assert sleeps == [1.25, 1.75]
+
+
+@pytest.mark.asyncio
+async def test_retry_applies_deterministic_jitter_for_async_functions(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sleeps: list[float] = []
+    jitter_values = iter([0.1, 0.2])
+
+    async def fake_sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+
+    retry_module = importlib.import_module("useful_decorators.retry")
+    monkeypatch.setattr(
+        retry_module.random,
+        "uniform",
+        lambda start, stop: next(jitter_values),
+    )
+
+    @retry(attempts=3, delay=0.5, jitter=0.3, sleep=fake_sleep)
+    async def always_fails() -> None:
+        raise RuntimeError("boom")
+
+    with pytest.raises(RuntimeError, match="boom"):
+        await always_fails()
+
+    assert sleeps == [0.6, 0.7]
