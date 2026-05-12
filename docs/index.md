@@ -7,6 +7,7 @@ Start here when navigating the Useful Decorators documentation.
 - [Public API policy](PUBLIC_API.md) — exported API, compatibility policy, and public API notes.
 - [Public exceptions](exceptions.md) — public exception hierarchy, inheritance, and handling examples.
 - [API design notes](API_DESIGN.md) — broader API design guidance for decorators.
+- [API reference](API_REFERENCE.md) — compact reference for exported decorators, cache APIs, data types, and exceptions.
 
 ## Decorator docs
 

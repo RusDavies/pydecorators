@@ -783,17 +783,24 @@
 - [ ] Add executable docs examples for `@circuit_breaker` if resilience examples grow.
 ## 10. Documentation Backlog
 
-- [ ] Write README quick start.
-- [ ] Add installation instructions.
-- [ ] Add one example per first-release decorator.
-- [ ] Add decorator comparison table or bullet list.
-- [ ] Add security notes.
-- [ ] Add async usage notes.
-- [ ] Add timeout limitations note.
-- [ ] Add contributing guide.
-- [ ] Add release process notes.
-- [ ] Add API reference documentation.
+- [x] Write README quick start.
+- [x] Add installation instructions.
+- [x] Add one example per first-release decorator.
+- [x] Add decorator comparison table or bullet list.
+- [x] Add security notes.
+- [x] Add async usage notes.
+- [x] Add timeout limitations note.
+- [x] Add contributing guide.
+- [x] Add release process notes.
+- [x] Add API reference documentation.
 
+
+### Newly Implied Documentation Follow-Ups
+
+- [ ] Expand API reference with exact parameter defaults if public signatures change before release.
+- [ ] Add a decorator-composition guide if users ask about stacking order.
+- [ ] Add executable README snippets for every first-release decorator if the examples are promoted beyond smoke-test coverage.
+- [ ] Add a security hardening page if cache/logging/validation warnings keep growing.
 ## 11. Quality Backlog
 
 - [ ] Add unit test coverage target.

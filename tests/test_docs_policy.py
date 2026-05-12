@@ -236,7 +236,7 @@ def test_readme_python_code_blocks_parse() -> None:
 
     code_blocks = readme_python_code_blocks()
 
-    assert len(code_blocks) == 11
+    assert len(code_blocks) == 12
     for code_block in code_blocks:
         ast.parse(code_block)
 

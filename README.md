@@ -20,16 +20,35 @@ The initial `v0.1.0` scope is:
 - `@circuit_breaker` — implemented
 
 
-## Quick example
+## Installation
+
+Not published yet. For local development:
+
+```bash
+python -m pip install -e '.[dev]'
+```
+
+For a built local wheel:
+
+```bash
+python -m build
+python -m pip install dist/useful_decorators-0.1.0-py3-none-any.whl
+```
+
+## Quick start
+
+Pick the smallest decorator that solves the immediate problem:
 
 ```python
-from useful_decorators import deprecated
+from useful_decorators import retry
 
 
-@deprecated("Kept for compatibility.", replacement="new_function", version="0.1.0")
-def old_function() -> str:
-    return "still works"
+@retry(attempts=3, delay=0.25, backoff=2, exceptions=(ConnectionError, TimeoutError))
+def call_service() -> str:
+    return "ok"
 ```
+
+Then read the per-decorator docs before stacking decorators together. Decorator soup is still soup, even when typed.
 
 ## Development status
 
@@ -60,7 +79,47 @@ See `RELEASE.md` for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, `docs/require_env.md` for environment checks, and `docs/circuit_breaker.md` for circuit-breaker behavior.
+See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, `docs/require_env.md` for environment checks, `docs/circuit_breaker.md` for circuit-breaker behavior, and `docs/API_REFERENCE.md` for a compact API reference.
+
+## Decorator overview
+
+- `@deprecated`: warn when old APIs are used.
+- `@cache_result`: cache expensive sync results in memory or trusted local disk storage.
+- `@retry`: retry transient failures with explicit policy.
+- `@rate_limit`: enforce in-process sliding-window call limits.
+- `@timeout`: apply async deadlines using `asyncio.wait_for`.
+- `@log_calls`: log calls, durations, exceptions, and optional summaries.
+- `@measure_time`: emit timing data to callbacks, loggers, or metrics hooks.
+- `@validate_types`: shallow runtime checks for simple annotations.
+- `@require_env`: check environment requirements at call time.
+- `@circuit_breaker`: stop hammering a failing dependency until a reset window opens.
+
+## Security and operational notes
+
+- Treat `DiskCacheBackend` files as trusted local data. The default pickle serializer must not load untrusted cache databases.
+- Do not put disk cache files in world-writable directories.
+- Keep cache values disposable; use namespaces or clear caches when semantics change.
+- Argument/result logging is opt-in because logs preserve secrets with the enthusiasm of a museum curator.
+- `@validate_types` is not a schema validator or security boundary.
+- `@rate_limit` and `@circuit_breaker` are in-process only; they do not coordinate across workers, containers, or hosts.
+- Environment checks protect configuration mistakes, not secret storage. Use proper secret-management systems for real secrets.
+
+## Async support notes
+
+- `@deprecated`, `@retry`, `@rate_limit`, `@timeout`, `@log_calls`, `@measure_time`, `@validate_types`, `@require_env`, and `@circuit_breaker` support async callables.
+- `@cache_result` is sync-only for now.
+- `@timeout` is deliberately async-only. Sync timeout strategies based on signals or worker threads have sharp edges, so sync functions currently raise `ConfigurationError` instead of pretending the problem is easy.
+
+### Deprecated example
+
+```python
+from useful_decorators import deprecated
+
+
+@deprecated("Kept for compatibility.", replacement="new_function", version="0.1.0")
+def old_function() -> str:
+    return "still works"
+```
 
 ### Retry example
 
