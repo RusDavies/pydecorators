@@ -10,6 +10,7 @@ Use the most specific exception when you can recover from a known condition. Cat
 | --- | --- | --- |
 | `UsefulDecoratorsError` | `Exception` | Base class for package-specific exceptions. |
 | `ConfigurationError` | `ValueError`, `UsefulDecoratorsError` | A decorator or backend receives invalid configuration. |
+| `CircuitBreakerOpen` | `UsefulDecoratorsError` | A circuit-breaker-protected call is rejected because the circuit is open. |
 | `CacheKeyError` | `TypeError`, `UsefulDecoratorsError` | `@cache_result` cannot build a hashable cache key. |
 | `CacheSerializationError` | `UsefulDecoratorsError` | Cache payload serialization or deserialization fails. |
 | `CacheBackendClosedError` | `UsefulDecoratorsError` | A closeable cache backend such as `DiskCacheBackend` is used after `close()`. |
@@ -29,6 +30,24 @@ from useful_decorators import ConfigurationError, cache_result
 try:
     cache_result(namespace="   ")
 except ConfigurationError:
+    ...
+```
+
+### `CircuitBreakerOpen`
+
+```python
+from useful_decorators import CircuitBreakerOpen, circuit_breaker
+
+@circuit_breaker(failure_threshold=1, reset_timeout=10)
+def call_service() -> None:
+    raise RuntimeError("down")
+
+try:
+    call_service()
+    call_service()
+except CircuitBreakerOpen:
+    ...
+except RuntimeError:
     ...
 ```
 

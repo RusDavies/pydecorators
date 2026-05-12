@@ -236,7 +236,7 @@ def test_readme_python_code_blocks_parse() -> None:
 
     code_blocks = readme_python_code_blocks()
 
-    assert len(code_blocks) == 10
+    assert len(code_blocks) == 11
     for code_block in code_blocks:
         ast.parse(code_block)
 
@@ -262,6 +262,8 @@ def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> Non
         "@validate_types(validate_return=True)",
         "from useful_decorators import require_env",
         '@require_env("API_TOKEN")',
+        "from useful_decorators import CircuitBreakerOpen, circuit_breaker",
+        "@circuit_breaker(failure_threshold=2, reset_timeout=10)",
         "from useful_decorators import cache_result",
         "@cache_result(maxsize=128)",
         "from useful_decorators import DiskCacheBackend, cache_result",

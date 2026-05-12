@@ -764,16 +764,23 @@
 
 ### `@circuit_breaker`
 
-- [ ] Design signature.
-- [ ] Define states: closed, open, half-open.
-- [ ] Track failure counts.
-- [ ] Track reset timeout.
-- [ ] Support exception filters.
-- [ ] Add sync support.
-- [ ] Add async support.
-- [ ] Add tests with fake clock.
-- [ ] Add docs with service-client examples.
+- [x] Design signature.
+- [x] Define states: closed, open, half-open.
+- [x] Track failure counts.
+- [x] Track reset timeout.
+- [x] Support exception filters.
+- [x] Add sync support.
+- [x] Add async support.
+- [x] Add tests with fake clock.
+- [x] Add docs with service-client examples.
 
+
+### Newly Implied `@circuit_breaker` Follow-Ups
+
+- [ ] Consider state inspection hooks or callbacks if users need circuit observability.
+- [ ] Consider thread-safety guards if decorated functions are used from multiple threads.
+- [ ] Consider configurable fallback callbacks only if callers request fallback behavior inside the decorator.
+- [ ] Add executable docs examples for `@circuit_breaker` if resilience examples grow.
 ## 10. Documentation Backlog
 
 - [ ] Write README quick start.

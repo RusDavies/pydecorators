@@ -21,6 +21,9 @@ Current public API:
 - `CacheInfo`
 - `CacheKeyError`
 - `deprecated`
+- `circuit_breaker`
+- `CircuitState`
+- `CircuitBreakerOpen`
 - `retry`
 - `rate_limit`
 - `timeout`
@@ -140,6 +143,18 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 ### `DiskCacheBackend`
 
 `DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, and `info`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+
+### `circuit_breaker`
+
+`circuit_breaker` stops calling a failing sync or async dependency after a configurable failure threshold, rejects calls while open, and allows a half-open probe after the reset timeout. It supports exception-type filters, an optional exception predicate, and injectable clocks for tests. See `docs/circuit_breaker.md` for behavior and examples.
+
+### `CircuitState`
+
+`CircuitState` exposes the breaker state names: `CLOSED`, `OPEN`, and `HALF_OPEN`.
+
+### `CircuitBreakerOpen`
+
+`CircuitBreakerOpen` is raised when a call is rejected because the circuit is open. It exposes `reset_after`.
 
 ### `retry`
 
