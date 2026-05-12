@@ -8,6 +8,7 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Supported cache-inspection API design guidance for future disk-cache tooling.
 - SQLite column-stability guidance for disk-cache debugging versus internal implementation details.
 - SQLite inspection example for JSON disk-cache rows.
 - Executable datetime/bytes JSON serializer adapter recipe for disk cache payloads.

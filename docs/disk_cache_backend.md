@@ -221,6 +221,53 @@ Internal implementation details:
 
 Safe rule: inspect `payload` and `serializer_content_type` to answer “what did this local cache row store?”, but use backend APIs to mutate, clear, count, or rely on behavior. If tooling needs more stable inspection guarantees later, add an explicit API instead of scraping private organs.
 
+## Supported cache-inspection API design
+
+If users need stable tooling beyond ad hoc SQLite debugging, add an explicit inspection API instead of promoting direct table scraping. The API should expose cache diagnostics without making SQLite layout, serialized keys, or private timestamp mechanics part of the public contract.
+
+Tentative public shape:
+
+```python
+@dataclass(frozen=True)
+class DiskCacheInspectionEntry:
+    is_exception: bool
+    serializer_content_type: str
+    payload_preview: str | None
+    payload_size_bytes: int
+    created_at: float
+    last_accessed: float
+    expires_at: float | None
+
+@dataclass(frozen=True)
+class DiskCacheInspectionReport:
+    entries: tuple[DiskCacheInspectionEntry, ...]
+    total_entries: int
+    truncated: bool
+
+report = backend.inspect_entries(limit=100, include_payload_preview=True)
+```
+
+Design constraints:
+
+- The method should be read-only. Mutation belongs to `clear()`, `cache_clear()`, and future `maintain()`/repair-style APIs.
+- It should not expose serialized `key` bytes by default. If key diagnostics are needed later, expose a redacted digest such as `key_sha256`, not a parseable implementation artifact.
+- Payload previews should be best-effort and bounded. For JSON-like serializers, previews may decode UTF-8 and truncate safely. For pickle or unknown binary serializers, previews should default to `None` or a small diagnostic marker rather than deserializing arbitrary objects.
+- It should report serializer content type and payload byte size without requiring payload deserialization.
+- It should avoid promising exact LRU/TTL timing semantics beyond “these are the backend’s current stored timestamps.”
+- It should have explicit `limit`/pagination behavior so accidental inspection does not scan huge cache files by default.
+- It should return structured data suitable for a future CLI, not preformatted log text.
+
+Non-goals for the first inspection API:
+
+- cross-process live monitoring
+- schema migration
+- payload repair
+- stable SQLite table/column contracts
+- automatic deserialization of untrusted pickle payloads
+- guaranteed external audit-log semantics
+
+This should stay a design note until a real user or release requirement needs it. The current supported interfaces are still `get()`, `set_value()`, `set_exception()`, `clear()`, `info()`, decorator `cache_info()`, and the documented serializer contracts.
+
 ## JSON adapter recipe for datetimes and bytes
 
 `JsonCacheSerializer` intentionally supports only ordinary JSON-compatible values. If cached payloads need common Python scalar adapters such as `datetime` or `bytes`, write a custom `CacheSerializer` with an explicit tagged representation instead of silently teaching the built-in serializer Python-specific tricks.
