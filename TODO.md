@@ -441,7 +441,7 @@
 
 ### Newly Implied Root Docs Link Policy Follow-Ups
 
-- [ ] Decide whether `TODO.md` should be included in root Markdown link policy long-term or exempted as mutable backlog.
+- [x] Decide whether `TODO.md` should be included in root Markdown link policy long-term or exempted as mutable backlog.
 - [x] Add policy test that root documentation files mention `docs/index.md` where appropriate.
 
 ### Newly Implied Root Docs Index Mention Follow-Ups
@@ -451,7 +451,7 @@
 
 ### Newly Implied Root Docs Policy Docs Follow-Ups
 
-- [ ] Add policy test that planning docs stay free of release/user-doc navigation requirements unless promoted.
+- [x] Add policy test that planning docs stay free of release/user-doc navigation requirements unless promoted.
 - [x] Consider adding a short docs-maintenance section to RELEASE.md before first release.
 
 ### Newly Implied Release Docs Maintenance Follow-Ups
@@ -460,6 +460,7 @@
 
 ### Newly Implied Docs Policy Command Follow-Ups
 
+- [ ] Revisit planning-doc navigation policy only if TODO/PLAN become public website pages.
 - [ ] Consider adding a package-manager alias for the docs policy script if project tooling grows beyond plain Python scripts.
 - [ ] Add CI job split for documentation policy tests if CI runtime becomes noisy.
 - [x] Consider splitting documentation policy tests out of `test_public_api_policy.py`.
