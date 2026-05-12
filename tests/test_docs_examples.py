@@ -135,3 +135,19 @@ def test_timeout_documentation_examples_execute() -> None:
     assert_example_result(
         asyncio.run(examples.custom_timeout_exception_example()), "vendor call timed out"
     )
+
+
+def test_log_calls_documentation_examples_execute() -> None:
+    examples = load_docs_example("log_calls_examples")
+
+    redacted = examples.redacted_arguments_example()
+    assert any("api_key" in message for message in redacted)
+    assert any("<redacted>" in message for message in redacted)
+    assert all("secret" not in message for message in redacted)
+
+    summarized = examples.summarized_result_example()
+    assert any("{'count': 3}" in message for message in summarized)
+
+    async_messages = asyncio.run(examples.async_logging_example())
+    assert any("refresh_user started" in message for message in async_messages)
+    assert any("refresh_user finished" in message for message in async_messages)

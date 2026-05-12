@@ -34,6 +34,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`deprecated_examples.py`](examples/deprecated_examples.py)
 - [`disk_cache_backend_examples.py`](examples/disk_cache_backend_examples.py)
 - [`public_exception_examples.py`](examples/public_exception_examples.py)
+- [`log_calls_examples.py`](examples/log_calls_examples.py)
 - [`rate_limit_examples.py`](examples/rate_limit_examples.py)
 - [`timeout_examples.py`](examples/timeout_examples.py)
 
