@@ -72,3 +72,10 @@ Metrics hook:
 def handle_job() -> None:
     ...
 ```
+
+
+## Executable examples
+
+Copy-pasteable examples live in `docs/examples/measure_time_examples.py` and are
+covered by `tests/test_docs_examples.py`. They demonstrate callback collection,
+metrics hooks, and async timing with an injectable clock for deterministic output.
