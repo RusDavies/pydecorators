@@ -157,7 +157,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `circuit_breaker`
 
-`circuit_breaker` stops calling a failing sync or async dependency after a configurable failure threshold, rejects calls while open, and allows a half-open probe after the reset timeout. It supports exception-type filters, an optional exception predicate, and injectable clocks for tests. See `docs/circuit_breaker.md` for behavior and examples.
+`circuit_breaker` stops calling a failing sync or async dependency after a configurable failure threshold, rejects calls while open, and allows a half-open probe after the reset timeout. It supports exception-type filters, an optional exception predicate, injectable clocks for tests, and decorated-function state inspection helpers. See `docs/circuit_breaker.md` for behavior and examples.
 
 ### `CircuitState`
 

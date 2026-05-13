@@ -783,7 +783,7 @@
 
 ### Newly Implied `@circuit_breaker` Follow-Ups
 
-- [ ] Consider state inspection hooks or callbacks if users need circuit observability.
+- [x] Add circuit state inspection helpers on decorated functions for observability.
 - [x] Consider thread-safety guards if decorated functions are used from multiple threads.
 - [ ] Consider configurable fallback callbacks only if callers request fallback behavior inside the decorator.
 - [x] Add executable docs examples for `@circuit_breaker`.

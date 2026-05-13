@@ -33,6 +33,15 @@ Invalid configuration raises `ConfigurationError` at decoration time.
 
 Both sync and async functions are supported. State is stored in the decorated function closure, so each decorated function gets its own in-process circuit. State transitions are guarded by a re-entrant lock for threaded callers within one process.
 
+## State inspection
+
+Decorated functions expose two small inspection helpers:
+
+- `wrapped.circuit_state()` returns the current `CircuitState`, promoting `OPEN` to `HALF_OPEN` first if the reset timeout has elapsed.
+- `wrapped.circuit_reset_after()` returns remaining seconds while open, or `None` when the circuit is closed or half-open.
+
+These helpers are for logs, health checks, and tests. They are snapshots, not synchronization primitives; another caller can change the circuit immediately after inspection, because time and concurrency remain rude.
+
 ## Example: service client
 
 ```python
