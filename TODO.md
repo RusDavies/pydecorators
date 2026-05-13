@@ -711,7 +711,7 @@
 ### Newly Implied `@log_calls` Follow-Ups
 
 - [ ] Consider supporting positional argument redaction by parameter name using `inspect.signature` if users request it.
-- [ ] Consider structured log record extras for function name, duration, and outcome if logging integrations need machine-readable fields.
+- [x] Consider structured log record extras for function name, duration, and outcome if logging integrations need machine-readable fields.
 - [x] Add executable docs examples for `@log_calls`.
 - [ ] Consider async-safe result summarizers only if users need asynchronous summarization hooks.
 ### `@measure_time`
