@@ -98,6 +98,24 @@ class DiskCacheInspectionReport:
     mode: str = "metadata"
 
 
+@dataclass(frozen=True, slots=True)
+class DiskCacheAggregateInspectionReport:
+    """Aggregate read-only diagnostics for support bundles and broad sharing."""
+
+    total_entries: int
+    value_entries: int
+    exception_entries: int
+    expired_entries: int
+    serializer_content_types: dict[str, int]
+    total_payload_bytes: int
+    largest_payload_bytes: int | None
+    scanned_entries: int
+    truncated: bool
+    sensitivity_warning: str
+    created_at: float
+    mode: str = "aggregate"
+
+
 PreviewRedactor = Callable[[str, DiskCachePreviewContext], str]
 
 
@@ -623,6 +641,71 @@ class DiskCacheBackend:
                 "and payload previews."
                 if include_payload_preview
                 else "Cache inspection reports may expose sensitive cached metadata."
+            ),
+        )
+
+    def inspect_aggregate(self, *, limit: int = 10_000) -> DiskCacheAggregateInspectionReport:
+        """Return aggregate cache diagnostics without per-row identifiers or previews."""
+
+        if limit < 1:
+            raise ConfigurationError("limit must be a positive integer")
+
+        now = self._clock()
+        with self._lock:
+            self._ensure_open()
+            rows = self._connection.execute(
+                """
+                SELECT payload, is_exception, expires_at, serializer_content_type
+                FROM cache_entries
+                LIMIT ?
+                """,
+                (limit + 1,),
+            ).fetchall()
+            [total_entries] = self._connection.execute(
+                "SELECT COUNT(*) FROM cache_entries"
+            ).fetchone()
+
+        scanned_rows = rows[:limit]
+        serializer_content_types: dict[str, int] = {}
+        value_entries = 0
+        exception_entries = 0
+        expired_entries = 0
+        total_payload_bytes = 0
+        largest_payload_bytes: int | None = None
+
+        for payload, is_exception, expires_at, serializer_content_type in scanned_rows:
+            if is_exception:
+                exception_entries += 1
+            else:
+                value_entries += 1
+            if expires_at is not None and now >= expires_at:
+                expired_entries += 1
+            serializer_content_types[serializer_content_type] = (
+                serializer_content_types.get(serializer_content_type, 0) + 1
+            )
+            payload_size = len(payload)
+            total_payload_bytes += payload_size
+            largest_payload_bytes = (
+                payload_size
+                if largest_payload_bytes is None
+                else max(largest_payload_bytes, payload_size)
+            )
+
+        return DiskCacheAggregateInspectionReport(
+            total_entries=total_entries,
+            value_entries=value_entries,
+            exception_entries=exception_entries,
+            expired_entries=expired_entries,
+            serializer_content_types=serializer_content_types,
+            total_payload_bytes=total_payload_bytes,
+            largest_payload_bytes=largest_payload_bytes,
+            scanned_entries=len(scanned_rows),
+            truncated=len(rows) > limit,
+            created_at=now,
+            sensitivity_warning=(
+                "Aggregate cache inspection reports may expose sensitive operational metadata; "
+                "they omit payload previews, raw payload bytes, serialized keys, key digests, "
+                "and per-row timestamps."
             ),
         )
 

@@ -8,6 +8,7 @@ The public API is anything exported from `useful_decorators.__all__` and documen
 
 Current public API:
 
+- `DiskCacheAggregateInspectionReport`
 - `DiskCacheBackend`
 - `DiskCacheDropEvent`
 - `DiskCacheInspectionEntry`
@@ -152,7 +153,11 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `DiskCacheBackend`
 
-`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, `info`, `maintain`, and read-only `inspect_entries`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, explicit maintenance cleanup, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, `info`, `maintain`, read-only `inspect_entries`, and aggregate `inspect_aggregate`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, explicit maintenance cleanup, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+
+### `DiskCacheAggregateInspectionReport`
+
+`DiskCacheAggregateInspectionReport` is the immutable aggregate diagnostic returned by `DiskCacheBackend.inspect_aggregate()`. It reports entry counts, exception/value counts, expired-entry counts, serializer content-type counts, aggregate payload byte statistics, scan truncation, creation time, mode, and a sensitivity warning while omitting per-row identifiers, previews, raw bytes, key digests, and per-row timestamps.
 
 ### `DiskCacheInspectionEntry`
 
