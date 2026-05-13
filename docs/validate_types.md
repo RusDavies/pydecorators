@@ -24,6 +24,8 @@ The first implementation intentionally supports a conservative subset:
 - basic runtime classes such as `str`, `int`, `float`, `bool`, and custom classes
 - `None`
 - `Optional` / union syntax such as `str | None` or `int | str`
+- `Literal[...]` value membership checks
+- `Annotated[...]` by validating the wrapped base type and ignoring metadata
 - common container origins such as `list[int]`, `dict[str, object]`, `tuple[...]`, `set[...]`, and `frozenset[...]`
 - `Any`, which always passes
 
@@ -45,7 +47,7 @@ Async functions are supported with the same argument and optional return validat
 
 ## Limitations
 
-`@validate_types` is not a schema validator and not a security boundary. It does not validate nested container contents, protocols, typed dictionaries, literals, callables, generics in depth, constrained values, data coercion, or user-defined validation rules. Use Pydantic, attrs validators, dataclasses plus explicit checks, or domain-specific validation when that level of enforcement matters.
+`@validate_types` is not a schema validator and not a security boundary. It does not validate nested container contents, protocols, typed dictionaries, callables, generics in depth, constrained values beyond explicit `Literal[...]` membership, data coercion, or user-defined validation rules. Use Pydantic, attrs validators, dataclasses plus explicit checks, or domain-specific validation when that level of enforcement matters.
 
 
 ## Executable examples

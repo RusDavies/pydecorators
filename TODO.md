@@ -747,7 +747,7 @@
 ### Newly Implied `@validate_types` Follow-Ups
 
 - [ ] Consider deep container validation only if users need it and limitations can stay clear.
-- [ ] Consider support for `Literal` and `Annotated` if lightweight validation use cases require them.
+- [x] Support lightweight `Literal` and `Annotated` validation.
 - [x] Add executable docs examples for `@validate_types`.
 - [x] Add package-specific `ValidationError` while preserving `TypeError` compatibility.
 ### `@require_env`

@@ -5,7 +5,7 @@ from __future__ import annotations
 import inspect
 import types
 from collections.abc import Callable
-from typing import Any, Union, cast, get_args, get_origin, get_type_hints
+from typing import Annotated, Any, Literal, Union, cast, get_args, get_origin, get_type_hints
 
 from useful_decorators._core import is_async_callable, mirror_metadata
 from useful_decorators._typing import P, R
@@ -95,6 +95,12 @@ def _matches_type(value: object, expected: object) -> bool:
     origin = get_origin(expected)
     args = get_args(expected)
 
+    if origin is Annotated:
+        if not args:
+            return True
+        return _matches_type(value, args[0])
+    if origin is Literal:
+        return value in args
     if origin in {Union, types.UnionType}:
         return any(_matches_type(value, option) for option in args)
     if origin is list:
@@ -115,6 +121,13 @@ def _matches_type(value: object, expected: object) -> bool:
 def _format_type(expected: object) -> str:
     if expected is None or expected is NoneType:
         return "None"
+    origin = get_origin(expected)
+    if origin is Annotated:
+        args = get_args(expected)
+        return _format_type(args[0]) if args else "Annotated"
+    if origin is Literal:
+        values = ", ".join(repr(value) for value in get_args(expected))
+        return f"Literal[{values}]"
     name = getattr(expected, "__name__", None)
     if isinstance(name, str):
         return name
