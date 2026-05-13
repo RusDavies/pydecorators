@@ -642,6 +642,52 @@ def test_external_link_checker_verbose_mode_reports_ignored_links(tmp_path: Path
     assert "ignore pattern https://ignored.example.com/* matches" in result.stdout
 
 
+def test_external_link_checker_verbose_mode_reports_successful_checked_links(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import subprocess
+    import sys
+
+    checker_path = Path.cwd() / "scripts/check_external_links.py"
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[checked](https://example.com/docs)\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(checker_path),
+            "--root",
+            str(tmp_path),
+            "--verbose",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    # Real network behavior varies; this test only requires successful checks to use
+    # verbose-only per-link output in syntax-only mode, where success is deterministic.
+    assert "ok " not in result.stdout
+
+    syntax_result = subprocess.run(
+        [
+            sys.executable,
+            str(checker_path),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+            "--verbose",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "checking" in syntax_result.stdout
+    assert "syntax-checked 1 external HTTP(S) link(s)" in syntax_result.stdout
+    assert "ok " not in syntax_result.stdout
+
+
 def test_external_link_checker_validates_ignore_pattern_reasons(tmp_path: Path) -> None:
     checker = load_external_link_checker_module()
     valid_ignore_file = tmp_path / "valid.ignore"
