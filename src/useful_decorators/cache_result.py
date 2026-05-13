@@ -919,6 +919,27 @@ def _ensure_hashable(value: object) -> Hashable:
     return value
 
 
+def cache_namespace(name: str, version: int | str) -> str:
+    """Return a conventional versioned cache namespace such as ``users:v1``."""
+
+    normalized_name = name.strip()
+    if not normalized_name:
+        raise ConfigurationError("cache namespace name must not be empty")
+    if ":" in normalized_name:
+        raise ConfigurationError("cache namespace name must not contain ':'")
+    if isinstance(version, int):
+        if version < 1:
+            raise ConfigurationError("cache namespace version must be positive")
+        normalized_version = f"v{version}"
+    else:
+        normalized_version = version.strip()
+        if not normalized_version:
+            raise ConfigurationError("cache namespace version must not be empty")
+        if ":" in normalized_version:
+            raise ConfigurationError("cache namespace version must not contain ':'")
+    return f"{normalized_name}:{normalized_version}"
+
+
 def _default_cache_key(
     args: tuple[object, ...],
     kwargs: dict[str, object],

@@ -13,6 +13,7 @@ from useful_decorators import (
     CacheInfo,
     DiskCacheBackend,
     MemoryCacheBackend,
+    cache_namespace,
     cache_result,
 )
 from useful_decorators.cache_result import _CacheEntry
@@ -520,6 +521,30 @@ def test_namespace_isolates_shared_backend_entries() -> None:
     assert second(1) == "second:1"
     assert first_calls == 1
     assert second_calls == 1
+
+
+def test_cache_namespace_builds_versioned_namespace() -> None:
+    assert cache_namespace("users", 1) == "users:v1"
+    assert cache_namespace(" users ", "v2") == "users:v2"
+
+
+@pytest.mark.parametrize(
+    ("name", "version", "message"),
+    [
+        (" ", 1, "cache namespace name must not be empty"),
+        ("users:admin", 1, "cache namespace name must not contain ':'"),
+        ("users", 0, "cache namespace version must be positive"),
+        ("users", " ", "cache namespace version must not be empty"),
+        ("users", "v1:beta", "cache namespace version must not contain ':'"),
+    ],
+)
+def test_cache_namespace_rejects_ambiguous_parts(
+    name: str,
+    version: int | str,
+    message: str,
+) -> None:
+    with pytest.raises(ConfigurationError, match=message):
+        cache_namespace(name, version)
 
 
 def test_cache_result_rejects_empty_namespace() -> None:

@@ -272,15 +272,17 @@ When a backend is provided, the backend owns storage policy. The decorator still
 
 Backend instances may be shared deliberately across decorated functions. Shared backends share storage, statistics, and clear behavior. Without a namespace, two decorated functions that produce the same generated key will read/write the same backend entry.
 
-Use `namespace=` when sharing a backend but keeping decorated functions isolated:
+Use `namespace=` when sharing a backend but keeping decorated functions isolated. `cache_namespace(name, version)` can build a conventional versioned namespace such as `users:v1` for long-lived caches:
 
 ```python
+from useful_decorators import cache_namespace
+
 backend = MemoryCacheBackend()
 
-@cache_result(backend=backend, namespace="users")
+@cache_result(backend=backend, namespace=cache_namespace("users", 1))
 def get_user(user_id: str) -> str: ...
 
-@cache_result(backend=backend, namespace="teams")
+@cache_result(backend=backend, namespace=cache_namespace("teams", 1))
 def get_team(team_id: str) -> str: ...
 ```
 

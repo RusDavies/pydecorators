@@ -19,6 +19,7 @@ from useful_decorators.cache_result import (
     JsonCacheSerializer,
     MemoryCacheBackend,
     PickleCacheSerializer,
+    cache_namespace,
     cache_result,
 )
 from useful_decorators.circuit_breaker import CircuitBreakerOpen, CircuitState, circuit_breaker
@@ -72,6 +73,7 @@ __all__ = [
     "UnsupportedCacheSchemaVersionError",
     "UsefulDecoratorsError",
     "ValidationError",
+    "cache_namespace",
     "cache_result",
     "circuit_breaker",
     "deprecated",

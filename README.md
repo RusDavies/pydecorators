@@ -293,7 +293,7 @@ For a trusted local persistent cache, create one `DiskCacheBackend`, pass it to 
 ```python
 from pathlib import Path
 
-from useful_decorators import DiskCacheBackend, cache_result
+from useful_decorators import DiskCacheBackend, cache_namespace, cache_result
 
 backend = DiskCacheBackend(
     Path(".cache/blakemere-decorators.sqlite3"),
@@ -302,7 +302,7 @@ backend = DiskCacheBackend(
 )
 
 
-@cache_result(backend=backend, namespace="users")
+@cache_result(backend=backend, namespace=cache_namespace("users", 1))
 def load_user_display_name(user_id: str) -> str:
     return fetch_user_display_name(user_id)
 
