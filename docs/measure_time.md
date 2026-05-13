@@ -23,6 +23,8 @@ With no callback, logger, or metrics hook, the decorator only measures internall
 
 Invalid configuration raises `ConfigurationError` at decoration time.
 
+Logger records include `useful_decorators_function`, `useful_decorators_duration_seconds`, and `useful_decorators_success` in `logging`'s `extra` data so log pipelines can aggregate timing data without parsing the message text.
+
 ## `TimingInfo`
 
 `TimingInfo` is an immutable dataclass with:
