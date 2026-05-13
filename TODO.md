@@ -424,7 +424,7 @@
 
 - [x] Add policy test that docs example module names match their linked labels in docs/index.md.
 - [x] Generate/check the executable example list in docs/index.md.
-- [ ] Consider moving docs-example policy helpers into a dedicated test module if public API policy tests get too broad.
+- [x] Consider moving docs-example policy helpers into a dedicated test module if public API policy tests get too broad.
 - [x] Add policy test that docs/index.md links to the executable example conventions section.
 
 ### Newly Implied Docs Example Conventions Link Follow-Ups
