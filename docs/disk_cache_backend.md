@@ -423,7 +423,7 @@ Timestamp guidance:
 
 - `created_at` on `DiskCacheAggregateInspectionReport` is report metadata, not proof of when cached work happened.
 - Per-row `created_at`, `last_accessed`, and `expires_at` remain available only in row-level `inspect_entries()` diagnostics.
-- If aggregate timestamp ranges are ever added later, docs and CLI labels must call them diagnostics, not audit timestamps.
+- If aggregate timestamp ranges are ever added later, docs and CLI labels must call them best-effort cache diagnostics, not audit timestamps.
 - Clock sources may be injectable for tests and may not be wall-clock-synchronized across processes.
 - Cache clearing, namespace changes, migrations, and manual SQLite edits can erase or distort timestamp history.
 
