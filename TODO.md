@@ -333,8 +333,8 @@
 
 ### Newly Implied README Code Block Policy Follow-Ups
 
-- [ ] Consider executing safe README snippets once examples are factored to avoid undefined placeholders.
-- [ ] Consider moving longer README snippets into docs/examples and embedding them from one source if snippet drift returns.
+- [x] Execute safe README snippets through `docs/examples/readme_examples.py` to avoid undefined placeholders.
+- [x] Move longer README snippets into executable docs examples for drift-resistant coverage.
 - [x] Add docs example coverage for DiskCacheBackend persistence across process/backend instances.
 
 ### Newly Implied Disk Persistence Docs Follow-Ups
@@ -412,7 +412,7 @@
 
 ### Newly Implied Docs Example Assertion Policy Follow-Ups
 
-- [ ] Extend docs example assertion policy if examples add public classes with public methods.
+- [x] Extend docs example assertion policy to cover public classes with public methods.
 - [x] Consider AST-based assertion detection if string matching becomes too loose.
 - [x] Add a naming convention note for executable docs examples.
 
@@ -805,7 +805,7 @@
 
 - [x] Expand API reference with exact parameter defaults if public signatures change before release.
 - [x] Add a decorator-composition guide if users ask about stacking order.
-- [ ] Add executable README snippets for every first-release decorator if the examples are promoted beyond smoke-test coverage.
+- [x] Add executable README snippets for every first-release decorator.
 - [x] Add a security hardening page if cache/logging/validation warnings keep growing.
 ## 11. Quality Backlog
 
