@@ -32,6 +32,17 @@ def readme_python_code_blocks() -> list[str]:
     )
 
 
+def docs_index_section_links(section_name: str) -> list[str]:
+    docs_index = Path("docs/index.md").read_text()
+    match = re.search(
+        rf"^## {re.escape(section_name)}\n(?P<body>.*?)(?=^## |\Z)",
+        docs_index,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    assert match is not None, f"missing docs index section: {section_name}"
+    return re.findall(r"\[[^\]]+\]\(([^)]+)\)", match.group("body"))
+
+
 def load_external_link_checker_module() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
         "check_external_links", "scripts/check_external_links.py"
@@ -41,6 +52,28 @@ def load_external_link_checker_module() -> ModuleType:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def test_docs_index_sections_follow_expected_classification() -> None:
+    expected_sections = [
+        "Core project docs",
+        "Decorator docs",
+        "Cache backend docs",
+        "Executable examples",
+    ]
+    docs_index = Path("docs/index.md").read_text()
+    actual_sections = re.findall(r"^## (.+)$", docs_index, flags=re.MULTILINE)
+
+    assert actual_sections == expected_sections
+
+    assert "cache_result.md" not in docs_index_section_links("Core project docs")
+    assert "disk_cache_backend.md" in docs_index_section_links("Cache backend docs")
+    for link in docs_index_section_links("Decorator docs"):
+        assert link.endswith(".md")
+        assert link not in {"PUBLIC_API.md", "API_REFERENCE.md", "API_DESIGN.md"}
+    for link in docs_index_section_links("Executable examples"):
+        if link.startswith("examples/") and link != "examples/":
+            assert link.endswith("_examples.py")
 
 
 def test_docs_index_links_resolve_to_existing_files() -> None:
