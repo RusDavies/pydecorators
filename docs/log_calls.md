@@ -17,7 +17,7 @@ def rebuild_index() -> None:
 - `level`: integer logging level. Defaults to `logging.INFO`.
 - `include_args`: include positional args and keyword args in the start log. Defaults to `False`.
 - `include_result`: include the return value, or summarized return value, in the finish log. Defaults to `False`.
-- `redact_args`: keyword argument names to replace with `"<redacted>"` when `include_args=True`.
+- `redact_args`: argument names to replace with `"<redacted>"` when `include_args=True`; this covers keyword arguments and positional arguments whose parameter names can be resolved from the wrapped function signature.
 - `summarize_result`: optional callable used to turn the return value into a smaller or safer logged summary.
 - `log_exceptions`: log failures with traceback via `logger.exception`. Defaults to `True`.
 - `clock`: injectable clock for duration tests.
@@ -34,7 +34,7 @@ Durations use Python's monotonic clock by default, not wall-clock time. That kee
 
 Logging arguments and return values is risky. The safe default is metadata-only logging: function name, start, finish, duration, and exceptions. Do not enable `include_args` or `include_result` on functions that handle credentials, tokens, personal data, payment data, medical data, tenant secrets, or large payloads unless the logging policy has been reviewed.
 
-`redact_args` only redacts keyword arguments by name. It does not inspect positional arguments, nested dictionaries, objects, headers, serialized payloads, or return values. That is deliberate: fake automatic secret detection is how secrets end up preserved forever in log aggregation with a tiny bow on top.
+`redact_args` redacts named parameters at the top level only. It does not inspect nested dictionaries, objects, headers, serialized payloads, varargs contents, or return values. That is deliberate: fake automatic secret detection is how secrets end up preserved forever in log aggregation with a tiny bow on top.
 
 When return values are useful for diagnostics, prefer `summarize_result` over raw `include_result=True`. Summaries should expose counts, statuses, IDs already safe for logs, or coarse shapes rather than full payloads.
 
@@ -68,6 +68,6 @@ async def refresh_user(user_id: str) -> None:
 ## Executable examples
 
 Copy-pasteable examples live in `docs/examples/log_calls_examples.py` and are
-covered by `tests/test_docs_examples.py`. They demonstrate keyword redaction,
+covered by `tests/test_docs_examples.py`. They demonstrate argument redaction,
 result summarization, and async logging using an in-memory test handler so the
 examples do not depend on global logging configuration.

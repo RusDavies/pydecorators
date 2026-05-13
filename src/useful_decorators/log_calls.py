@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 from collections.abc import Callable, Iterable
 from typing import Any, cast
@@ -36,6 +37,7 @@ def log_calls(
 
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         active_logger = logger or logging.getLogger(func.__module__)
+        signature = inspect.signature(func)
 
         if is_async_callable(func):
             async_func = cast(Callable[P, Any], func)
@@ -50,6 +52,7 @@ def log_calls(
                     redacted_names=redacted_names,
                     args=args,
                     kwargs=kwargs,
+                    signature=signature,
                 )
                 try:
                     result = async_func(*args, **kwargs)
@@ -94,6 +97,7 @@ def log_calls(
                 redacted_names=redacted_names,
                 args=args,
                 kwargs=kwargs,
+                signature=signature,
             )
             try:
                 result = func(*args, **kwargs)
@@ -160,6 +164,7 @@ def _log_started(
     redacted_names: frozenset[str],
     args: tuple[object, ...],
     kwargs: dict[str, object],
+    signature: inspect.Signature,
 ) -> None:
     if not include_args:
         logger.log(level, "%s started", name, extra=_log_extra(name, event="started"))
@@ -168,7 +173,7 @@ def _log_started(
         level,
         "%s started args=%r kwargs=%r",
         name,
-        args,
+        _redact_args(args, kwargs, redacted_names, signature),
         _redact_kwargs(kwargs, redacted_names),
         extra=_log_extra(name, event="started"),
     )
@@ -220,6 +225,39 @@ def _log_extra(
     if success is not None:
         extra["useful_decorators_success"] = success
     return extra
+
+
+def _redact_args(
+    args: tuple[object, ...],
+    kwargs: dict[str, object],
+    redacted_names: frozenset[str],
+    signature: inspect.Signature,
+) -> tuple[object, ...]:
+    if not redacted_names or not args:
+        return args
+    try:
+        bound = signature.bind_partial(*args, **kwargs)
+    except TypeError:
+        return args
+
+    redacted_args = list(args)
+    positional_index = 0
+    for parameter in signature.parameters.values():
+        if parameter.kind is parameter.VAR_POSITIONAL:
+            values = bound.arguments.get(parameter.name, ())
+            positional_index += len(cast(tuple[object, ...], values))
+            continue
+        if parameter.kind not in {
+            parameter.POSITIONAL_ONLY,
+            parameter.POSITIONAL_OR_KEYWORD,
+        }:
+            continue
+        if positional_index >= len(redacted_args):
+            break
+        if parameter.name in redacted_names:
+            redacted_args[positional_index] = "<redacted>"
+        positional_index += 1
+    return tuple(redacted_args)
 
 
 def _redact_kwargs(kwargs: dict[str, object], redacted_names: frozenset[str]) -> dict[str, object]:
