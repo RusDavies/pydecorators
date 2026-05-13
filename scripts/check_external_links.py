@@ -230,6 +230,14 @@ def main() -> int:
         action="store_true",
         help="print checked and ignored external links during manual release checks",
     )
+    parser.add_argument(
+        "--allow-stale-ignores",
+        action="store_true",
+        help=(
+            "allow ignore patterns that do not currently match docs links; use only "
+            "while staging ignore-list updates with nearby docs changes"
+        ),
+    )
     args = parser.parse_args()
 
     root = args.root.resolve()
@@ -245,7 +253,7 @@ def main() -> int:
     ignore_patterns = load_ignore_patterns(ignore_file)
     links_by_file = external_http_links(root)
     unmatched_patterns = unmatched_ignore_patterns(ignore_patterns, links_by_file)
-    if unmatched_patterns:
+    if unmatched_patterns and not args.allow_stale_ignores:
         for pattern in unmatched_patterns:
             print(
                 f"{ignore_file}: ignore pattern does not match any current docs link: {pattern}",

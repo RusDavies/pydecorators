@@ -813,6 +813,35 @@ def test_external_link_checker_fails_for_stale_ignore_pattern(
     assert "https://missing.example.com/*" in result.stderr
 
 
+def test_external_link_checker_can_allow_stale_ignore_patterns(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[checked](https://example.com/docs)\n")
+    (tmp_path / ".external-links-ignore").write_text(
+        "# Staged vendor docs ignore for a nearby docs change.\nhttps://missing.example.com/*\n"
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+            "--allow-stale-ignores",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "syntax-checked 1 external HTTP(S) link(s)" in result.stdout
+
+
 def test_retry_docs_include_idempotency_guidance() -> None:
     text = Path("docs/retry.md").read_text()
 
