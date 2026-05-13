@@ -25,6 +25,8 @@ Invalid configuration raises `ConfigurationError` at decoration time.
 
 Logger records include `useful_decorators_function`, `useful_decorators_duration_seconds`, and `useful_decorators_success` in `logging`'s `extra` data so log pipelines can aggregate timing data without parsing the message text.
 
+Durations use Python's monotonic clock by default. This makes elapsed-time measurement resilient to wall-clock changes such as NTP adjustments, daylight saving transitions, or virtual-machine clock jumps. Inject `clock=` only for deterministic tests or specialized runtime integrations; production clocks should be monotonic-style functions that return increasing seconds.
+
 ## `TimingInfo`
 
 `TimingInfo` is an immutable dataclass with:

@@ -28,6 +28,8 @@ Invalid configuration raises `ConfigurationError` at decoration time.
 
 Every emitted record includes `useful_decorators_function` and `useful_decorators_event` (`"started"`, `"finished"`, or `"failed"`) in `logging`'s `extra` data. Finished and failed records also include `useful_decorators_duration_seconds` and `useful_decorators_success` so log pipelines can filter or aggregate without parsing the human-readable message.
 
+Durations use Python's monotonic clock by default, not wall-clock time. That keeps call durations stable across NTP corrections, daylight saving changes, and other clock adjustments. Use `clock=` for tests or custom runtimes, and prefer a monotonic-style source in production.
+
 ## Security notes
 
 Logging arguments and return values is risky. The safe default is metadata-only logging: function name, start, finish, duration, and exceptions. Do not enable `include_args` or `include_result` on functions that handle credentials, tokens, personal data, payment data, medical data, tenant secrets, or large payloads unless the logging policy has been reviewed.

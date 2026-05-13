@@ -730,7 +730,7 @@
 - [x] Consider structured logger extras for duration/success fields if logging integrations request them.
 - [ ] Consider async callback/metrics hooks only if users need asynchronous timing sinks.
 - [x] Add executable docs examples for `@measure_time`.
-- [ ] Consider monotonic-clock source documentation if timing precision questions recur.
+- [x] Consider monotonic-clock source documentation if timing precision questions recur.
 ## 8. Validation and Configuration Decorators Backlog
 
 ### `@validate_types`
