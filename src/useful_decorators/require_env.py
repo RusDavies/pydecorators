@@ -30,20 +30,27 @@ def require_env(
     validators: Mapping[str, EnvValidator] | None = None,
     environ: Mapping[str, str] | None = None,
     messages: Mapping[str, str] | None = None,
+    allow_empty: bool = True,
 ) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """Require environment variables to exist and optionally pass validators at call time."""
 
     requirements = _normalize_names(names)
     active_validators = dict(validators or {})
     active_messages = dict(messages or {})
-    _validate_config(requirements, active_validators, environ, active_messages)
+    _validate_config(requirements, active_validators, environ, active_messages, allow_empty)
 
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         if is_async_callable(func):
             async_func = cast(Callable[P, Any], func)
 
             async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> object:
-                _check_environment(requirements, active_validators, environ, active_messages)
+                _check_environment(
+                    requirements,
+                    active_validators,
+                    environ,
+                    active_messages,
+                    allow_empty,
+                )
                 result = async_func(*args, **kwargs)
                 if hasattr(result, "__await__"):
                     return await result
@@ -52,7 +59,13 @@ def require_env(
             return mirror_metadata(cast(Callable[P, R], async_wrapper), cast(Callable[P, R], func))
 
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            _check_environment(requirements, active_validators, environ, active_messages)
+            _check_environment(
+                requirements,
+                active_validators,
+                environ,
+                active_messages,
+                allow_empty,
+            )
             return func(*args, **kwargs)
 
         return mirror_metadata(wrapper, func)
@@ -71,6 +84,7 @@ def _validate_config(
     validators: Mapping[str, EnvValidator],
     environ: Mapping[str, str] | None,
     messages: Mapping[str, str],
+    allow_empty: bool,
 ) -> None:
     names_tuple = tuple(names)
     if not names_tuple:
@@ -85,6 +99,8 @@ def _validate_config(
             raise ConfigurationError(f"validator for {name!r} must be callable")
     if environ is not None and not isinstance(environ, Mapping):
         raise ConfigurationError("environ must be a mapping when provided")
+    if not isinstance(allow_empty, bool):
+        raise ConfigurationError("allow_empty must be a boolean")
     for name, message in messages.items():
         if name not in names_tuple:
             raise ConfigurationError(f"message configured for unknown variable {name!r}")
@@ -97,12 +113,15 @@ def _check_environment(
     validators: Mapping[str, EnvValidator],
     environ: Mapping[str, str] | None,
     messages: Mapping[str, str],
+    allow_empty: bool,
 ) -> None:
     source = os.environ if environ is None else environ
     for name in names:
         if name not in source:
             raise EnvRequirementError(name, messages.get(name, "is required"))
         value = source[name]
+        if not allow_empty and value == "":
+            raise EnvRequirementError(name, "must not be empty")
         validator = validators.get(name)
         if validator is not None and validator(value) is False:
             raise EnvRequirementError(name, "failed validation")
