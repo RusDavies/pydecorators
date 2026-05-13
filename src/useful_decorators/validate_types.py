@@ -117,8 +117,7 @@ def _matches_type(value: object, expected: object, *, deep: bool = False) -> boo
             not deep
             or len(args) != 2
             or all(
-                _matches_type(key, args[0], deep=True)
-                and _matches_type(item, args[1], deep=True)
+                _matches_type(key, args[0], deep=True) and _matches_type(item, args[1], deep=True)
                 for key, item in value.items()
             )
         )
