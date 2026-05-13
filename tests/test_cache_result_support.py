@@ -27,7 +27,7 @@ def test_cache_info_is_immutable() -> None:
     try:
         info.hits = 1  # type: ignore[misc]
     except Exception as exc:
-        assert isinstance(exc, (AttributeError, TypeError))
+        assert isinstance(exc, AttributeError | TypeError)
     else:  # pragma: no cover - defensive; frozen dataclass should prevent this
         raise AssertionError("CacheInfo should be immutable")
 
