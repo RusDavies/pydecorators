@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from useful_decorators import CircuitBreakerOpen, ConfigurationError, circuit_breaker
+from useful_decorators import CircuitBreakerOpen, CircuitState, ConfigurationError, circuit_breaker
 
 
 class MutableClock:
@@ -68,6 +68,27 @@ def test_circuit_breaker_half_open_failure_reopens_circuit() -> None:
         service()
     with pytest.raises(CircuitBreakerOpen, match="retry after 5"):
         service()
+
+
+def test_circuit_breaker_exposes_state_inspection_helpers() -> None:
+    clock = MutableClock()
+
+    @circuit_breaker(failure_threshold=1, reset_timeout=5, clock=clock)
+    def service() -> str:
+        raise RuntimeError("down")
+
+    circuit_state = service.circuit_state  # type: ignore[attr-defined]
+    circuit_reset_after = service.circuit_reset_after  # type: ignore[attr-defined]
+
+    assert circuit_state() is CircuitState.CLOSED
+    assert circuit_reset_after() is None
+    with pytest.raises(RuntimeError):
+        service()
+    assert circuit_state() is CircuitState.OPEN
+    assert circuit_reset_after() == 5
+    clock.advance(5)
+    assert circuit_state() is CircuitState.HALF_OPEN
+    assert circuit_reset_after() is None
 
 
 def test_circuit_breaker_respects_exception_types_and_filters() -> None:

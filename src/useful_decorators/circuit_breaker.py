@@ -62,6 +62,14 @@ def circuit_breaker(
                 state = CircuitState.HALF_OPEN
             return state
 
+    def reset_after() -> float | None:
+        with lock:
+            current = current_state()
+            if current is not CircuitState.OPEN or opened_at is None:
+                return None
+            elapsed = active_clock() - opened_at
+            return max(0.0, reset_timeout - elapsed)
+
     def before_call() -> None:
         with lock:
             current = current_state()
@@ -110,7 +118,11 @@ def circuit_breaker(
                 record_success()
                 return result
 
-            return mirror_metadata(cast(Callable[P, R], async_wrapper), cast(Callable[P, R], func))
+            wrapped = mirror_metadata(
+                cast(Callable[P, R], async_wrapper), cast(Callable[P, R], func)
+            )
+            _attach_inspection(wrapped, current_state, reset_after)
+            return wrapped
 
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             before_call()
@@ -122,9 +134,20 @@ def circuit_breaker(
             record_success()
             return result
 
-        return mirror_metadata(wrapper, func)
+        wrapped = mirror_metadata(wrapper, func)
+        _attach_inspection(wrapped, current_state, reset_after)
+        return wrapped
 
     return decorate
+
+
+def _attach_inspection(
+    wrapper: Callable[P, R],
+    current_state: Callable[[], CircuitState],
+    reset_after: Callable[[], float | None],
+) -> None:
+    wrapper.circuit_state = current_state  # type: ignore[attr-defined]
+    wrapper.circuit_reset_after = reset_after  # type: ignore[attr-defined]
 
 
 def _validate_config(
