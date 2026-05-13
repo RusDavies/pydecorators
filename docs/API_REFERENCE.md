@@ -54,7 +54,7 @@ Default in-process cache backend for `cache_result`.
 
 ### `DiskCacheBackend(path, *, ttl=None, maxsize=128, refresh_ttl_on_hit=False, serializer=None, on_drop=None, clock=None, busy_timeout_ms=5000, wal=True)`
 
-SQLite-backed persistent cache backend for trusted local cache files. See [`DiskCacheBackend`](disk_cache_backend.md).
+SQLite-backed persistent cache backend for trusted local cache files. Includes `maintain()` and read-only `inspect_entries(...)` diagnostics. See [`DiskCacheBackend`](disk_cache_backend.md).
 
 ### `CacheBackend`
 
@@ -79,6 +79,18 @@ Cache statistics dataclass returned by cache info helpers.
 ### `DiskCacheDropEvent`
 
 Event passed to `DiskCacheBackend(on_drop=...)` when corrupt or incompatible rows are dropped.
+
+### `DiskCacheInspectionEntry`
+
+Immutable row-level diagnostic returned by `DiskCacheBackend.inspect_entries()`.
+
+### `DiskCacheInspectionReport`
+
+Immutable read-only cache inspection report returned by `DiskCacheBackend.inspect_entries()`.
+
+### `DiskCachePreviewContext`
+
+Metadata passed to `preview_redactor` callbacks during payload-preview inspection.
 
 ## Timing and resilience types
 

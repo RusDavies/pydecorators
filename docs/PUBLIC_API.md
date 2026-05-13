@@ -10,7 +10,10 @@ Current public API:
 
 - `DiskCacheBackend`
 - `DiskCacheDropEvent`
+- `DiskCacheInspectionEntry`
+- `DiskCacheInspectionReport`
 - `DiskCacheMaintenanceReport`
+- `DiskCachePreviewContext`
 - `CacheBackendClosedError`
 - `UnsupportedCacheSchemaVersionError`
 - `CacheSerializationError`
@@ -149,7 +152,19 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `DiskCacheBackend`
 
-`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, `info`, and `maintain`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, explicit maintenance cleanup, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, `info`, `maintain`, and read-only `inspect_entries`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, explicit maintenance cleanup, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+
+### `DiskCacheInspectionEntry`
+
+`DiskCacheInspectionEntry` is the immutable per-row diagnostic object returned inside `DiskCacheInspectionReport.entries`. It exposes a redacted `key_sha256` digest, serializer content type, payload size, optional bounded payload preview, exception flag, and backend timestamp fields for debugging.
+
+### `DiskCacheInspectionReport`
+
+`DiskCacheInspectionReport` is the immutable report returned by `DiskCacheBackend.inspect_entries()`. It reports entries, total entry count, truncation, preview redaction failures, report creation time, inspection mode, and a sensitivity warning.
+
+### `DiskCachePreviewContext`
+
+`DiskCachePreviewContext` is passed to `preview_redactor` callbacks when `inspect_entries(include_payload_preview=True, preview_redactor=...)` is used. It contains the key digest, serializer content type, exception flag, and payload size.
 
 ### `DiskCacheMaintenanceReport`
 
