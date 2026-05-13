@@ -34,9 +34,9 @@ Log start, finish duration, optional arguments, optional result summaries, and e
 
 Measure sync or async function duration and emit `TimingInfo` through callbacks, logs, or metrics hooks. See [`@measure_time`](measure_time.md).
 
-### `validate_types(*, validate_return=False)`
+### `validate_types(*, validate_return=False, deep=False)`
 
-Perform lightweight runtime checks for annotated arguments and optionally return values. See [`@validate_types`](validate_types.md).
+Perform lightweight runtime checks for annotated arguments and optionally return values. `deep=True` recursively validates supported container contents. See [`@validate_types`](validate_types.md).
 
 ### `require_env(*names, validators=None, environ=None, messages=None, allow_empty=True)`
 

@@ -189,7 +189,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `validate_types`
 
-`validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins, `Any`, optional/union types, `Literal[...]`, and `Annotated[...]` base-type validation. Validation mismatches raise `ValidationError`, which still inherits from `TypeError` for compatibility with ordinary type-check handling. It is intentionally not a full schema-validation system. See `docs/validate_types.md` for behavior and limitations.
+`validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins by default, optional deep validation for supported container contents, `Any`, optional/union types, `Literal[...]`, and `Annotated[...]` base-type validation. Validation mismatches raise `ValidationError`, which still inherits from `TypeError` for compatibility with ordinary type-check handling. It is intentionally not a full schema-validation system. See `docs/validate_types.md` for behavior and limitations.
 
 ### `ValidationError`
 
