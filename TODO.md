@@ -271,7 +271,7 @@
 ### Newly Implied Disk Schema Metadata Follow-Ups
 
 - [ ] Implement `cache_metadata` only if disk-cache file compatibility becomes a public release promise.
-- [ ] Add strict schema-version startup tests before implementing disk-cache migrations.
+- [x] Add strict schema-version startup tests before implementing disk-cache migrations.
 - [ ] Consider a disk-cache-specific exception for unsupported future schema versions instead of reusing `ConfigurationError`.
 - [x] Document pickle trust-boundary warning in disk/Redis backend docs.
 - [x] Design `DiskCacheBackend` storage strategy, likely SQLite.

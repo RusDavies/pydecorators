@@ -30,6 +30,23 @@ def test_disk_cache_backend_initializes_schema(tmp_path: Path) -> None:
 
     assert stats == [(1, 0, 0)]
 
+    with closing(sqlite3.connect(db_path)) as connection:
+        [schema_version] = connection.execute("PRAGMA user_version").fetchone()
+
+    assert schema_version == 1
+
+
+def test_disk_cache_backend_rejects_unsupported_future_schema_version(tmp_path: Path) -> None:
+    db_path = tmp_path / "cache.sqlite3"
+    with closing(sqlite3.connect(db_path)) as connection:
+        connection.execute("PRAGMA user_version = 999")
+
+    with pytest.raises(
+        ConfigurationError,
+        match="disk cache schema version is newer than this package supports",
+    ):
+        DiskCacheBackend(db_path)
+
 
 def test_disk_cache_backend_schema_is_idempotent(tmp_path: Path) -> None:
     db_path = tmp_path / "cache.sqlite3"
