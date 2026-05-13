@@ -31,7 +31,7 @@ Invalid configuration raises `ConfigurationError` at decoration time.
 
 ## Sync and async support
 
-Both sync and async functions are supported. State is stored in the decorated function closure, so each decorated function gets its own in-process circuit.
+Both sync and async functions are supported. State is stored in the decorated function closure, so each decorated function gets its own in-process circuit. State transitions are guarded by a re-entrant lock for threaded callers within one process.
 
 ## Example: service client
 
