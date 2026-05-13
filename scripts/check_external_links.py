@@ -83,16 +83,27 @@ def is_ignored_link(link: str, patterns: list[str]) -> bool:
     return ignored_link_pattern(link, patterns) is not None
 
 
+def ignore_pattern_matches(
+    patterns: list[str],
+    links_by_file: dict[Path, list[str]],
+) -> dict[str, list[tuple[Path, str]]]:
+    return {
+        pattern: [
+            (docs_file, link)
+            for docs_file, links in links_by_file.items()
+            for link in links
+            if fnmatch.fnmatchcase(link, pattern)
+        ]
+        for pattern in patterns
+    }
+
+
 def unmatched_ignore_patterns(
     patterns: list[str],
     links_by_file: dict[Path, list[str]],
 ) -> list[str]:
-    links = [link for links in links_by_file.values() for link in links]
-    return [
-        pattern
-        for pattern in patterns
-        if not any(fnmatch.fnmatchcase(link, pattern) for link in links)
-    ]
+    matches = ignore_pattern_matches(patterns, links_by_file)
+    return [pattern for pattern in patterns if not matches[pattern]]
 
 
 def markdown_links(path: Path) -> list[str]:
@@ -252,7 +263,8 @@ def main() -> int:
 
     ignore_patterns = load_ignore_patterns(ignore_file)
     links_by_file = external_http_links(root)
-    unmatched_patterns = unmatched_ignore_patterns(ignore_patterns, links_by_file)
+    ignore_matches = ignore_pattern_matches(ignore_patterns, links_by_file)
+    unmatched_patterns = [pattern for pattern, matches in ignore_matches.items() if not matches]
     if unmatched_patterns and not args.allow_stale_ignores:
         for pattern in unmatched_patterns:
             print(
@@ -260,6 +272,11 @@ def main() -> int:
                 file=sys.stderr,
             )
         return 1
+
+    if args.verbose:
+        for pattern, matches in ignore_matches.items():
+            for docs_file, link in matches:
+                print(f"ignore pattern {pattern} matches {docs_file}: {link}")
 
     failures: list[str] = []
     checked = 0

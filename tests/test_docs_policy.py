@@ -639,6 +639,7 @@ def test_external_link_checker_verbose_mode_reports_ignored_links(tmp_path: Path
     assert "ignored" in result.stdout
     assert "https://ignored.example.com/docs" in result.stdout
     assert "matched https://ignored.example.com/*" in result.stdout
+    assert "ignore pattern https://ignored.example.com/* matches" in result.stdout
 
 
 def test_external_link_checker_validates_ignore_pattern_reasons(tmp_path: Path) -> None:
