@@ -24,7 +24,7 @@ Invalid configuration raises `ConfigurationError` at decoration time.
 
 ## Modes
 
-In `"raise"` mode, an exceeded call raises `RateLimitExceeded` with a retry-after hint in the message.
+In `"raise"` mode, an exceeded call raises `RateLimitExceeded`. The exception exposes a machine-readable `retry_after` value in seconds and includes the same retry-after hint in its message.
 
 In `"block"` mode, the wrapper sleeps until the oldest call leaves the sliding window, then tries again. Tests should inject `clock` and `sleep` so they do not actually wait around like patient little potatoes.
 

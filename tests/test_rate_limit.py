@@ -41,8 +41,10 @@ def test_rate_limit_raise_mode_rejects_exceeded_calls() -> None:
         return "ok"
 
     assert limited() == "ok"
-    with pytest.raises(RateLimitExceeded, match="retry after 10"):
+    with pytest.raises(RateLimitExceeded, match="retry after 10") as exc_info:
         limited()
+
+    assert exc_info.value.retry_after == 10
 
 
 def test_rate_limit_sliding_window_resets_after_period() -> None:
