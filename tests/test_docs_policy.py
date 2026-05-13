@@ -319,6 +319,23 @@ def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> Non
         assert required in joined_blocks
 
 
+def test_redis_backend_design_records_key_naming_decisions() -> None:
+    design = Path("docs/redis_backend_design.md").read_text()
+
+    for required in [
+        "useful-decorators:{schema_version}:{namespace}:{key_digest}",
+        "SHA-256 hex digest",
+        "not the raw argument representation",
+        "useful-decorators:{schema_version}:{namespace}:stats",
+        "hits",
+        "misses",
+        "Redis hash",
+        "base package must not require Redis dependencies",
+        "fail only when the Redis backend is imported or constructed",
+    ]:
+        assert required in design
+
+
 def test_readme_disk_cache_code_block_matches_lifecycle_guidance() -> None:
     disk_cache_block = next(
         block for block in readme_python_code_blocks() if "DiskCacheBackend" in block

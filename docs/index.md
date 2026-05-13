@@ -32,6 +32,7 @@ Start here when navigating the Useful Decorators documentation.
 ## Cache backend docs
 
 - [`DiskCacheBackend`](disk_cache_backend.md) — SQLite-backed cache design, persistence, trust boundaries, WAL/busy-timeout behavior, and context-manager usage.
+- [Redis backend design notes](redis_backend_design.md) — optional Redis backend key-prefix, stats-key, and dependency decisions before implementation.
 
 ## Executable examples
 
