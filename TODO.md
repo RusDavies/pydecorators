@@ -595,7 +595,7 @@
 
 ### Newly Implied Redis Backend Design Follow-Ups
 
-- [ ] Decide Redis key prefix and stats-key naming before implementing `RedisCacheBackend`.
+- [x] Decide Redis key prefix and stats-key naming before implementing `RedisCacheBackend`.
 - [ ] Add Redis extra dependency import-failure tests when the optional backend is implemented.
 - [x] Reduce duplicate backend behavior tests now covered by the conformance suite.
 
