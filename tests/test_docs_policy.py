@@ -376,6 +376,19 @@ def test_contributing_documents_docs_index_inclusion_rule() -> None:
         assert required in contributing
 
 
+def test_markdown_links_include_reference_style_links(tmp_path: Path) -> None:
+    markdown_file = tmp_path / "reference-links.md"
+    markdown_file.write_text(
+        "See [inline](docs/index.md) and [reference][docs-index].\n\n"
+        "[docs-index]: docs/index.md#core-project-docs\n"
+    )
+
+    assert markdown_links(markdown_file) == [
+        "docs/index.md",
+        "docs/index.md#core-project-docs",
+    ]
+
+
 def test_markdown_heading_anchor_helper_matches_expected_slug_shape() -> None:
     assert markdown_heading_anchor("Cache Backend: WAL & Busy Timeout!") == (
         "cache-backend-wal-busy-timeout"
