@@ -62,6 +62,12 @@ def log_calls(
                             "%s failed after %.6g seconds",
                             func.__qualname__,
                             duration,
+                            extra=_log_extra(
+                                func.__qualname__,
+                                event="failed",
+                                duration=duration,
+                                success=False,
+                            ),
                         )
                     raise
                 duration = active_clock() - start
@@ -98,6 +104,12 @@ def log_calls(
                         "%s failed after %.6g seconds",
                         func.__qualname__,
                         duration,
+                        extra=_log_extra(
+                            func.__qualname__,
+                            event="failed",
+                            duration=duration,
+                            success=False,
+                        ),
                     )
                 raise
             duration = active_clock() - start
@@ -150,7 +162,7 @@ def _log_started(
     kwargs: dict[str, object],
 ) -> None:
     if not include_args:
-        logger.log(level, "%s started", name)
+        logger.log(level, "%s started", name, extra=_log_extra(name, event="started"))
         return
     logger.log(
         level,
@@ -158,6 +170,7 @@ def _log_started(
         name,
         args,
         _redact_kwargs(kwargs, redacted_names),
+        extra=_log_extra(name, event="started"),
     )
 
 
@@ -172,10 +185,41 @@ def _log_finished(
     result: object,
 ) -> None:
     if not include_result:
-        logger.log(level, "%s finished in %.6g seconds", name, duration)
+        logger.log(
+            level,
+            "%s finished in %.6g seconds",
+            name,
+            duration,
+            extra=_log_extra(name, event="finished", duration=duration, success=True),
+        )
         return
     summary = summarize_result(result) if summarize_result else result
-    logger.log(level, "%s finished in %.6g seconds result=%r", name, duration, summary)
+    logger.log(
+        level,
+        "%s finished in %.6g seconds result=%r",
+        name,
+        duration,
+        summary,
+        extra=_log_extra(name, event="finished", duration=duration, success=True),
+    )
+
+
+def _log_extra(
+    name: str,
+    *,
+    event: str,
+    duration: float | None = None,
+    success: bool | None = None,
+) -> dict[str, object]:
+    extra: dict[str, object] = {
+        "useful_decorators_function": name,
+        "useful_decorators_event": event,
+    }
+    if duration is not None:
+        extra["useful_decorators_duration_seconds"] = duration
+    if success is not None:
+        extra["useful_decorators_success"] = success
+    return extra
 
 
 def _redact_kwargs(kwargs: dict[str, object], redacted_names: frozenset[str]) -> dict[str, object]:

@@ -24,6 +24,10 @@ def rebuild_index() -> None:
 
 Invalid configuration raises `ConfigurationError` at decoration time.
 
+## Structured log fields
+
+Every emitted record includes `useful_decorators_function` and `useful_decorators_event` (`"started"`, `"finished"`, or `"failed"`) in `logging`'s `extra` data. Finished and failed records also include `useful_decorators_duration_seconds` and `useful_decorators_success` so log pipelines can filter or aggregate without parsing the human-readable message.
+
 ## Security notes
 
 Logging arguments and return values is risky. The safe default is metadata-only logging: function name, start, finish, duration, and exceptions. Do not enable `include_args` or `include_result` on functions that handle credentials, tokens, personal data, payment data, medical data, tenant secrets, or large payloads unless the logging policy has been reviewed.
