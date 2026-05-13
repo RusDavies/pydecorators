@@ -485,7 +485,7 @@
 
 - [x] Add PR-template checkboxes for docs index, docs examples, and docs policy marker updates.
 - [x] Add issue templates if external contributors start filing repeated docs/release questions.
-- [ ] Add a docs-policy exemption registry if intentionally unindexed docs files become common.
+- [x] Add a docs-policy exemption registry if intentionally unindexed docs files become common.
 - [x] Consider moving Markdown policy helpers into `tests/docs_policy_helpers.py` if reuse grows.
 
 ### Newly Implied Docs Policy Helpers Follow-Ups

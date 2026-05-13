@@ -12,6 +12,7 @@ Start here when navigating the Useful Decorators documentation.
 - [Quality gates](quality_gates.md) — local verification commands, Hatch aliases, and release-prep gate meaning.
 - [Security hardening guide](security_hardening.md) — cache, logging, validation, and in-process control safety checklist.
 - [Markdown anchor policy](markdown_anchor_policy.md) — heading-anchor assumptions used by docs-link policy tests.
+- [Docs index exemption registry](docs_index_exemptions.md) — rules for intentional docs-index exclusions.
 
 ## Decorator docs
 
