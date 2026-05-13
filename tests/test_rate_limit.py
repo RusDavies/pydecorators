@@ -94,6 +94,20 @@ def test_rate_limit_key_isolates_buckets() -> None:
         limited("a")
 
 
+def test_rate_limit_cleans_up_idle_keyed_buckets() -> None:
+    from useful_decorators.rate_limit import _SlidingWindowLimiter
+
+    clock = MutableClock()
+    limiter = _SlidingWindowLimiter(calls=1, period=10, clock=clock)
+
+    assert limiter.reserve_or_delay("a") is None
+    assert limiter.reserve_or_delay("b") is None
+    clock.advance(10)
+    assert limiter.reserve_or_delay("c") is None
+
+    assert list(limiter._windows) == ["c"]
+
+
 def test_rate_limit_block_mode_sleeps_until_slot_available() -> None:
     clock = MutableClock()
     sleeps: list[float] = []
