@@ -20,8 +20,8 @@ def fetch_user(user_id: str) -> dict[str, object]:
 - `jitter`: optional random additive jitter, from `0` to `jitter`, applied to each sleep.
 - `exceptions`: exception type or tuple of exception types that should be considered retryable. Defaults to `Exception`.
 - `retry_if`: optional predicate receiving the caught exception. Return `False` to stop retrying even if attempts remain.
-- `before_attempt`: optional hook called with the 1-based attempt number before each call.
-- `after_attempt`: optional hook called with the 1-based attempt number and either the caught exception or `None` after success.
+- `before_attempt`: optional hook called with the 1-based attempt number before each call. Async retry wrappers await the hook if it returns an awaitable.
+- `after_attempt`: optional hook called with the 1-based attempt number and either the caught exception or `None` after success. Async retry wrappers await the hook if it returns an awaitable.
 - `sleep`: injectable sync or async sleep callable for tests and custom schedulers.
 
 Invalid configuration raises `ConfigurationError` at decoration time.
