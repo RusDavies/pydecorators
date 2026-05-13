@@ -13,7 +13,9 @@ Current public API:
 - `DiskCacheDropEvent`
 - `DiskCacheInspectionEntry`
 - `DiskCacheInspectionReport`
+- `DiskCacheIntegrityReport`
 - `DiskCacheMaintenanceReport`
+- `DiskCacheMetadata`
 - `DiskCachePreviewContext`
 - `CacheBackendClosedError`
 - `UnsupportedCacheSchemaVersionError`
@@ -25,6 +27,7 @@ Current public API:
 - `MemoryCacheBackend`
 - `cache_namespace`
 - `cache_result`
+- `redact_json_preview`
 - `CacheCoalescingInfo`
 - `CacheInfo`
 - `CacheKeyError`
@@ -163,7 +166,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `DiskCacheBackend`
 
-`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, `info`, `maintain`, read-only `inspect_entries`, and aggregate `inspect_aggregate`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, explicit maintenance cleanup, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, `info`, `cache_metadata`, `inspect_integrity`, `maintain`, read-only `inspect_entries`, and aggregate `inspect_aggregate`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, explicit maintenance cleanup, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping or strict corrupt-row raising, and SQLite WAL/busy-timeout configuration.
 
 ### `DiskCacheAggregateInspectionReport`
 
@@ -181,9 +184,21 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 `DiskCachePreviewContext` is passed to `preview_redactor` callbacks when `inspect_entries(include_payload_preview=True, preview_redactor=...)` is used. It contains the key digest, serializer content type, exception flag, and payload size.
 
+### `DiskCacheIntegrityReport`
+
+`DiskCacheIntegrityReport` is the immutable read-only summary returned by `DiskCacheBackend.inspect_integrity()`. It counts expired, corrupt, and serializer-mismatch rows without deleting them.
+
 ### `DiskCacheMaintenanceReport`
 
 `DiskCacheMaintenanceReport` is the immutable summary returned by `DiskCacheBackend.maintain()`. It reports `expired_rows_dropped`, `corrupt_rows_dropped`, `serializer_mismatch_rows_dropped`, and whether explicit SQLite `VACUUM` ran via `vacuumed`.
+
+### `DiskCacheMetadata`
+
+`DiskCacheMetadata` is the immutable metadata returned by `DiskCacheBackend.cache_metadata()`. It reports the cache path, schema version, serializer content type, busy timeout, and WAL setting for compatibility diagnostics.
+
+### `redact_json_preview`
+
+`redact_json_preview()` is a small preview-redactor helper for `DiskCacheBackend.inspect_entries(preview_redactor=...)`. It redacts obvious JSON keys such as `token`, `password`, `secret`, `api_key`, and `authorization`. Treat it as defense-in-depth, not a guarantee that previews are safe to publish.
 
 ### `circuit_breaker`
 

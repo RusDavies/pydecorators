@@ -2,7 +2,12 @@
 
 from pathlib import Path
 
-from useful_decorators import DiskCacheBackend, cache_result
+from useful_decorators import (
+    DiskCacheBackend,
+    JsonCacheSerializer,
+    cache_result,
+    redact_json_preview,
+)
 
 _CALLS = 0
 
@@ -173,6 +178,48 @@ def json_datetime_bytes_serializer_example(cache_path: Path) -> tuple[object, ob
         restored = entry.payload
         assert isinstance(restored, dict)
         return restored["created_at"], restored["digest"]
+    finally:
+        backend.close()
+
+
+def cli_style_inspection_json_example(cache_path: Path) -> dict[str, object]:
+    """Return safe-default machine-readable inspection data for a cache file."""
+
+    backend = DiskCacheBackend(cache_path, serializer=JsonCacheSerializer())
+    try:
+        backend.set_value("profile", {"id": "user-123", "token": "secret"})
+        aggregate = backend.inspect_aggregate()
+        metadata = backend.cache_metadata()
+        return {
+            "mode": aggregate.mode,
+            "sensitivity_warning": aggregate.sensitivity_warning,
+            "metadata": {
+                "schema_version": metadata.schema_version,
+                "serializer_content_type": metadata.serializer_content_type,
+            },
+            "total_entries": aggregate.total_entries,
+            "serializer_content_types": aggregate.serializer_content_types,
+            "includes_payload_previews": False,
+            "cli_help": (
+                "Default inspection output is aggregate-only; pass --rows and "
+                "--include-payload-preview explicitly for more sensitive output."
+            ),
+        }
+    finally:
+        backend.close()
+
+
+def preview_redaction_example(cache_path: Path) -> str | None:
+    """Use the built-in obvious JSON-key redactor for preview diagnostics."""
+
+    backend = DiskCacheBackend(cache_path, serializer=JsonCacheSerializer())
+    try:
+        backend.set_value("profile", {"id": "user-123", "token": "secret"})
+        report = backend.inspect_entries(
+            include_payload_preview=True,
+            preview_redactor=redact_json_preview,
+        )
+        return report.entries[0].payload_preview
     finally:
         backend.close()
 

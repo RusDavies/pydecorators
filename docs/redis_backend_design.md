@@ -51,3 +51,5 @@ Changing the Redis prefix, schema version, serializer format, or stats key namin
 ## Optional dependency behavior
 
 When the Redis backend is eventually implemented, importing the base package must not require Redis dependencies. Missing Redis extras should fail only when the Redis backend is imported or constructed, and the error message should point to the documented extra name.
+
+Until then, tests assert that the base package imports without Redis installed and that `useful_decorators.redis_backend` is not accidentally exposed as a public module before the optional backend exists.

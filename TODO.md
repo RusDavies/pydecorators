@@ -141,7 +141,7 @@
 
 ### Newly Implied Sliding TTL Follow-Ups
 
-- [ ] Consider exposing refreshed expiry timestamps in disk-cache diagnostics if operators ask for TTL debugging.
+- [x] Expose refreshed expiry timestamps in disk-cache diagnostics for TTL debugging.
 - [x] Consider documenting fixed-vs-sliding TTL tradeoffs in README if cache behavior questions recur.
 - [x] Add request coalescing design for duplicate concurrent misses.
 
@@ -195,7 +195,7 @@
 
 ### Newly Implied JSON Row Inspection Follow-Ups
 
-- [ ] Consider adding a CLI-style inspection recipe if users ask for operational cache debugging workflows.
+- [x] Add a CLI-style inspection recipe for operational cache debugging workflows.
 - [x] Document which SQLite columns are stable enough for debugging versus internal implementation detail before public release.
 
 ### Newly Implied SQLite Column Stability Follow-Ups
@@ -231,8 +231,8 @@
 
 ### Newly Implied Inspection CLI Safe Default Follow-Ups
 
-- [ ] Consider CLI help-text tests if a disk-cache inspection command is implemented.
-- [ ] Consider JSON-output safe-default tests if inspection CLI output becomes machine-readable.
+- [x] Add CLI-style help-text coverage for disk-cache inspection examples.
+- [x] Add JSON-output safe-default tests for machine-readable inspection output.
 - [x] Add explicit warning-channel policy before adding quiet/scripted inspection modes.
 - [x] Add tests that safe mode never invokes preview redactors.
 - [x] Document support-bundle metadata sensitivity even when previews are disabled.
@@ -265,12 +265,12 @@
 - [x] Add creation-time and mode metadata to `DiskCacheInspectionReport`.
 - [x] Document that future CI examples must not upload inspection reports by default.
 - [x] Document short retention defaults for generated inspection reports.
-- [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
+- [x] Add built-in obvious JSON key redaction as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
 
 ### Newly Implied Disk Schema Metadata Follow-Ups
 
-- [ ] Implement `cache_metadata` only if disk-cache file compatibility becomes a public release promise.
+- [x] Implement `cache_metadata` for disk-cache file compatibility diagnostics.
 - [x] Add strict schema-version startup tests before implementing disk-cache migrations.
 - [x] Add disk-cache-specific exception for unsupported future schema versions instead of reusing `ConfigurationError`.
 - [x] Document pickle trust-boundary warning in disk/Redis backend docs.
@@ -305,8 +305,8 @@
 
 ### Newly Implied Disk Drop Diagnostics Follow-Ups
 
-- [ ] Consider exposing structured dropped-row counters in `CacheInfo` or a disk-specific diagnostics API after user feedback.
-- [ ] Consider allowing operators to opt into raising instead of dropping corrupt rows if strict cache integrity becomes useful.
+- [x] Expose structured dropped-row counters through disk-specific `inspect_integrity()` diagnostics.
+- [x] Allow operators to opt into raising instead of dropping corrupt rows with `drop_corrupt_rows=False`.
 - [x] Add disk backend integrity-check/maintenance helper design.
 
 ### Newly Implied Disk Maintenance Helper Follow-Ups
@@ -591,12 +591,12 @@
 
 ### Newly Implied Disk Concurrency Smoke Follow-Ups
 
-- [ ] Consider a heavier long-running disk concurrency stress test outside default CI if SQLite locking bugs appear.
+- [x] Add a heavier long-running disk concurrency stress script outside default CI.
 
 ### Newly Implied Redis Backend Design Follow-Ups
 
 - [x] Decide Redis key prefix and stats-key naming before implementing `RedisCacheBackend`.
-- [ ] Add Redis extra dependency import-failure tests when the optional backend is implemented.
+- [x] Add Redis optional-dependency import policy tests before the optional backend is implemented.
 - [x] Reduce duplicate backend behavior tests now covered by the conformance suite.
 
 ## 4. `@retry`
