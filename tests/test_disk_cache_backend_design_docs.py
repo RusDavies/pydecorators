@@ -256,13 +256,13 @@ def test_disk_cache_backend_design_doc_covers_aggregate_inspection_report_design
         "serializer_content_types",
         "total_payload_bytes",
         "largest_payload_bytes",
-        "report_truncated",
+        "truncated",
         "should not include payload previews",
         "serialized keys",
         "key digests",
         "per-row timestamps",
         "Content types should be counted",
-        "Timestamp ranges should be coarse diagnostics",
+        "Timestamp ranges are omitted from the implemented aggregate report",
         "should not update hits, misses, TTL, LRU, or `last_accessed`",
     ]:
         assert required in text
@@ -330,11 +330,11 @@ def test_disk_cache_backend_design_doc_covers_timestamp_diagnostics_not_audit() 
 
     for required in [
         "## Aggregate timestamp diagnostics are not audit evidence",
-        "rough debugging questions",
-        "not audit logs",
-        "not proof of when the underlying business event happened",
-        "current cache expiry policy, not data retention policy",
-        "cache recency mechanics",
+        "intentionally omits per-row timestamp ranges",
+        "not cache-row activity, business events, access records, or compliance evidence",
+        "is report metadata, not proof of when cached work happened",
+        "remain available only in row-level",
+        "If aggregate timestamp ranges are ever added later",
         "Clock sources may be injectable",
         "Cache clearing, namespace changes, migrations, and manual SQLite edits",
         "diagnostics, not audit timestamps",
