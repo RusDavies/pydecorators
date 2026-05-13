@@ -1146,6 +1146,40 @@ def test_quality_gates_page_documents_full_gate_commands() -> None:
         assert command in text
 
 
+def test_quality_gates_document_optional_benchmark_script() -> None:
+    text = Path("docs/quality_gates.md").read_text()
+
+    assert "python scripts/benchmark_decorators.py" in text
+    assert "outside default CI" in text
+
+
+def test_future_extension_decisions_record_deferred_api_choices() -> None:
+    text = Path("docs/future_extension_decisions.md").read_text()
+
+    for required in [
+        "JSON datetime/bytes adapter helper",
+        "no public tag/version compatibility promise yet",
+        "Planning document navigation",
+        "Docs-policy CI path filtering",
+        "Retry hook context objects",
+        "Circuit breaker fallback callbacks",
+        "Redis conformance suite timing",
+    ]:
+        assert required in text
+
+
+def test_docs_site_plan_defers_generator_until_needed() -> None:
+    text = Path("docs/docs_site_plan.md").read_text()
+
+    for required in [
+        "Do not add MkDocs, Sphinx, Astro",
+        "Markdown-first authoring",
+        "Minimum launch checklist",
+        "redirect/anchor policy",
+    ]:
+        assert required in text
+
+
 def test_docs_example_index_checker_is_in_docs_policy_script() -> None:
     script = Path("scripts/docs-policy.sh").read_text()
 

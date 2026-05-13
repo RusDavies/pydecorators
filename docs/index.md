@@ -10,6 +10,8 @@ Start here when navigating the Useful Decorators documentation.
 - [API reference](API_REFERENCE.md) — compact reference for exported decorators, cache APIs, data types, and exceptions.
 - [Decorator composition](composition.md) — practical guidance for stacking wrappers and choosing retry/logging/timing/rate-limit semantics.
 - [Quality gates](quality_gates.md) — local verification commands, Hatch aliases, and release-prep gate meaning.
+- [Documentation site plan](docs_site_plan.md) — site-generator deferral, launch checklist, and Markdown-first docs posture.
+- [Future extension decisions](future_extension_decisions.md) — explicit deferrals for conditional API and tooling ideas.
 - [Release note template](release_note_template.md) — compatibility wording for release notes.
 - [Security hardening guide](security_hardening.md) — cache, logging, validation, and in-process control safety checklist.
 - [Markdown anchor policy](markdown_anchor_policy.md) — heading-anchor assumptions used by docs-link policy tests.
@@ -39,6 +41,7 @@ Start here when navigating the Useful Decorators documentation.
 Executable documentation examples live under [`examples/`](examples/):
 
 - [`circuit_breaker_examples.py`](examples/circuit_breaker_examples.py)
+- [`cli_examples.py`](examples/cli_examples.py)
 - [`composition_examples.py`](examples/composition_examples.py)
 - [`deprecated_examples.py`](examples/deprecated_examples.py)
 - [`disk_cache_backend_examples.py`](examples/disk_cache_backend_examples.py)

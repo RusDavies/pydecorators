@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import pickle
 import sqlite3
+import sys
 from collections import OrderedDict
 from collections.abc import Callable, Hashable
 from contextlib import suppress
@@ -1040,6 +1042,33 @@ def cache_namespace(name: str, version: int | str) -> str:
         if ":" in normalized_version:
             raise ConfigurationError("cache namespace version must not contain ':'")
     return f"{normalized_name}:{normalized_version}"
+
+
+def cache_directory(app_name: str, *, base_path: str | Path | None = None) -> Path:
+    """Return a conventional per-application cache directory path.
+
+    The helper does not create the directory. It only centralizes the boring
+    platform/env-var selection used by docs and examples.
+    """
+
+    normalized_name = app_name.strip()
+    if not normalized_name:
+        raise ConfigurationError("cache directory app name must not be empty")
+    if Path(normalized_name).name != normalized_name:
+        raise ConfigurationError("cache directory app name must be a single path segment")
+
+    if base_path is not None:
+        return Path(base_path).expanduser() / normalized_name
+
+    if sys.platform == "win32":
+        root = os.environ.get("LOCALAPPDATA")
+        base = Path(root).expanduser() if root else Path.home() / "AppData" / "Local"
+    elif sys.platform == "darwin":
+        base = Path.home() / "Library" / "Caches"
+    else:
+        root = os.environ.get("XDG_CACHE_HOME")
+        base = Path(root).expanduser() if root else Path.home() / ".cache"
+    return base / normalized_name
 
 
 def _default_cache_key(

@@ -40,6 +40,14 @@ python scripts/dogfood_external_project.py
 - `python scripts/dogfood_local_wheel.py`: local wheel dogfood scenarios across the first-release decorators.
 - `python scripts/dogfood_external_project.py`: wheel dogfood against a separate workspace project.
 
+## Optional benchmark suite
+
+```bash
+python scripts/benchmark_decorators.py --iterations 100000 --rounds 5
+```
+
+The benchmark script is intentionally outside default CI. Use it for rough local before/after comparisons when changing wrapper internals, not as a hard performance contract.
+
 ## Release posture
 
 Passing the full gate means the local package is mechanically healthy. It does not mean publish immediately. Before TestPyPI or PyPI, re-run the package-name availability check and confirm publishing credentials/protected environments are ready.
