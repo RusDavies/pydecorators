@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from useful_decorators import DiskCacheBackend, JsonCacheSerializer
-from useful_decorators.exceptions import ConfigurationError
+from useful_decorators.exceptions import ConfigurationError, UnsupportedCacheSchemaVersionError
 
 
 def table_names(path: Path) -> set[str]:
@@ -42,7 +42,7 @@ def test_disk_cache_backend_rejects_unsupported_future_schema_version(tmp_path: 
         connection.execute("PRAGMA user_version = 999")
 
     with pytest.raises(
-        ConfigurationError,
+        UnsupportedCacheSchemaVersionError,
         match="disk cache schema version is newer than this package supports",
     ):
         DiskCacheBackend(db_path)

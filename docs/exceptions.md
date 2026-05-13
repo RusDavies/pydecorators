@@ -14,6 +14,7 @@ Use the most specific exception when you can recover from a known condition. Cat
 | `CacheKeyError` | `TypeError`, `UsefulDecoratorsError` | `@cache_result` cannot build a hashable cache key. |
 | `CacheSerializationError` | `UsefulDecoratorsError` | Cache payload serialization or deserialization fails. |
 | `CacheBackendClosedError` | `UsefulDecoratorsError` | A closeable cache backend such as `DiskCacheBackend` is used after `close()`. |
+| `UnsupportedCacheSchemaVersionError` | `UsefulDecoratorsError` | A persistent cache file uses a newer schema version than this package supports. |
 | `RateLimitExceeded` | `UsefulDecoratorsError` | A future rate-limited call exceeds its configured allowance. |
 | `FunctionTimedOut` | `TimeoutError`, `UsefulDecoratorsError` | A future timeout-decorated function exceeds its configured timeout. |
 | `EnvRequirementError` | `RuntimeError` | `@require_env` finds a missing or invalid required environment variable. |
@@ -93,6 +94,18 @@ backend.close()
 try:
     backend.info()
 except CacheBackendClosedError:
+    ...
+```
+
+### `UnsupportedCacheSchemaVersionError`
+
+```python
+from useful_decorators import DiskCacheBackend, UnsupportedCacheSchemaVersionError
+
+try:
+    DiskCacheBackend(".cache/example.sqlite3")
+except UnsupportedCacheSchemaVersionError:
+    # Upgrade useful-decorators, choose a compatible cache file, or rebuild the cache.
     ...
 ```
 

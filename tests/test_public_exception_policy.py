@@ -43,6 +43,7 @@ def test_public_exception_inheritance_matches_documentation() -> None:
         useful_decorators.CacheKeyError: "TypeError",
         useful_decorators.CacheSerializationError: "UsefulDecoratorsError",
         useful_decorators.CacheBackendClosedError: "UsefulDecoratorsError",
+        useful_decorators.UnsupportedCacheSchemaVersionError: "UsefulDecoratorsError",
     }
 
     for exception_type, expected_phrase in inheritance_phrases.items():

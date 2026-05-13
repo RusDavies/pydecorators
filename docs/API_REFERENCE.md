@@ -97,6 +97,7 @@ Enum with `CLOSED`, `OPEN`, and `HALF_OPEN` states.
 - `CacheKeyError`
 - `CacheSerializationError`
 - `CacheBackendClosedError`
+- `UnsupportedCacheSchemaVersionError`
 - `RateLimitExceeded`
 - `FunctionTimedOut`
 - `EnvRequirementError`
