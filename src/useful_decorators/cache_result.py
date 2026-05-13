@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import pickle
 import sqlite3
@@ -26,6 +27,7 @@ from useful_decorators.exceptions import (
 _KW_MARKER = object()
 _TYPE_MARKER = object()
 _DISK_CACHE_SCHEMA_VERSION = 1
+_MAX_PAYLOAD_PREVIEW_BYTES = 4096
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,6 +59,46 @@ class DiskCacheMaintenanceReport:
     corrupt_rows_dropped: int
     serializer_mismatch_rows_dropped: int
     vacuumed: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class DiskCachePreviewContext:
+    """Context passed to disk-cache payload preview redactors."""
+
+    key_sha256: str
+    serializer_content_type: str
+    is_exception: bool
+    payload_size_bytes: int
+
+
+@dataclass(frozen=True, slots=True)
+class DiskCacheInspectionEntry:
+    """Read-only diagnostic entry returned by ``DiskCacheBackend.inspect_entries()``."""
+
+    key_sha256: str
+    is_exception: bool
+    serializer_content_type: str
+    payload_preview: str | None
+    payload_size_bytes: int
+    created_at: float
+    last_accessed: float
+    expires_at: float | None
+
+
+@dataclass(frozen=True, slots=True)
+class DiskCacheInspectionReport:
+    """Read-only diagnostic report returned by ``DiskCacheBackend.inspect_entries()``."""
+
+    entries: tuple[DiskCacheInspectionEntry, ...]
+    total_entries: int
+    truncated: bool
+    preview_redaction_failures: int = 0
+    sensitivity_warning: str = "Cache inspection reports may expose sensitive metadata."
+    created_at: float = 0.0
+    mode: str = "metadata"
+
+
+PreviewRedactor = Callable[[str, DiskCachePreviewContext], str]
 
 
 @dataclass(slots=True)
@@ -492,6 +534,98 @@ class DiskCacheBackend:
                 vacuumed=vacuum,
             )
 
+    def inspect_entries(
+        self,
+        *,
+        limit: int = 100,
+        include_payload_preview: bool = False,
+        payload_preview_bytes: int = 512,
+        preview_redactor: PreviewRedactor | None = None,
+    ) -> DiskCacheInspectionReport:
+        """Return read-only diagnostics for cache rows without exposing raw keys."""
+
+        if limit < 1:
+            raise ConfigurationError("limit must be a positive integer")
+        if payload_preview_bytes < 0 or payload_preview_bytes > _MAX_PAYLOAD_PREVIEW_BYTES:
+            raise ConfigurationError(
+                f"payload_preview_bytes must be between 0 and {_MAX_PAYLOAD_PREVIEW_BYTES}"
+            )
+        if preview_redactor is not None and not callable(preview_redactor):
+            raise ConfigurationError("preview_redactor must be callable when provided")
+
+        with self._lock:
+            self._ensure_open()
+            rows = self._connection.execute(
+                """
+                SELECT key, payload, is_exception, serializer_content_type,
+                       created_at, last_accessed, expires_at
+                FROM cache_entries
+                ORDER BY last_accessed DESC, created_at DESC
+                LIMIT ?
+                """,
+                (limit + 1,),
+            ).fetchall()
+            [total_entries] = self._connection.execute(
+                "SELECT COUNT(*) FROM cache_entries"
+            ).fetchone()
+
+        redaction_failures = 0
+        entries: list[DiskCacheInspectionEntry] = []
+        for row in rows[:limit]:
+            (
+                key,
+                payload,
+                is_exception,
+                serializer_content_type,
+                created_at,
+                last_accessed,
+                expires_at,
+            ) = row
+            key_sha256 = hashlib.sha256(bytes(key)).hexdigest()
+            payload_size_bytes = len(payload)
+            payload_preview: str | None = None
+            if include_payload_preview:
+                payload_preview = _payload_preview(payload, payload_preview_bytes)
+                if preview_redactor is not None:
+                    context = DiskCachePreviewContext(
+                        key_sha256=key_sha256,
+                        serializer_content_type=serializer_content_type,
+                        is_exception=bool(is_exception),
+                        payload_size_bytes=payload_size_bytes,
+                    )
+                    try:
+                        payload_preview = preview_redactor(payload_preview, context)
+                    except Exception:
+                        redaction_failures += 1
+                        payload_preview = None
+            entries.append(
+                DiskCacheInspectionEntry(
+                    key_sha256=key_sha256,
+                    is_exception=bool(is_exception),
+                    serializer_content_type=serializer_content_type,
+                    payload_preview=payload_preview,
+                    payload_size_bytes=payload_size_bytes,
+                    created_at=created_at,
+                    last_accessed=last_accessed,
+                    expires_at=expires_at,
+                )
+            )
+
+        return DiskCacheInspectionReport(
+            entries=tuple(entries),
+            total_entries=total_entries,
+            truncated=len(rows) > limit,
+            preview_redaction_failures=redaction_failures,
+            created_at=self._clock(),
+            mode="preview" if include_payload_preview else "metadata",
+            sensitivity_warning=(
+                "Cache inspection reports may expose sensitive cached metadata "
+                "and payload previews."
+                if include_payload_preview
+                else "Cache inspection reports may expose sensitive cached metadata."
+            ),
+        )
+
     def info(self) -> CacheInfo:
         """Return current cache statistics after pruning expired entries."""
 
@@ -677,6 +811,12 @@ class DiskCacheBackend:
                 """
             )
             self._connection.execute(f"PRAGMA user_version = {_DISK_CACHE_SCHEMA_VERSION}")
+
+
+def _payload_preview(payload: bytes, limit: int) -> str:
+    preview = payload[:limit]
+    suffix = "…" if len(payload) > limit else ""
+    return preview.decode("utf-8", errors="replace") + suffix
 
 
 def _ensure_hashable(value: object) -> Hashable:

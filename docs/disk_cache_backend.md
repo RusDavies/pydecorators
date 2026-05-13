@@ -225,11 +225,19 @@ Safe rule: inspect `payload` and `serializer_content_type` to answer “what did
 
 If users need stable tooling beyond ad hoc SQLite debugging, add an explicit inspection API instead of promoting direct table scraping. The API should expose cache diagnostics without making SQLite layout, serialized keys, or private timestamp mechanics part of the public contract.
 
-Tentative public shape:
+Public shape:
 
 ```python
 @dataclass(frozen=True)
+class DiskCachePreviewContext:
+    key_sha256: str
+    serializer_content_type: str
+    is_exception: bool
+    payload_size_bytes: int
+
+@dataclass(frozen=True)
 class DiskCacheInspectionEntry:
+    key_sha256: str
     is_exception: bool
     serializer_content_type: str
     payload_preview: str | None
@@ -243,6 +251,10 @@ class DiskCacheInspectionReport:
     entries: tuple[DiskCacheInspectionEntry, ...]
     total_entries: int
     truncated: bool
+    preview_redaction_failures: int
+    sensitivity_warning: str
+    created_at: float
+    mode: str
 
 report = backend.inspect_entries(limit=100, include_payload_preview=True)
 ```
@@ -251,23 +263,23 @@ Design constraints:
 
 - The method should be read-only. Mutation belongs to `clear()`, `cache_clear()`, and future `maintain()`/repair-style APIs.
 - It should not expose serialized `key` bytes by default. If key diagnostics are needed later, expose a redacted digest such as `key_sha256`, not a parseable implementation artifact.
-- Payload previews should be best-effort and bounded. For JSON-like serializers, previews may decode UTF-8 and truncate safely. For pickle or unknown binary serializers, previews should default to `None` or a small diagnostic marker rather than deserializing arbitrary objects.
+- Payload previews are best-effort and bounded. Previews decode bounded bytes as UTF-8 with replacement and never deserialize payloads.
 - It should report serializer content type and payload byte size without requiring payload deserialization.
 - It should avoid promising exact LRU/TTL timing semantics beyond “these are the backend’s current stored timestamps.”
 - It should have explicit `limit`/pagination behavior so accidental inspection does not scan huge cache files by default.
-- It should return structured data suitable for a future CLI, not preformatted log text.
+- It returns structured data suitable for a future CLI, not preformatted log text.
 
 ## Bounded payload preview policy design
 
-Any future inspection API that exposes payload previews must be deliberately boring and safe. Previewing cache rows is for operator/debugging visibility, not for reconstructing cached values or bypassing serializer boundaries.
+The inspection API exposes payload previews deliberately and boringly. Previewing cache rows is for operator/debugging visibility, not for reconstructing cached values or bypassing serializer boundaries.
 
-Proposed default policy:
+Implemented default policy:
 
 - `include_payload_preview=False` by default for the first public inspection API. Callers must opt in.
-- `payload_preview_max_bytes=256` by default, with a documented upper bound such as `4096` bytes.
-- Truncation should happen by bytes before display formatting, and the result should include `payload_preview_truncated: bool` so callers do not mistake previews for complete payloads.
-- UTF-8 JSON serializers may decode previews with `errors="replace"` after byte truncation. Invalid UTF-8 should never fail inspection.
-- Binary, pickle, and unknown serializers should not be deserialized for previews. They should return `payload_preview=None` plus payload size/content-type metadata, or a small marker such as `<binary payload: 128 bytes>`.
+- `payload_preview_bytes=512` by default, with a hard upper bound of `4096` bytes.
+- Truncation happens by bytes before display formatting and appends `…` when truncated.
+- Preview bytes decode with `errors="replace"`; invalid UTF-8 never fails inspection.
+- Binary, pickle, and unknown serializers are never deserialized for previews.
 - Pickle previews must never call `pickle.loads()`. The whole point is to avoid accidentally turning a diagnostic endpoint into a haunted object launcher.
 - Previews should not include serialized cache keys. If key correlation is needed later, use a redacted digest such as `key_sha256`.
 - Preview generation should be side-effect free and should not update `last_accessed`, hits, misses, TTL, or LRU state.
@@ -447,19 +459,18 @@ Pre-implementation tests should cover:
 
 ## `preview_redactor` callback design
 
-If payload previews become part of `DiskCacheBackend.inspect_entries()`, redaction should be caller-owned and explicit. A callback gives applications a place to apply domain-specific policy without pretending the library can magically recognize every secret shaped like a cursed potato.
+Payload preview redaction is caller-owned and explicit. A callback gives applications a place to apply domain-specific policy without pretending the library can magically recognize every secret shaped like a cursed potato.
 
-Tentative callback shape:
+Callback shape:
 
 ```python
 @dataclass(frozen=True)
 class DiskCachePreviewContext:
     serializer_content_type: str
     payload_size_bytes: int
-    payload_preview_truncated: bool
     is_exception: bool
 
-PreviewRedactor = Callable[[str, DiskCachePreviewContext], str | None]
+PreviewRedactor = Callable[[str, DiskCachePreviewContext], str]
 
 report = backend.inspect_entries(
     include_payload_preview=True,
@@ -471,7 +482,7 @@ Callback semantics:
 
 - The callback receives the already bounded/decoded preview string, never raw payload bytes.
 - Returning a string uses that value as the preview.
-- Returning `None` suppresses the preview for that row.
+- If the callback raises, the preview is suppressed for that row and `preview_redaction_failures` increments.
 - The callback receives metadata only; it should not receive serialized keys.
 - The callback should run after truncation and basic decoding so it cannot accidentally request unbounded payload material.
 - Redaction must preserve separate metadata such as `payload_preview_truncated`, `payload_size_bytes`, and `serializer_content_type`.

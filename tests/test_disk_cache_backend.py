@@ -7,7 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from useful_decorators import DiskCacheBackend, JsonCacheSerializer
+from useful_decorators import (
+    DiskCacheBackend,
+    DiskCacheInspectionReport,
+    DiskCachePreviewContext,
+    JsonCacheSerializer,
+)
 from useful_decorators.exceptions import ConfigurationError, UnsupportedCacheSchemaVersionError
 
 
@@ -488,6 +493,123 @@ def test_disk_cache_backend_maintenance_can_vacuum(tmp_path: Path) -> None:
         report = backend.maintain(vacuum=True)
 
         assert report.vacuumed is True
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_inspects_entries_without_raw_keys_or_previews_by_default(
+    tmp_path: Path,
+) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", serializer=JsonCacheSerializer())
+    try:
+        backend.set_value("user:1", {"token": "secret", "name": "Ada"})
+        report = backend.inspect_entries()
+
+        assert isinstance(report, DiskCacheInspectionReport)
+        assert report.total_entries == 1
+        assert report.truncated is False
+        assert report.mode == "metadata"
+        assert "metadata" in report.sensitivity_warning
+        [entry] = report.entries
+        assert len(entry.key_sha256) == 64
+        assert entry.key_sha256 != "user:1"
+        assert entry.payload_preview is None
+        assert entry.payload_size_bytes > 0
+        assert entry.serializer_content_type == "application/json"
+        assert entry.created_at == entry.last_accessed
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_inspection_supports_bounded_redacted_payload_previews(
+    tmp_path: Path,
+) -> None:
+    seen_contexts: list[DiskCachePreviewContext] = []
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", serializer=JsonCacheSerializer())
+    try:
+        backend.set_value("user:1", {"token": "secret", "name": "Ada"})
+
+        def redact(preview: str, context: DiskCachePreviewContext) -> str:
+            seen_contexts.append(context)
+            return preview.replace("secret", "<redacted>")
+
+        report = backend.inspect_entries(
+            include_payload_preview=True,
+            payload_preview_bytes=30,
+            preview_redactor=redact,
+        )
+
+        [entry] = report.entries
+        assert report.mode == "preview"
+        assert "payload previews" in report.sensitivity_warning
+        assert entry.payload_preview is not None
+        assert "<redacted>" in entry.payload_preview
+        assert "secret" not in entry.payload_preview
+        assert entry.payload_preview.endswith("…")
+        assert seen_contexts[0].key_sha256 == entry.key_sha256
+        assert seen_contexts[0].payload_size_bytes == entry.payload_size_bytes
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_inspection_tracks_redaction_failures(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", serializer=JsonCacheSerializer())
+    try:
+        backend.set_value("user:1", {"token": "secret"})
+
+        def broken_redactor(preview: str, context: DiskCachePreviewContext) -> str:
+            raise RuntimeError("redactor failed")
+
+        report = backend.inspect_entries(
+            include_payload_preview=True,
+            preview_redactor=broken_redactor,
+        )
+
+        assert report.preview_redaction_failures == 1
+        assert report.entries[0].payload_preview is None
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_inspection_safe_mode_does_not_call_redactor(tmp_path: Path) -> None:
+    called = False
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3", serializer=JsonCacheSerializer())
+    try:
+        backend.set_value("user:1", {"token": "secret"})
+
+        def redactor(preview: str, context: DiskCachePreviewContext) -> str:
+            nonlocal called
+            called = True
+            return preview
+
+        report = backend.inspect_entries(preview_redactor=redactor)
+
+        assert report.mode == "metadata"
+        assert report.entries[0].payload_preview is None
+        assert called is False
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_inspection_enforces_limits_and_reports_truncation(
+    tmp_path: Path,
+) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
+    try:
+        backend.set_value("first", "one")
+        backend.set_value("second", "two")
+
+        report = backend.inspect_entries(limit=1)
+
+        assert report.total_entries == 2
+        assert report.truncated is True
+        assert len(report.entries) == 1
+        with pytest.raises(ConfigurationError, match="limit must be a positive integer"):
+            backend.inspect_entries(limit=0)
+        with pytest.raises(ConfigurationError, match="payload_preview_bytes must be between"):
+            backend.inspect_entries(payload_preview_bytes=4097)
+        with pytest.raises(ConfigurationError, match="preview_redactor must be callable"):
+            backend.inspect_entries(preview_redactor=object())  # type: ignore[arg-type]
     finally:
         backend.close()
 

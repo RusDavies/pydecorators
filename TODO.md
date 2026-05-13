@@ -204,14 +204,14 @@
 
 ### Newly Implied Cache Inspection API Follow-Ups
 
-- [ ] Implement `DiskCacheBackend.inspect_entries()` only if stable inspection tooling becomes part of public scope.
-- [ ] Consider adding redacted key digests such as `key_sha256` if operators need to correlate rows without exposing serialized keys.
+- [x] Implement `DiskCacheBackend.inspect_entries()` for stable read-only diagnostics.
+- [x] Add redacted `key_sha256` digests for correlating rows without exposing serialized keys.
 - [x] Add bounded payload preview policy design/tests before implementing any inspection API.
 
 ### Newly Implied Bounded Payload Preview Follow-Ups
 
-- [ ] Implement payload preview helper tests only if `DiskCacheBackend.inspect_entries()` enters public scope.
-- [ ] Consider making preview byte limits configurable only within a hard maximum.
+- [x] Add payload preview helper tests for `DiskCacheBackend.inspect_entries()`.
+- [x] Make preview byte limits configurable within a hard maximum.
 - [x] Document redaction expectations for payload previews that may contain sensitive cached data.
 
 ### Newly Implied Payload Preview Redaction Follow-Ups
@@ -220,9 +220,9 @@
 
 ### Newly Implied Preview Redactor Callback Follow-Ups
 
-- [ ] Consider adding `DiskCachePreviewContext` only if `inspect_entries()` enters public scope.
-- [ ] Consider tracking redaction failure counts in a future inspection report.
-- [ ] Consider documenting whether built-in redaction policies run before or after caller-provided redactors if both are ever supported.
+- [x] Add `DiskCachePreviewContext` for inspection preview redactors.
+- [x] Track redaction failure counts in `DiskCacheInspectionReport`.
+- [x] Document preview redaction order and avoid built-in redaction policy for now.
 - [x] Document no-previews mode for support bundles and CI artifacts if inspection tooling is added.
 
 ### Newly Implied No-Preview Safe Mode Follow-Ups
@@ -234,7 +234,7 @@
 - [ ] Consider CLI help-text tests if a disk-cache inspection command is implemented.
 - [ ] Consider JSON-output safe-default tests if inspection CLI output becomes machine-readable.
 - [x] Add explicit warning-channel policy before adding quiet/scripted inspection modes.
-- [ ] Consider adding tests that safe mode never invokes preview redactors if inspection tooling is implemented.
+- [x] Add tests that safe mode never invokes preview redactors.
 - [x] Document support-bundle metadata sensitivity even when previews are disabled.
 
 ### Newly Implied Support Bundle Metadata Follow-Ups
@@ -255,14 +255,14 @@
 
 ### Newly Implied Inspection Warning Follow-Ups
 
-- [ ] Consider adding a `sensitivity_warning` field to any future machine-readable inspection report.
+- [x] Add `sensitivity_warning` to `DiskCacheInspectionReport`.
 - [ ] Consider tests that preview-enabled CLI output uses stronger warnings than aggregate-only output.
 - [ ] Consider documenting approved quiet-mode warning channels before adding scripted inspection output.
 - [x] Add retention/deletion guidance for generated cache inspection reports if support tooling is added.
 
 ### Newly Implied Inspection Report Retention Follow-Ups
 
-- [ ] Consider adding creation-time and mode metadata to any future inspection report artifact.
+- [x] Add creation-time and mode metadata to `DiskCacheInspectionReport`.
 - [ ] Consider tests that future CI examples do not upload inspection reports by default.
 - [ ] Consider documenting short retention defaults if support-bundle generation is implemented.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
