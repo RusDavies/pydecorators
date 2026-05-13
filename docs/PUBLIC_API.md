@@ -24,6 +24,7 @@ Current public API:
 - `CacheBackend`
 - `MemoryCacheBackend`
 - `cache_result`
+- `CacheCoalescingInfo`
 - `CacheInfo`
 - `CacheKeyError`
 - `deprecated`
@@ -89,6 +90,10 @@ See `docs/exceptions.md` for a centralized public exception reference.
 `ConfigurationError` is raised when a decorator or backend receives invalid configuration, such as an unsupported async callable for `cache_result`, a non-positive TTL, or an invalid cache namespace. It inherits from `ValueError` and `UsefulDecoratorsError`.
 
 Example: `cache_result(namespace="   ")` raises `ConfigurationError` because namespaces must not be empty.
+
+### `CacheCoalescingInfo`
+
+`CacheCoalescingInfo` is the immutable duplicate-miss coalescing diagnostic object returned by `@cache_result` wrappers via `cache_coalescing_info()`. It exposes `current_in_flight`, `total_waiters`, and `total_wait_seconds` so operators can see whether `coalesce_misses=True` is actually causing callers to wait behind a shared producer.
 
 ### `CacheInfo`
 

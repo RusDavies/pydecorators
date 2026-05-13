@@ -41,6 +41,15 @@ class CacheInfo:
 
 
 @dataclass(frozen=True, slots=True)
+class CacheCoalescingInfo:
+    """Duplicate-miss coalescing diagnostics exposed by cached functions."""
+
+    current_in_flight: int
+    total_waiters: int
+    total_wait_seconds: float
+
+
+@dataclass(frozen=True, slots=True)
 class DiskCacheDropEvent:
     """Diagnostic event for a disk-cache row dropped during lookup."""
 
@@ -980,6 +989,16 @@ def cache_result(
 
         in_flight_lock = RLock()
         in_flight: dict[Hashable, Event] = {}
+        total_waiters = 0
+        total_wait_seconds = 0.0
+
+        def cache_coalescing_info() -> CacheCoalescingInfo:
+            with in_flight_lock:
+                return CacheCoalescingInfo(
+                    current_in_flight=len(in_flight),
+                    total_waiters=total_waiters,
+                    total_wait_seconds=total_wait_seconds,
+                )
 
         def cached_entry_value(entry: _CacheEntry) -> R:
             if entry.is_exception:
@@ -1000,6 +1019,8 @@ def cache_result(
             return result
 
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            nonlocal total_wait_seconds, total_waiters
+
             cache_key = make_key(cast(tuple[object, ...], args), cast(dict[str, object], kwargs))
             entry = cache_backend.get(cache_key)
             if entry is not None:
@@ -1032,7 +1053,12 @@ def cache_result(
                                 in_flight.pop(cache_key, None)
                             in_flight_event.set()
 
+                wait_started = monotonic()
                 in_flight_event.wait()
+                wait_seconds = monotonic() - wait_started
+                with in_flight_lock:
+                    total_waiters += 1
+                    total_wait_seconds += wait_seconds
                 entry = cache_backend.get(cache_key)
                 if entry is not None:
                     return cached_entry_value(entry)
@@ -1041,6 +1067,7 @@ def cache_result(
         wrapped_with_cache_api = cast(Any, wrapped)
         wrapped_with_cache_api.cache_info = cache_info
         wrapped_with_cache_api.cache_clear = cache_clear
+        wrapped_with_cache_api.cache_coalescing_info = cache_coalescing_info
         return wrapped
 
     return decorator
