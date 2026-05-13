@@ -491,7 +491,7 @@
 ### Newly Implied Docs Policy Helpers Follow-Ups
 
 - [x] Add unit tests for Markdown helper edge cases if link parsing grows more sophisticated.
-- [ ] Consider supporting reference-style Markdown links if docs begin using them.
+- [x] Consider supporting reference-style Markdown links if docs begin using them.
 - [x] Decide whether external HTTP links should be syntax-checked or left unchecked.
 
 ### Newly Implied External Link Policy Follow-Ups

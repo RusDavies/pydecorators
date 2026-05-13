@@ -36,7 +36,14 @@ def public_example_functions(example_path: Path) -> set[str]:
 
 
 def markdown_links(path: Path) -> list[str]:
-    return re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text())
+    text = path.read_text()
+    inline_links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+    reference_links = re.findall(
+        r"^\s*\[[^\]]+\]:\s+(\S+)",
+        text,
+        flags=re.MULTILINE,
+    )
+    return inline_links + reference_links
 
 
 def markdown_policy_files() -> list[Path]:
