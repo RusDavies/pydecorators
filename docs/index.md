@@ -11,6 +11,7 @@ Start here when navigating the Useful Decorators documentation.
 - [Decorator composition](composition.md) — practical guidance for stacking wrappers and choosing retry/logging/timing/rate-limit semantics.
 - [Quality gates](quality_gates.md) — local verification commands, Hatch aliases, and release-prep gate meaning.
 - [Security hardening guide](security_hardening.md) — cache, logging, validation, and in-process control safety checklist.
+- [Markdown anchor policy](markdown_anchor_policy.md) — heading-anchor assumptions used by docs-link policy tests.
 
 ## Decorator docs
 
