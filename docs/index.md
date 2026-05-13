@@ -10,6 +10,7 @@ Start here when navigating the Useful Decorators documentation.
 - [API reference](API_REFERENCE.md) — compact reference for exported decorators, cache APIs, data types, and exceptions.
 - [Decorator composition](composition.md) — practical guidance for stacking wrappers and choosing retry/logging/timing/rate-limit semantics.
 - [Quality gates](quality_gates.md) — local verification commands, Hatch aliases, and release-prep gate meaning.
+- [Release note template](release_note_template.md) — compatibility wording for release notes.
 - [Security hardening guide](security_hardening.md) — cache, logging, validation, and in-process control safety checklist.
 - [Markdown anchor policy](markdown_anchor_policy.md) — heading-anchor assumptions used by docs-link policy tests.
 - [Docs index exemption registry](docs_index_exemptions.md) — rules for intentional docs-index exclusions.
