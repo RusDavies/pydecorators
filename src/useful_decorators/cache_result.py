@@ -24,6 +24,7 @@ from useful_decorators.exceptions import (
 
 _KW_MARKER = object()
 _TYPE_MARKER = object()
+_DISK_CACHE_SCHEMA_VERSION = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -300,6 +301,7 @@ class DiskCacheBackend:
             timeout=busy_timeout_ms / 1000,
         )
         self._configure_connection()
+        self._check_schema_version()
         self._initialize_schema()
 
     def _configure_connection(self) -> None:
@@ -568,6 +570,14 @@ class DiskCacheBackend:
 
         return self._serializer.content_type
 
+    def _check_schema_version(self) -> None:
+        with self._lock:
+            [schema_version] = self._connection.execute("PRAGMA user_version").fetchone()
+            if schema_version > _DISK_CACHE_SCHEMA_VERSION:
+                raise ConfigurationError(
+                    "disk cache schema version is newer than this package supports"
+                )
+
     def _initialize_schema(self) -> None:
         with self._lock, self._connection:
             self._connection.execute(
@@ -598,6 +608,7 @@ class DiskCacheBackend:
                 VALUES (1, 0, 0)
                 """
             )
+            self._connection.execute(f"PRAGMA user_version = {_DISK_CACHE_SCHEMA_VERSION}")
 
 
 def _ensure_hashable(value: object) -> Hashable:
