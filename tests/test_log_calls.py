@@ -132,6 +132,26 @@ async def test_log_calls_supports_async_functions(caplog: pytest.LogCaptureFixtu
     assert "async_add finished" in joined
 
 
+@pytest.mark.asyncio
+async def test_log_calls_awaits_async_result_summarizer_for_async_functions(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    logger = logging.getLogger("tests.log_calls.async_summarizer")
+
+    async def summarize(result: object) -> object:
+        await asyncio.sleep(0)
+        return {"length": len(cast(list[int], result))}
+
+    @log_calls(logger=logger, include_result=True, summarize_result=summarize)
+    async def load_items() -> list[int]:
+        return [1, 2, 3]
+
+    with caplog.at_level(logging.INFO, logger=logger.name):
+        assert await load_items() == [1, 2, 3]
+
+    assert "result={'length': 3}" in "\n".join(messages(caplog))
+
+
 def test_log_calls_preserves_metadata() -> None:
     @log_calls()
     def documented(value: int) -> int:

@@ -713,7 +713,7 @@
 - [x] Support positional argument redaction by parameter name using `inspect.signature`.
 - [x] Consider structured log record extras for function name, duration, and outcome if logging integrations need machine-readable fields.
 - [x] Add executable docs examples for `@log_calls`.
-- [ ] Consider async-safe result summarizers only if users need asynchronous summarization hooks.
+- [x] Add async-safe result summarizers for async `@log_calls` wrappers.
 ### `@measure_time`
 
 - [x] Design signature.
