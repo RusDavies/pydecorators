@@ -74,7 +74,7 @@ def log_calls(
                         )
                     raise
                 duration = active_clock() - start
-                _log_finished(
+                await _log_finished_async(
                     active_logger,
                     level,
                     func.__qualname__,
@@ -190,15 +190,53 @@ def _log_finished(
     result: object,
 ) -> None:
     if not include_result:
-        logger.log(
-            level,
-            "%s finished in %.6g seconds",
-            name,
-            duration,
-            extra=_log_extra(name, event="finished", duration=duration, success=True),
-        )
+        _log_finished_without_result(logger, level, name, duration)
         return
     summary = summarize_result(result) if summarize_result else result
+    _log_finished_with_result(logger, level, name, duration, summary)
+
+
+async def _log_finished_async(
+    logger: logging.Logger,
+    level: int,
+    name: str,
+    duration: float,
+    *,
+    include_result: bool,
+    summarize_result: ResultSummarizer | None,
+    result: object,
+) -> None:
+    if not include_result:
+        _log_finished_without_result(logger, level, name, duration)
+        return
+    summary = summarize_result(result) if summarize_result else result
+    if inspect.isawaitable(summary):
+        summary = await summary
+    _log_finished_with_result(logger, level, name, duration, summary)
+
+
+def _log_finished_without_result(
+    logger: logging.Logger,
+    level: int,
+    name: str,
+    duration: float,
+) -> None:
+    logger.log(
+        level,
+        "%s finished in %.6g seconds",
+        name,
+        duration,
+        extra=_log_extra(name, event="finished", duration=duration, success=True),
+    )
+
+
+def _log_finished_with_result(
+    logger: logging.Logger,
+    level: int,
+    name: str,
+    duration: float,
+    summary: object,
+) -> None:
     logger.log(
         level,
         "%s finished in %.6g seconds result=%r",

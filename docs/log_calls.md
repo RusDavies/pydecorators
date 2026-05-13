@@ -18,7 +18,7 @@ def rebuild_index() -> None:
 - `include_args`: include positional args and keyword args in the start log. Defaults to `False`.
 - `include_result`: include the return value, or summarized return value, in the finish log. Defaults to `False`.
 - `redact_args`: argument names to replace with `"<redacted>"` when `include_args=True`; this covers keyword arguments and positional arguments whose parameter names can be resolved from the wrapped function signature.
-- `summarize_result`: optional callable used to turn the return value into a smaller or safer logged summary.
+- `summarize_result`: optional callable used to turn the return value into a smaller or safer logged summary. Async wrappers await the summary if the callable returns an awaitable.
 - `log_exceptions`: log failures with traceback via `logger.exception`. Defaults to `True`.
 - `clock`: injectable clock for duration tests.
 
