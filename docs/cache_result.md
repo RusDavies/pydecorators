@@ -249,7 +249,7 @@ Future backends should follow the same separation of responsibilities: the decor
 
 `@cache_result` accepts `backend=`. When omitted, the decorator creates a `MemoryCacheBackend` from `ttl`, `maxsize`, `refresh_ttl_on_hit`, and `clock`.
 
-When a backend is provided, the backend owns storage policy. The decorator still owns key generation, metadata preservation, exception-caching decisions, and sync/async rejection. Backend instances are intentionally reusable, but callers should usually provide one backend per decorated function unless they deliberately want shared storage.
+When a backend is provided, the backend owns storage policy. The decorator still owns key generation, metadata preservation, exception-caching decisions, and sync/async rejection. Provided backends are checked at configuration time by calling `info()`, so closed backends fail before the first decorated call. Backend instances are intentionally reusable, but callers should usually provide one backend per decorated function unless they deliberately want shared storage.
 
 ## Backend sharing and namespace behavior
 
