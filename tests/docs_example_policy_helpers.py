@@ -58,9 +58,8 @@ def public_example_functions(example_path: Path) -> set[str]:
     public_callables: set[str] = set()
 
     for node in tree.body:
-        if (
-            isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
-            and not node.name.startswith("_")
+        if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and not node.name.startswith(
+            "_"
         ):
             public_callables.add(node.name)
         if isinstance(node, ast.ClassDef) and not node.name.startswith("_"):
