@@ -843,6 +843,63 @@ def test_external_link_checker_can_allow_stale_ignore_patterns(
     assert "syntax-checked 1 external HTTP(S) link(s)" in result.stdout
 
 
+def test_external_link_checker_fails_for_expired_ignore_pattern(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[ignored](https://ignored.example.com/docs)\n")
+    (tmp_path / ".external-links-ignore").write_text(
+        "# Temporary vendor outage; expires: 2000-01-01\nhttps://ignored.example.com/*\n"
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert "ignore pattern expired on 2000-01-01" in result.stderr
+
+
+def test_external_link_checker_allows_future_ignore_expiration(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[ignored](https://ignored.example.com/docs)\n")
+    (tmp_path / ".external-links-ignore").write_text(
+        "# Temporary vendor outage; expires: 2999-01-01\nhttps://ignored.example.com/*\n"
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "ignored 1" in result.stdout
+
+
 def test_retry_docs_include_idempotency_guidance() -> None:
     text = Path("docs/retry.md").read_text()
 
