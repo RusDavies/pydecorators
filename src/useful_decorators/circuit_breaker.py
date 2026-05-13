@@ -5,6 +5,7 @@ from __future__ import annotations
 import enum
 from collections.abc import Callable
 from dataclasses import dataclass
+from threading import RLock
 from typing import Any, cast
 
 from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
@@ -48,29 +49,33 @@ def circuit_breaker(
     state = CircuitState.CLOSED
     failure_count = 0
     opened_at: float | None = None
+    lock = RLock()
 
     def current_state() -> CircuitState:
         nonlocal state, opened_at
-        if (
-            state is CircuitState.OPEN
-            and opened_at is not None
-            and active_clock() - opened_at >= reset_timeout
-        ):
-            state = CircuitState.HALF_OPEN
-        return state
+        with lock:
+            if (
+                state is CircuitState.OPEN
+                and opened_at is not None
+                and active_clock() - opened_at >= reset_timeout
+            ):
+                state = CircuitState.HALF_OPEN
+            return state
 
     def before_call() -> None:
-        current = current_state()
-        if current is CircuitState.OPEN:
-            assert opened_at is not None
-            elapsed = active_clock() - opened_at
-            raise CircuitBreakerOpen(max(0.0, reset_timeout - elapsed))
+        with lock:
+            current = current_state()
+            if current is CircuitState.OPEN:
+                assert opened_at is not None
+                elapsed = active_clock() - opened_at
+                raise CircuitBreakerOpen(max(0.0, reset_timeout - elapsed))
 
     def record_success() -> None:
         nonlocal state, failure_count, opened_at
-        state = CircuitState.CLOSED
-        failure_count = 0
-        opened_at = None
+        with lock:
+            state = CircuitState.CLOSED
+            failure_count = 0
+            opened_at = None
 
     def record_failure(exc: BaseException) -> None:
         nonlocal state, failure_count, opened_at
@@ -78,15 +83,16 @@ def circuit_breaker(
             return
         if exception_filter is not None and not exception_filter(exc):
             return
-        if state is CircuitState.HALF_OPEN:
-            state = CircuitState.OPEN
-            failure_count = failure_threshold
-            opened_at = active_clock()
-            return
-        failure_count += 1
-        if failure_count >= failure_threshold:
-            state = CircuitState.OPEN
-            opened_at = active_clock()
+        with lock:
+            if state is CircuitState.HALF_OPEN:
+                state = CircuitState.OPEN
+                failure_count = failure_threshold
+                opened_at = active_clock()
+                return
+            failure_count += 1
+            if failure_count >= failure_threshold:
+                state = CircuitState.OPEN
+                opened_at = active_clock()
 
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         if is_async_callable(func):
