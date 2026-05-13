@@ -148,6 +148,20 @@ def external_http_links(root: Path) -> dict[Path, list[str]]:
     return links_by_file
 
 
+def non_http_scheme_links(root: Path, allowed_schemes: set[str]) -> list[str]:
+    failures: list[str] = []
+    for docs_file in markdown_policy_files(root):
+        for link in markdown_links(docs_file):
+            parsed = urlparse(link)
+            if not parsed.scheme or parsed.scheme in {"http", "https"}:
+                continue
+            if parsed.scheme not in allowed_schemes:
+                failures.append(
+                    f"{docs_file}: unsupported external link scheme {parsed.scheme!r}: {link}"
+                )
+    return failures
+
+
 def is_retryable_status(status: int) -> bool:
     return status in {408, 429} or 500 <= status < 600
 
@@ -263,6 +277,13 @@ def main() -> int:
         action="store_true",
         help="emit a quiet machine-readable summary instead of human-readable output",
     )
+    parser.add_argument(
+        "--allow-scheme",
+        action="append",
+        default=[],
+        metavar="SCHEME",
+        help="allow an intentional non-HTTP Markdown link scheme such as mailto",
+    )
     args = parser.parse_args()
 
     root = args.root.resolve()
@@ -276,6 +297,26 @@ def main() -> int:
         return 1
 
     ignore_patterns = load_ignore_patterns(ignore_file)
+    scheme_failures = non_http_scheme_links(root, set(args.allow_scheme))
+    if scheme_failures:
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "mode": "syntax-checked" if args.syntax_only else "checked",
+                        "checked": 0,
+                        "ignored": 0,
+                        "failures": scheme_failures,
+                        "ok": False,
+                    },
+                    sort_keys=True,
+                )
+            )
+        else:
+            for failure in scheme_failures:
+                print(failure, file=sys.stderr)
+        return 1
+
     links_by_file = external_http_links(root)
     ignore_matches = ignore_pattern_matches(ignore_patterns, links_by_file)
     unmatched_patterns = [pattern for pattern, matches in ignore_matches.items() if not matches]
