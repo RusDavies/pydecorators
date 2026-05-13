@@ -10,6 +10,7 @@ Current public API:
 
 - `DiskCacheBackend`
 - `DiskCacheDropEvent`
+- `DiskCacheMaintenanceReport`
 - `CacheBackendClosedError`
 - `UnsupportedCacheSchemaVersionError`
 - `CacheSerializationError`
@@ -148,7 +149,11 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `DiskCacheBackend`
 
-`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, and `info`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+`DiskCacheBackend` is the SQLite-backed persistent cache backend. It implements `get`, `set_value`, `set_exception`, `clear`, `info`, and `maintain`; supports TTL expiry, LRU maxsize eviction, persistent values across backend instances, cached exceptions, explicit maintenance cleanup, context-manager cleanup, serializer content-type mismatch handling, corrupt-row dropping, and SQLite WAL/busy-timeout configuration.
+
+### `DiskCacheMaintenanceReport`
+
+`DiskCacheMaintenanceReport` is the immutable summary returned by `DiskCacheBackend.maintain()`. It reports `expired_rows_dropped`, `corrupt_rows_dropped`, `serializer_mismatch_rows_dropped`, and whether explicit SQLite `VACUUM` ran via `vacuumed`.
 
 ### `circuit_breaker`
 

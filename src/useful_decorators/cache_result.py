@@ -49,6 +49,16 @@ class DiskCacheDropEvent:
     exception: BaseException | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class DiskCacheMaintenanceReport:
+    """Summary returned by ``DiskCacheBackend.maintain()``."""
+
+    expired_rows_dropped: int
+    corrupt_rows_dropped: int
+    serializer_mismatch_rows_dropped: int
+    vacuumed: bool = False
+
+
 @dataclass(slots=True)
 class _CacheEntry:
     """Internal cache entry for values or cached exceptions."""
@@ -439,6 +449,49 @@ class DiskCacheBackend:
                 self._connection.execute("DELETE FROM cache_entries")
                 self._connection.execute("UPDATE cache_stats SET hits = 0, misses = 0 WHERE id = 1")
 
+    def maintain(self, *, vacuum: bool = False) -> DiskCacheMaintenanceReport:
+        """Drop expired/corrupt/incompatible rows and optionally run SQLite VACUUM."""
+
+        now = self._clock()
+        with self._lock:
+            self._ensure_open()
+            with self._connection:
+                expired_rows_dropped = self._delete_matching_rows(
+                    "expires_at IS NOT NULL AND expires_at <= ?",
+                    (now,),
+                )
+                serializer_mismatch_rows_dropped = self._delete_matching_rows(
+                    "serializer_content_type != ?",
+                    (self.serializer_content_type,),
+                )
+                corrupt_keys = [
+                    key
+                    for key, payload in self._connection.execute(
+                        """
+                        SELECT key, payload
+                        FROM cache_entries
+                        WHERE serializer_content_type = ?
+                        """,
+                        (self.serializer_content_type,),
+                    ).fetchall()
+                    if self._payload_is_corrupt(payload)
+                ]
+                corrupt_rows_dropped = 0
+                for key in corrupt_keys:
+                    cursor = self._connection.execute(
+                        "DELETE FROM cache_entries WHERE key = ?",
+                        (key,),
+                    )
+                    corrupt_rows_dropped += cursor.rowcount
+            if vacuum:
+                self._connection.execute("VACUUM")
+            return DiskCacheMaintenanceReport(
+                expired_rows_dropped=expired_rows_dropped,
+                corrupt_rows_dropped=corrupt_rows_dropped,
+                serializer_mismatch_rows_dropped=serializer_mismatch_rows_dropped,
+                vacuumed=vacuum,
+            )
+
     def info(self) -> CacheInfo:
         """Return current cache statistics after pruning expired entries."""
 
@@ -520,6 +573,20 @@ class DiskCacheBackend:
 
     def _record_miss(self) -> None:
         self._connection.execute("UPDATE cache_stats SET misses = misses + 1 WHERE id = 1")
+
+    def _delete_matching_rows(self, where_clause: str, parameters: tuple[object, ...]) -> int:
+        cursor = self._connection.execute(
+            f"DELETE FROM cache_entries WHERE {where_clause}",
+            parameters,
+        )
+        return cursor.rowcount
+
+    def _payload_is_corrupt(self, payload: bytes) -> bool:
+        try:
+            self._deserialize_payload(payload)
+        except CacheSerializationError:
+            return True
+        return False
 
     def _prune_expired(self) -> None:
         now = self._clock()

@@ -311,8 +311,8 @@
 
 ### Newly Implied Disk Maintenance Helper Follow-Ups
 
-- [ ] Implement `DiskCacheBackend.maintain()` and `DiskCacheMaintenanceReport` if operator maintenance becomes part of the public v0.1.0 scope.
-- [ ] Add tests for maintenance helper pruning expired rows, dropping corrupt payloads, reporting serializer mismatches, and explicit VACUUM behavior if implemented.
+- [x] Implement `DiskCacheBackend.maintain()` and `DiskCacheMaintenanceReport` if operator maintenance becomes part of the public v0.1.0 scope.
+- [x] Add tests for maintenance helper pruning expired rows, dropping corrupt payloads, reporting serializer mismatches, and explicit VACUUM behavior if implemented.
 - [x] Add disk backend SQLite operational tuning decision for WAL/busy timeout.
 
 ### Newly Implied Disk SQLite Tuning Follow-Ups

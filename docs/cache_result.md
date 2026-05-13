@@ -331,7 +331,7 @@ The Redis backend should remain a design item until there is a concrete user nee
 
 ## Disk backend implementation
 
-`DiskCacheBackend` implements the `CacheBackend` protocol using SQLite. It supports value and exception storage, TTL expiry, LRU maxsize eviction, persistent entries across backend instances, `clear()`, `info()`, context-manager cleanup, and package-specific `CacheBackendClosedError` failures after `close()`.
+`DiskCacheBackend` implements the `CacheBackend` protocol using SQLite. It supports value and exception storage, TTL expiry, LRU maxsize eviction, persistent entries across backend instances, `clear()`, `info()`, explicit `maintain(vacuum=False)` cleanup with `DiskCacheMaintenanceReport`, context-manager cleanup, and package-specific `CacheBackendClosedError` failures after `close()`.
 
 Disk payloads use the configured `CacheSerializer`; the default is `PickleCacheSerializer`, which is only safe for trusted local cache files. Use `JsonCacheSerializer` for JSON-compatible payloads when pickle is unnecessary. Rows whose stored serializer content type does not match the active serializer are treated as misses and removed rather than deserialized with the wrong serializer. `DiskCacheBackend(on_drop=...)` can report those drops, and payload deserialization failures, to logging or metrics without changing caller-facing miss behavior.
 
