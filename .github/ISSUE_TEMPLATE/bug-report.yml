@@ -1,0 +1,30 @@
+name: Bug report
+description: Report behavior that looks incorrect.
+title: "[bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Include a small code sample or command sequence.
+      render: python
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: blakemere-decorators 0.1.0
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: Python 3.12
