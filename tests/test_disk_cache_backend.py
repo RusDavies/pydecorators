@@ -433,6 +433,65 @@ def test_disk_cache_backend_treats_corrupt_payload_as_miss(tmp_path: Path) -> No
         backend.close()
 
 
+def test_disk_cache_backend_maintenance_drops_expired_corrupt_and_incompatible_rows(
+    tmp_path: Path,
+) -> None:
+    clock = MutableClock()
+    db_path = tmp_path / "cache.sqlite3"
+    backend = DiskCacheBackend(db_path, ttl=10, clock=clock)
+    corrupt_key = backend._serialize_key("corrupt")
+    incompatible_key = backend._serialize_key("incompatible")
+    backend.set_value("stale", "old")
+    backend.close()
+    clock.advance(11)
+
+    with closing(sqlite3.connect(db_path)) as connection:
+        connection.execute(
+            """
+            INSERT INTO cache_entries (
+                key, payload, is_exception, expires_at, last_accessed, created_at,
+                serializer_content_type
+            )
+            VALUES (?, ?, 0, NULL, 100, 100, ?)
+            """,
+            (corrupt_key, b"not a pickle payload", "application/python-pickle"),
+        )
+        connection.execute(
+            """
+            INSERT INTO cache_entries (
+                key, payload, is_exception, expires_at, last_accessed, created_at,
+                serializer_content_type
+            )
+            VALUES (?, ?, 0, NULL, 100, 100, ?)
+            """,
+            (incompatible_key, b"{}", "application/json"),
+        )
+        connection.commit()
+
+    backend = DiskCacheBackend(db_path, ttl=10, clock=clock)
+    try:
+        report = backend.maintain()
+
+        assert report.expired_rows_dropped == 1
+        assert report.corrupt_rows_dropped == 1
+        assert report.serializer_mismatch_rows_dropped == 1
+        assert report.vacuumed is False
+        assert backend.info().currsize == 0
+        assert backend.get("stale") is None
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_maintenance_can_vacuum(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
+    try:
+        report = backend.maintain(vacuum=True)
+
+        assert report.vacuumed is True
+    finally:
+        backend.close()
+
+
 def test_disk_cache_backend_configures_sqlite_operational_pragmas(tmp_path: Path) -> None:
     db_path = tmp_path / "cache.sqlite3"
     backend = DiskCacheBackend(db_path, busy_timeout_ms=7_500)

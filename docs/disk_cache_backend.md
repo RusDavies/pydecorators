@@ -660,36 +660,31 @@ For persistent cache reuse, treat cache keys as part of the on-disk compatibilit
 - If you provide a custom `key` function, keep its output stable across releases and process restarts. A changed custom key function can orphan old cache rows.
 - Changing serializers, payload types, or cache value schemas may make old rows disposable. Use `clear()` or a new namespace when old persistent values should not be reused.
 
-## Integrity check and maintenance helper design
+## Integrity check and maintenance helper
 
-A future disk-cache maintenance helper should be explicit and operator-facing, not part of normal `get()` hot-path behavior. The intended public shape is a small method on `DiskCacheBackend`, tentatively `maintain()`, with a report object such as `DiskCacheMaintenanceReport`.
+`DiskCacheBackend.maintain()` is explicit operator-facing cleanup, not part of normal `get()` hot-path behavior.
 
-Planned call shape:
+Call shape:
 
 ```python
-report = backend.maintain(
-    prune_expired=True,
-    validate_payloads=False,
-    vacuum=False,
-)
+report = backend.maintain(vacuum=False)
 ```
 
-The helper should support these maintenance actions deliberately:
+The helper deliberately performs these maintenance actions:
 
-- `prune_expired=True`: delete expired rows without waiting for individual lookups or `info()`.
-- `validate_payloads=True`: scan rows whose `serializer_content_type` matches the active backend serializer and attempt payload deserialization, dropping rows that fail.
-- serializer mismatch cleanup: count and optionally drop rows whose stored `serializer_content_type` does not match the active serializer.
-- `vacuum=True`: run SQLite `VACUUM` only as an explicit operator choice, because it can be more expensive and may require exclusive database access.
+- deletes expired rows without waiting for individual lookups or `info()`;
+- deletes rows whose stored `serializer_content_type` does not match the active backend serializer;
+- scans rows whose serializer matches the active backend serializer and drops rows whose payload cannot be deserialized;
+- runs SQLite `VACUUM` only when `vacuum=True`, because compaction can be more expensive and may require exclusive database access.
 
-The report should be structured rather than log-text-only. At minimum it should include:
+`DiskCacheMaintenanceReport` is structured rather than log-text-only. It includes:
 
-- `rows_seen`
 - `expired_rows_dropped`
 - `serializer_mismatch_rows_dropped`
-- `corrupt_payload_rows_dropped`
-- `vacuum_ran`
+- `corrupt_rows_dropped`
+- `vacuumed`
 
-Maintenance should reuse `DiskCacheDropEvent` / `on_drop` for rows it discards, using the same reasons as lookup-time cleanup where possible. That keeps diagnostics consistent instead of inventing a second tiny telemetry kingdom.
+Maintenance drop counts are aggregate cleanup diagnostics. Lookup-time `on_drop` remains the per-key diagnostic hook for rows discarded while serving a specific `get()` call.
 
 Non-goals for the first maintenance helper:
 
