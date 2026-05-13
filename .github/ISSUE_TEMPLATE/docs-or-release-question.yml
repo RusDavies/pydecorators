@@ -1,0 +1,26 @@
+name: Docs or release question
+description: Ask about documentation, examples, packaging, or release checks.
+title: "[docs/release]: "
+labels: [documentation]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are you trying to understand or verify?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Link the page, command, package version, or release step involved.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before filing
+      options:
+        - label: I checked README.md and docs/index.md.
+        - label: I included the command output or page link when relevant.
