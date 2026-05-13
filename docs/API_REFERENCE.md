@@ -14,6 +14,10 @@ Emit a deprecation warning when a sync or async function is called. Supports bar
 
 Cache sync function results in memory or a configured backend. Supports TTL, maxsize/LRU behavior, custom key functions, namespaces, cached exceptions, miss coalescing diagnostics via `cache_coalescing_info()`, and memory/disk backends. Async callables are rejected until async cache semantics are deliberately designed. See [`@cache_result`](cache_result.md).
 
+### `cache_namespace(name, version)`
+
+Build a conventional versioned cache namespace string such as `users:v1` for long-lived cache examples and applications.
+
 ### `retry(*, attempts, delay=0, backoff=1, max_delay=None, jitter=0, exceptions=(Exception,), retry_if=None, on_attempt=None, sleep=None, async_sleep=None)`
 
 Retry sync or async callables after configured failures. See [`@retry`](retry.md).

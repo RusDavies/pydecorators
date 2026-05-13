@@ -310,9 +310,9 @@ def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> Non
         "@circuit_breaker(failure_threshold=2, reset_timeout=10)",
         "from useful_decorators import cache_result",
         "@cache_result(maxsize=128)",
-        "from useful_decorators import DiskCacheBackend, cache_result",
+        "from useful_decorators import DiskCacheBackend, cache_namespace, cache_result",
         "DiskCacheBackend(",
-        '@cache_result(backend=backend, namespace="users")',
+        '@cache_result(backend=backend, namespace=cache_namespace("users", 1))',
         "finally:",
         "backend.close()",
     ]:
@@ -342,7 +342,7 @@ def test_readme_disk_cache_code_block_matches_lifecycle_guidance() -> None:
     )
 
     assert "backend = DiskCacheBackend" in disk_cache_block
-    assert 'namespace="users"' in disk_cache_block
+    assert 'namespace=cache_namespace("users", 1)' in disk_cache_block
     assert "try:" in disk_cache_block
     assert "finally:" in disk_cache_block
     assert disk_cache_block.index("try:") < disk_cache_block.index("finally:")

@@ -14,6 +14,7 @@ from useful_decorators import (
     CircuitBreakerOpen,
     DiskCacheBackend,
     TimingInfo,
+    cache_namespace,
     cache_result,
     circuit_breaker,
     deprecated,
@@ -181,7 +182,7 @@ def disk_cache_readme_example(path: Path) -> str:
 
     backend = DiskCacheBackend(path, ttl=3600, maxsize=10_000)
 
-    @cache_result(backend=backend, namespace="users")
+    @cache_result(backend=backend, namespace=cache_namespace("users", 1))
     def load_user_display_name(user_id: str) -> str:
         return fetch_user_display_name(user_id)
 

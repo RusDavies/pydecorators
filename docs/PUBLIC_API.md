@@ -23,6 +23,7 @@ Current public API:
 - `CacheSerializer`
 - `CacheBackend`
 - `MemoryCacheBackend`
+- `cache_namespace`
 - `cache_result`
 - `CacheCoalescingInfo`
 - `CacheInfo`
@@ -104,6 +105,10 @@ Example: `cache_result(namespace="   ")` raises `ConfigurationError` because nam
 `CacheKeyError` is raised when `@cache_result` key generation cannot produce a hashable key. It inherits from both `TypeError` and `UsefulDecoratorsError`.
 
 Example: calling a cached function with an unhashable list argument raises `CacheKeyError` unless a custom key function converts the arguments into a hashable key.
+
+### `cache_namespace`
+
+`cache_namespace(name, version)` returns a conventional versioned namespace string such as `users:v1`. Use it when persistent cache examples need a small, consistent namespace/version pattern without hand-formatting the string each time.
 
 ### `MemoryCacheBackend`
 

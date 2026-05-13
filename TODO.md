@@ -355,7 +355,7 @@
 ### Newly Implied Release Cache Compatibility Follow-Ups
 
 - [x] Consider adding a release-note template for persistent cache compatibility once public releases begin.
-- [ ] Consider adding a package-level helper for recommended cache namespace/version strings if examples start repeating them.
+- [x] Add `cache_namespace()` package-level helper for recommended cache namespace/version strings.
 - [x] Decide whether README examples should show explicit backend cleanup with `close()` or context-managed app lifecycle.
 
 ### Newly Implied Disk Lifecycle Docs Follow-Ups
