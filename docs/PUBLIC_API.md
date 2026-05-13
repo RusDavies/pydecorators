@@ -11,6 +11,7 @@ Current public API:
 - `DiskCacheBackend`
 - `DiskCacheDropEvent`
 - `CacheBackendClosedError`
+- `UnsupportedCacheSchemaVersionError`
 - `CacheSerializationError`
 - `PickleCacheSerializer`
 - `JsonCacheSerializer`
@@ -37,6 +38,7 @@ Current public API:
 - `ConfigurationError`
 - `RateLimitExceeded`
 - `FunctionTimedOut`
+- `UnsupportedCacheSchemaVersionError`
 
 ## Internal API
 
@@ -139,6 +141,10 @@ except CacheBackendClosedError:
 ```
 
 For decorator-bound disk backends, prefer keeping the backend alive for the whole decorated-function lifetime and closing it from script cleanup or application shutdown.
+
+### `UnsupportedCacheSchemaVersionError`
+
+`UnsupportedCacheSchemaVersionError` is raised when `DiskCacheBackend` opens a SQLite cache file whose schema version is newer than this package understands. It inherits from `UsefulDecoratorsError`. Treat it as a compatibility failure: upgrade the package, point the application at a compatible cache file, or rebuild the cache.
 
 ### `DiskCacheBackend`
 

@@ -24,6 +24,7 @@ from useful_decorators.exceptions import (
     ConfigurationError,
     FunctionTimedOut,
     RateLimitExceeded,
+    UnsupportedCacheSchemaVersionError,
     UsefulDecoratorsError,
 )
 from useful_decorators.log_calls import log_calls
@@ -55,6 +56,7 @@ __all__ = [
     "PickleCacheSerializer",
     "RateLimitExceeded",
     "TimingInfo",
+    "UnsupportedCacheSchemaVersionError",
     "UsefulDecoratorsError",
     "cache_result",
     "circuit_breaker",

@@ -20,6 +20,7 @@ from useful_decorators.exceptions import (
     CacheKeyError,
     CacheSerializationError,
     ConfigurationError,
+    UnsupportedCacheSchemaVersionError,
 )
 
 _KW_MARKER = object()
@@ -574,7 +575,7 @@ class DiskCacheBackend:
         with self._lock:
             [schema_version] = self._connection.execute("PRAGMA user_version").fetchone()
             if schema_version > _DISK_CACHE_SCHEMA_VERSION:
-                raise ConfigurationError(
+                raise UnsupportedCacheSchemaVersionError(
                     "disk cache schema version is newer than this package supports"
                 )
 

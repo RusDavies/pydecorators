@@ -37,3 +37,7 @@ class CacheSerializationError(UsefulDecoratorsError):
 
 class CacheBackendClosedError(UsefulDecoratorsError):
     """Raised when a cache backend is used after it has been closed."""
+
+
+class UnsupportedCacheSchemaVersionError(UsefulDecoratorsError):
+    """Raised when a persistent cache uses a newer unsupported schema."""
