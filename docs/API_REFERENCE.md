@@ -38,7 +38,7 @@ Measure sync or async function duration and emit `TimingInfo` through callbacks,
 
 Perform lightweight runtime checks for annotated arguments and optionally return values. See [`@validate_types`](validate_types.md).
 
-### `require_env(*names, validators=None, environ=None, messages=None)`
+### `require_env(*names, validators=None, environ=None, messages=None, allow_empty=True)`
 
 Require environment variables at call time before running sync or async functions. See [`@require_env`](require_env.md).
 

@@ -37,6 +37,15 @@ def test_require_env_supports_custom_missing_variable_messages() -> None:
         call_service()
 
 
+def test_require_env_rejects_empty_values_when_configured() -> None:
+    @require_env("API_TOKEN", environ={"API_TOKEN": ""}, allow_empty=False)
+    def call_service() -> str:
+        return "ok"
+
+    with pytest.raises(EnvRequirementError, match="'API_TOKEN' must not be empty"):
+        call_service()
+
+
 def test_require_env_supports_multiple_names_and_validators() -> None:
     environ = {"API_TOKEN": "abc", "REGION": "ca"}
 
@@ -113,6 +122,7 @@ def test_require_env_preserves_metadata() -> None:
         (("API_TOKEN",), {"environ": object()}, "environ must be a mapping"),
         (("API_TOKEN",), {"messages": {"OTHER": "set it"}}, "unknown variable"),
         (("API_TOKEN",), {"messages": {"API_TOKEN": ""}}, "non-empty string"),
+        (("API_TOKEN",), {"allow_empty": object()}, "allow_empty must be a boolean"),
     ],
 )
 def test_require_env_validates_configuration(
