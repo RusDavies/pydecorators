@@ -469,7 +469,7 @@
 
 ### Newly Implied Docs Policy Test Split Follow-Ups
 
-- [ ] Consider splitting public API exception policy tests into a dedicated exception policy module if they keep growing.
+- [x] Consider splitting public API exception policy tests into a dedicated exception policy module if they keep growing.
 - [x] Consider adding pytest markers for documentation-policy tests.
 
 ### Newly Implied Docs Policy Marker Follow-Ups
