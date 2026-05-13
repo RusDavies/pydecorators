@@ -113,6 +113,7 @@ The wrapped function should expose:
 
 - `cache_clear() -> None`
 - `cache_info() -> CacheInfo`
+- `cache_coalescing_info() -> CacheCoalescingInfo`
 
 Implemented `CacheInfo` shape:
 
@@ -123,6 +124,16 @@ class CacheInfo:
     misses: int
     maxsize: int | None
     currsize: int
+```
+
+Implemented `CacheCoalescingInfo` shape:
+
+```python
+@dataclass(frozen=True, slots=True)
+class CacheCoalescingInfo:
+    current_in_flight: int
+    total_waiters: int
+    total_wait_seconds: float
 ```
 
 ## Sync and async
@@ -229,7 +240,13 @@ Implementation sketch for the sync decorator:
 - Never hold the in-flight lock while running user code or while calling backend methods that may take their own locks. Lock-order bugs are tiny deadlocks wearing clown shoes.
 - After producer completion, notify all waiters, remove the marker, and let waiters perform the normal cache lookup path.
 
-Use request coalescing when many threads may stampede the same slow cache key. Leave it disabled when duplicate work is cheap and waiting behind a slow producer would be worse than recomputing.
+`cache_coalescing_info()` reports wrapper-local diagnostics for this behavior:
+
+- `current_in_flight`: number of cache keys currently being produced by a first caller.
+- `total_waiters`: number of calls that waited behind an existing in-flight producer.
+- `total_wait_seconds`: cumulative wall-clock-ish monotonic seconds those waiters spent waiting.
+
+Use request coalescing when many threads may stampede the same slow cache key. Leave it disabled when duplicate work is cheap and waiting behind a slow producer would be worse than recomputing. Use the diagnostics to confirm coalescing is doing useful work before treating it as a performance win.
 
 Non-goals for first coalescing support:
 

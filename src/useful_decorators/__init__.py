@@ -6,6 +6,7 @@ timeouts, and developer ergonomics without dragging in a framework-shaped sofa.
 
 from useful_decorators.cache_result import (
     CacheBackend,
+    CacheCoalescingInfo,
     CacheInfo,
     CacheSerializer,
     DiskCacheAggregateInspectionReport,
@@ -46,6 +47,7 @@ __version__ = "0.1.0"
 __all__ = [
     "CacheBackend",
     "CacheBackendClosedError",
+    "CacheCoalescingInfo",
     "CacheInfo",
     "CacheKeyError",
     "CacheSerializationError",

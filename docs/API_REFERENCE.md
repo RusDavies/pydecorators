@@ -12,7 +12,7 @@ Emit a deprecation warning when a sync or async function is called. Supports bar
 
 ### `cache_result(*, ttl=None, maxsize=128, key=None, typed=False, cache_exceptions=False, refresh_ttl_on_hit=False, coalesce_misses=False, clock=None, backend=None, namespace=None)`
 
-Cache sync function results in memory or a configured backend. Supports TTL, maxsize/LRU behavior, custom key functions, namespaces, cached exceptions, miss coalescing, and memory/disk backends. Async callables are rejected until async cache semantics are deliberately designed. See [`@cache_result`](cache_result.md).
+Cache sync function results in memory or a configured backend. Supports TTL, maxsize/LRU behavior, custom key functions, namespaces, cached exceptions, miss coalescing diagnostics via `cache_coalescing_info()`, and memory/disk backends. Async callables are rejected until async cache semantics are deliberately designed. See [`@cache_result`](cache_result.md).
 
 ### `retry(*, attempts, delay=0, backoff=1, max_delay=None, jitter=0, exceptions=(Exception,), retry_if=None, on_attempt=None, sleep=None, async_sleep=None)`
 
@@ -71,6 +71,10 @@ Default trusted-local serializer for disk cache payloads.
 ### `JsonCacheSerializer`
 
 JSON serializer for simple JSON-compatible cache payloads.
+
+### `CacheCoalescingInfo`
+
+Duplicate-miss coalescing diagnostics dataclass returned by `cache_coalescing_info()`.
 
 ### `CacheInfo`
 

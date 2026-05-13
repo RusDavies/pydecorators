@@ -9,6 +9,7 @@ import pytest
 
 from useful_decorators import (
     CacheBackendClosedError,
+    CacheCoalescingInfo,
     CacheInfo,
     DiskCacheBackend,
     MemoryCacheBackend,
@@ -24,6 +25,10 @@ def get_cache_info(func: object) -> CacheInfo:
 
 def clear_cache(func: object) -> None:
     cast(Any, func).cache_clear()
+
+
+def get_coalescing_info(func: object) -> CacheCoalescingInfo:
+    return cast(CacheCoalescingInfo, cast(Any, func).cache_coalescing_info())
 
 
 def test_cache_result_caches_sync_hits_and_misses() -> None:
@@ -537,6 +542,20 @@ def test_custom_key_function_controls_namespace_separation() -> None:
     assert calls == 1
 
 
+def test_cache_result_exposes_empty_coalescing_diagnostics() -> None:
+    @cache_result(coalesce_misses=True)
+    def value(number: int) -> int:
+        return number
+
+    info = get_coalescing_info(value)
+
+    assert info == CacheCoalescingInfo(
+        current_in_flight=0,
+        total_waiters=0,
+        total_wait_seconds=0.0,
+    )
+
+
 def test_cache_result_can_coalesce_duplicate_concurrent_misses() -> None:
     calls = 0
     started = Event()
@@ -562,6 +581,39 @@ def test_cache_result_can_coalesce_duplicate_concurrent_misses() -> None:
         assert second.result(timeout=5) == "value:same"
 
     assert calls == 1
+    info = get_coalescing_info(slow_value)
+    assert info.current_in_flight == 0
+    assert info.total_waiters == 1
+    assert info.total_wait_seconds > 0
+
+
+def test_cache_result_coalescing_stress_many_waiters_on_one_key() -> None:
+    calls = 0
+    started = Event()
+    release = Event()
+
+    @cache_result(coalesce_misses=True)
+    def slow_value(key: str) -> str:
+        nonlocal calls
+        calls += 1
+        started.set()
+        assert release.wait(timeout=5)
+        return f"value:{key}"
+
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        futures = [executor.submit(slow_value, "same") for _ in range(12)]
+        assert started.wait(timeout=5)
+        sleep(0.05)
+        assert calls == 1
+        release.set()
+
+        assert [future.result(timeout=5) for future in futures] == ["value:same"] * 12
+
+    info = get_coalescing_info(slow_value)
+    assert calls == 1
+    assert info.current_in_flight == 0
+    assert info.total_waiters == 11
+    assert info.total_wait_seconds > 0
 
 
 def test_cache_result_coalescing_does_not_block_different_keys() -> None:

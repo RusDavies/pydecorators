@@ -153,8 +153,8 @@
 
 ### Newly Implied Request Coalescing Implementation Follow-Ups
 
-- [ ] Consider exposing in-flight wait counters or timing diagnostics if users need visibility into coalesced waits.
-- [ ] Consider adding stress tests for many waiters on one key if coalescing becomes heavily used.
+- [x] Expose in-flight wait counters and timing diagnostics via `cache_coalescing_info()`.
+- [x] Add stress tests for many waiters on one coalesced cache key.
 
 ### Newly Implied `@cache_result` Backend Follow-Ups
 
