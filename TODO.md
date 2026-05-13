@@ -530,7 +530,7 @@
 
 ### Newly Implied External Link Verbose Follow-Ups
 
-- [ ] Consider reporting successful checked links only in verbose mode once the checker scans more external links.
+- [x] Consider reporting successful checked links only in verbose mode once the checker scans more external links.
 - [ ] Consider adding quiet JSON output if release automation starts consuming external link checker results.
 - [ ] Add allowlist or scheme policy if docs start using non-HTTP external links intentionally.
 - [x] Add duplicate-heading anchor collision handling if docs pages grow repeated headings.

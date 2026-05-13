@@ -321,6 +321,8 @@ def main() -> int:
             )
             if not ok:
                 failures.append(f"{docs_file}: unreachable external link ({detail}): {link}")
+            elif args.verbose:
+                print(f"ok {docs_file}: {link} ({detail})")
 
     if failures:
         for failure in failures:
