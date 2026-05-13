@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from useful_decorators import (
+    DiskCacheAggregateInspectionReport,
     DiskCacheBackend,
     DiskCacheInspectionReport,
     DiskCachePreviewContext,
@@ -610,6 +611,66 @@ def test_disk_cache_backend_inspection_enforces_limits_and_reports_truncation(
             backend.inspect_entries(payload_preview_bytes=4097)
         with pytest.raises(ConfigurationError, match="preview_redactor must be callable"):
             backend.inspect_entries(preview_redactor=object())  # type: ignore[arg-type]
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_aggregate_inspection_omits_row_level_sensitive_data(
+    tmp_path: Path,
+) -> None:
+    clock = MutableClock()
+    backend = DiskCacheBackend(
+        tmp_path / "cache.sqlite3",
+        ttl=10,
+        clock=clock,
+    )
+    try:
+        backend.set_value("user:1", {"token": "secret"})
+        backend.set_exception("user:2", RuntimeError("boom"))
+        clock.advance(11)
+
+        hits_before, misses_before = backend._connection.execute(
+            "SELECT hits, misses FROM cache_stats WHERE id = 1"
+        ).fetchone()
+        report = backend.inspect_aggregate()
+        hits_after, misses_after = backend._connection.execute(
+            "SELECT hits, misses FROM cache_stats WHERE id = 1"
+        ).fetchone()
+
+        assert isinstance(report, DiskCacheAggregateInspectionReport)
+        assert report.total_entries == 2
+        assert report.scanned_entries == 2
+        assert report.value_entries == 1
+        assert report.exception_entries == 1
+        assert report.expired_entries == 2
+        assert report.serializer_content_types == {"application/python-pickle": 2}
+        assert report.total_payload_bytes > 0
+        assert report.largest_payload_bytes is not None
+        assert report.truncated is False
+        assert report.mode == "aggregate"
+        assert "payload previews" in report.sensitivity_warning
+        assert "key digests" in report.sensitivity_warning
+        assert (hits_before, misses_before) == (hits_after, misses_after)
+        assert not hasattr(report, "entries")
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_aggregate_inspection_reports_truncation_and_validates_limit(
+    tmp_path: Path,
+) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
+    try:
+        backend.set_value("first", "one")
+        backend.set_value("second", "two")
+
+        report = backend.inspect_aggregate(limit=1)
+
+        assert report.total_entries == 2
+        assert report.scanned_entries == 1
+        assert report.truncated is True
+        with pytest.raises(ConfigurationError, match="limit must be a positive integer"):
+            backend.inspect_aggregate(limit=0)
     finally:
         backend.close()
 

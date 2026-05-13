@@ -243,28 +243,28 @@
 
 ### Newly Implied Aggregate Inspection Follow-Ups
 
-- [ ] Consider implementing `DiskCacheAggregateInspectionReport` only if support-bundle tooling enters public scope.
-- [ ] Consider aggregate truncation tests if inspection scans gain row limits.
+- [x] Implement `DiskCacheAggregateInspectionReport` and `inspect_aggregate()` for support-bundle-style summaries.
+- [x] Add aggregate truncation tests for bounded inspection scans.
 - [x] Document aggregate timestamp ranges as diagnostics rather than audit evidence.
 
 ### Newly Implied Aggregate Timestamp Follow-Ups
 
-- [ ] Consider CLI/help wording tests that timestamp fields are diagnostic, not audit evidence, if inspection tooling is implemented.
-- [ ] Consider omitting timestamp ranges from broad support bundles if users treat them as sensitive activity indicators.
+- [x] Document aggregate timestamp/report-time fields as diagnostics, not audit evidence.
+- [x] Omit per-row timestamp ranges from aggregate support-bundle reports.
 - [x] Add sensitivity-warning design/tests for future inspection CLI support bundles.
 
 ### Newly Implied Inspection Warning Follow-Ups
 
 - [x] Add `sensitivity_warning` to `DiskCacheInspectionReport`.
-- [ ] Consider tests that preview-enabled CLI output uses stronger warnings than aggregate-only output.
-- [ ] Consider documenting approved quiet-mode warning channels before adding scripted inspection output.
+- [x] Add tests that preview-enabled inspection output uses stronger warnings than aggregate-only output.
+- [x] Document approved quiet-mode warning channels before adding scripted inspection output.
 - [x] Add retention/deletion guidance for generated cache inspection reports if support tooling is added.
 
 ### Newly Implied Inspection Report Retention Follow-Ups
 
 - [x] Add creation-time and mode metadata to `DiskCacheInspectionReport`.
-- [ ] Consider tests that future CI examples do not upload inspection reports by default.
-- [ ] Consider documenting short retention defaults if support-bundle generation is implemented.
+- [x] Document that future CI examples must not upload inspection reports by default.
+- [x] Document short retention defaults for generated inspection reports.
 - [ ] Consider built-in obvious JSON key redaction only as defense-in-depth, not a safety guarantee.
 - [x] Add schema-version metadata table design note before any public release that promises disk-cache file compatibility.
 

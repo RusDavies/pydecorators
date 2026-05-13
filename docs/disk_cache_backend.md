@@ -354,7 +354,7 @@ Warning expectations:
 - Text CLI output should include a concise sensitivity warning by default for support-bundle and row-level inspection commands.
 - JSON output should include a machine-readable warning field, such as `sensitivity_warning`, unless a documented envelope already carries equivalent classification metadata.
 - Preview-enabled output should use stronger wording than aggregate/no-preview output.
-- Quiet/scripted modes should require an explicit flag and should document where the warning is available instead, such as command help, schema docs, or wrapper tooling.
+- Quiet/scripted modes should require an explicit flag and should document where the warning is available instead, such as command help, JSON `sensitivity_warning` fields, schema docs, or wrapper tooling.
 - Warnings should mention that metadata can reveal behavior even without payload previews.
 - Warnings should not claim that redaction or no-preview mode makes output safe for public posting.
 
@@ -385,7 +385,7 @@ Support-bundle guidance:
 
 If support-bundle tooling is added, start with an aggregate-only report before exposing per-row inspection data. Aggregate reports should answer “is the cache broadly healthy?” without listing individual cached objects.
 
-Tentative aggregate shape:
+Implemented aggregate shape:
 
 ```python
 @dataclass(frozen=True)
@@ -394,14 +394,14 @@ class DiskCacheAggregateInspectionReport:
     value_entries: int
     exception_entries: int
     expired_entries: int
-    serializer_content_types: Mapping[str, int]
+    serializer_content_types: dict[str, int]
     total_payload_bytes: int
     largest_payload_bytes: int | None
-    earliest_created_at: float | None
-    latest_created_at: float | None
-    earliest_expires_at: float | None
-    latest_expires_at: float | None
-    report_truncated: bool
+    scanned_entries: int
+    truncated: bool
+    sensitivity_warning: str
+    created_at: float
+    mode: str
 ```
 
 Design constraints:
@@ -409,27 +409,25 @@ Design constraints:
 - Aggregate reports should not include payload previews, raw payload bytes, deserialized values, serialized keys, key digests, or per-row timestamps.
 - Content types should be counted by value, not listed alongside row identifiers.
 - Payload sizes should be aggregated; the largest payload size is useful, but per-row sizes should stay out of broad support reports.
-- Timestamp ranges should be coarse diagnostics, not audit logs.
-- If the cache is too large to scan under a configured limit, `report_truncated=True` should make partial summaries obvious.
+- Timestamp ranges are omitted from the implemented aggregate report because broad support bundles should avoid per-row activity indicators by default.
+- If the cache is too large to scan under a configured limit, `truncated=True` makes partial summaries obvious.
 - Aggregate inspection should be read-only and should not update hits, misses, TTL, LRU, or `last_accessed`.
 - Any future CLI support-bundle command should prefer this aggregate report by default.
+- `inspect_aggregate()` includes a sensitivity warning and creation/mode metadata so generated reports are easier to classify and expire.
 
 ## Aggregate timestamp diagnostics are not audit evidence
 
-Aggregate inspection timestamp ranges are intended to help answer rough debugging questions: “does this cache contain old rows?”, “are entries expiring?”, and “was this cache recently active?” They are not audit logs, access records, or compliance evidence.
+The implemented aggregate inspection report intentionally omits per-row timestamp ranges. That avoids turning broad support bundles into activity timelines. The report still has a `created_at` field for the report itself so generated artifacts can be aged out, but that timestamp describes the diagnostic report, not cache-row activity, business events, access records, or compliance evidence.
 
 Timestamp guidance:
 
-- `earliest_created_at` and `latest_created_at` are cache-row creation ranges, not proof of when the underlying business event happened.
-- `earliest_expires_at` and `latest_expires_at` describe current cache expiry policy, not data retention policy.
-- `last_accessed`-style aggregate ranges, if added later, describe cache recency mechanics and may change due to implementation details such as LRU updates.
+- `created_at` on `DiskCacheAggregateInspectionReport` is report metadata, not proof of when cached work happened.
+- Per-row `created_at`, `last_accessed`, and `expires_at` remain available only in row-level `inspect_entries()` diagnostics.
+- If aggregate timestamp ranges are ever added later, docs and CLI labels must call them diagnostics, not audit timestamps.
 - Clock sources may be injectable for tests and may not be wall-clock-synchronized across processes.
 - Cache clearing, namespace changes, migrations, and manual SQLite edits can erase or distort timestamp history.
-- Documentation and future CLI labels should call these fields diagnostics, not audit timestamps.
 
-Pre-implementation tests should assert docs/help text avoid audit/compliance wording for aggregate timestamp ranges and describe them as best-effort cache diagnostics.
-
-Pre-implementation tests should cover aggregate reports excluding per-row data, preserving safe-mode no-preview behavior, surfacing truncation, and not mutating cache stats or recency state.
+Implemented tests cover aggregate reports excluding per-row data, preserving no-preview behavior, surfacing truncation, and not mutating cache stats or recency state.
 
 ## Inspection report retention and deletion guidance
 
@@ -439,13 +437,14 @@ Retention guidance:
 
 - Prefer generating reports into caller-controlled paths, not hidden library-managed locations.
 - Support-bundle tooling should document where reports are written and when they should be deleted.
+- Recommended retention defaults should be short: delete local aggregate reports after the debugging window closes, and keep preview-enabled reports only as long as necessary for the immediate investigation.
 - CI examples should avoid uploading inspection reports by default; if uploaded, retention should be short and access-controlled.
 - Support workflows should delete local report files after transfer or after the debugging window closes.
 - Reports should include creation time and safe-mode/preview-mode metadata so stale artifacts are easier to identify.
 - Preview-enabled reports should be treated like sensitive data exports and should have stricter retention than aggregate/no-preview reports.
 - The library should not silently phone home, upload, or retain inspection reports. External transfer remains the caller’s responsibility.
 
-Pre-implementation tests should cover docs/examples that avoid automatic uploads, label report sensitivity, and show caller-owned output paths rather than hidden default report directories.
+Docs and tests should continue to avoid examples that automatically upload reports. Generated reports should be caller-owned artifacts, not hidden library-managed files.
 
 Pre-implementation tests should cover documentation and examples that label no-preview reports as lower-risk but still sensitive. If a future CLI/support-bundle command is added, tests should assert its default output excludes previews and includes a sensitivity warning.
 

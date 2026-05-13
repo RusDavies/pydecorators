@@ -54,7 +54,7 @@ Default in-process cache backend for `cache_result`.
 
 ### `DiskCacheBackend(path, *, ttl=None, maxsize=128, refresh_ttl_on_hit=False, serializer=None, on_drop=None, clock=None, busy_timeout_ms=5000, wal=True)`
 
-SQLite-backed persistent cache backend for trusted local cache files. Includes `maintain()` and read-only `inspect_entries(...)` diagnostics. See [`DiskCacheBackend`](disk_cache_backend.md).
+SQLite-backed persistent cache backend for trusted local cache files. Includes `maintain()`, read-only `inspect_entries(...)`, and aggregate `inspect_aggregate(...)` diagnostics. See [`DiskCacheBackend`](disk_cache_backend.md).
 
 ### `CacheBackend`
 
@@ -75,6 +75,10 @@ JSON serializer for simple JSON-compatible cache payloads.
 ### `CacheInfo`
 
 Cache statistics dataclass returned by cache info helpers.
+
+### `DiskCacheAggregateInspectionReport`
+
+Immutable aggregate diagnostics returned by `DiskCacheBackend.inspect_aggregate()` for support-bundle-style cache summaries.
 
 ### `DiskCacheDropEvent`
 
