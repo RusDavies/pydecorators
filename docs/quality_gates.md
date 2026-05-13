@@ -46,3 +46,7 @@ Passing the full gate means the local package is mechanically healthy. It does n
 
 
 External link ignore patterns must normally match at least one current docs link. During staged release-maintenance edits, `python scripts/check_external_links.py --allow-stale-ignores` permits temporary unmatched ignore patterns; remove the escape hatch before treating the ignore list as final.
+
+### External link ignore wildcards
+
+`.external-links-ignore` uses Python `fnmatch`-style URL patterns. Use full HTTP(S) URL shapes such as `https://vendor.example.com/docs/*`; `*` matches within the URL string, including path separators, and matching is case-sensitive. Each non-comment pattern must be preceded by a reason comment so temporary ignores do not fossilize into mystery sediment.

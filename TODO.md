@@ -524,7 +524,7 @@
 
 - [x] Consider adding an explicit `--allow-stale-ignores` escape hatch if release maintenance ever needs to stage ignore entries before docs changes.
 - [x] Consider showing the matching docs link for each ignore pattern in verbose mode if the ignore file grows.
-- [ ] Consider documenting wildcard semantics for `.external-links-ignore` in a dedicated maintenance doc if the checker grows further.
+- [x] Consider documenting wildcard semantics for `.external-links-ignore` in a dedicated maintenance doc if the checker grows further.
 - [ ] Consider adding expiration dates for ignored external links if the ignore list grows.
 - [x] Consider reporting ignored external links in verbose mode during release checks.
 

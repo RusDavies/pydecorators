@@ -87,3 +87,17 @@ def test_hatch_full_gate_alias_matches_release_prep_commands() -> None:
         "python scripts/dogfood_external_project.py",
     ]:
         assert command in pyproject
+
+
+def test_quality_gates_documents_external_link_ignore_wildcards() -> None:
+    text = Path("docs/quality_gates.md").read_text()
+
+    for required in [
+        "External link ignore wildcards",
+        ".external-links-ignore",
+        "fnmatch",
+        "https://vendor.example.com/docs/*",
+        "case-sensitive",
+        "reason comment",
+    ]:
+        assert required in text
