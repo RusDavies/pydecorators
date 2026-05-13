@@ -123,5 +123,11 @@ def _check_environment(
         if not allow_empty and value == "":
             raise EnvRequirementError(name, "must not be empty")
         validator = validators.get(name)
-        if validator is not None and validator(value) is False:
+        if validator is None:
+            continue
+        try:
+            valid = validator(value)
+        except Exception as exc:
+            raise EnvRequirementError(name, "failed validation") from exc
+        if valid is False:
             raise EnvRequirementError(name, "failed validation")

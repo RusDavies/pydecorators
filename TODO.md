@@ -765,7 +765,7 @@
 - [x] Consider custom error messages for required environment variables if CLI UX needs them.
 - [x] Consider optional empty-string rejection semantics if users want non-empty environment values by default.
 - [x] Add executable docs examples for `@require_env`.
-- [ ] Consider validator exception wrapping only if callers need normalized environment-check failures.
+- [x] Wrap validator exceptions in `EnvRequirementError` with the original exception preserved as `__cause__`.
 ## 9. Resilience Decorators Backlog
 
 ### `@circuit_breaker`

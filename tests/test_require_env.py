@@ -76,6 +76,22 @@ def test_require_env_raises_when_validator_returns_false() -> None:
         call_service()
 
 
+def test_require_env_wraps_validator_exceptions() -> None:
+    environ = {"API_TOKEN": "secret"}
+
+    def broken_validator(value: str) -> bool:
+        raise ValueError(f"bad value: {value}")
+
+    @require_env("API_TOKEN", validators={"API_TOKEN": broken_validator}, environ=environ)
+    def call_service() -> str:
+        return "ok"
+
+    with pytest.raises(EnvRequirementError, match="'API_TOKEN' failed validation") as exc_info:
+        call_service()
+
+    assert isinstance(exc_info.value.__cause__, ValueError)
+
+
 def test_require_env_checks_at_call_time() -> None:
     environ: MutableMapping[str, str] = {}
 

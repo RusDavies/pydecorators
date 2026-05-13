@@ -25,7 +25,7 @@ Invalid decorator configuration raises `ConfigurationError` at decoration time.
 
 Environment variables are checked when the wrapped function is called, not when it is decorated. This lets scripts load `.env` files, test fixtures patch environment values, or deployment platforms inject variables after import. Tiny mercy, because import-time environment checks are how CLIs become haunted furniture.
 
-Missing, empty-when-disallowed, or invalid variables raise `EnvRequirementError` before the wrapped function runs. Use `messages={"API_TOKEN": "must be configured"}` when a CLI or deployment guide needs friendlier missing-variable wording.
+Missing, empty-when-disallowed, or invalid variables raise `EnvRequirementError` before the wrapped function runs. Validator exceptions are wrapped in `EnvRequirementError` with the original exception preserved as `__cause__`. Use `messages={"API_TOKEN": "must be configured"}` when a CLI or deployment guide needs friendlier missing-variable wording.
 
 ## Examples
 
