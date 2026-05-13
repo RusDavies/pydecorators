@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, cast
+from typing import Annotated, Any, Literal, cast
 
 import pytest
 
@@ -42,6 +42,19 @@ def test_validate_types_supports_common_container_origins_without_deep_checks() 
     assert count([1, 2, 3]) == 3
     with pytest.raises(ValidationError, match="argument 'values' expected list"):
         count((1, 2, 3))  # type: ignore[arg-type]
+
+
+def test_validate_types_supports_literal_and_annotated() -> None:
+    @validate_types()
+    def configure(mode: Literal["fast", "safe"], retries: Annotated[int, "non-negative"]) -> str:
+        return f"{mode}:{retries}"
+
+    assert configure("fast", 3) == "fast:3"
+    expected_message = r"argument 'mode' expected Literal\['fast', 'safe'\]"
+    with pytest.raises(ValidationError, match=expected_message):
+        configure("slow", 3)  # type: ignore[arg-type]
+    with pytest.raises(ValidationError, match="argument 'retries' expected int, got str"):
+        configure("safe", "many")  # type: ignore[arg-type]
 
 
 def test_validate_types_can_validate_return_value() -> None:
