@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -58,7 +59,7 @@ def measure_time(
                     if hasattr(result, "__await__"):
                         result = await result
                 except Exception as exc:
-                    _emit_timing(
+                    await _emit_timing_async(
                         callback=callback,
                         logger=active_logger,
                         level=level,
@@ -66,7 +67,7 @@ def measure_time(
                         info=TimingInfo(func.__qualname__, active_clock() - start, False, exc),
                     )
                     raise
-                _emit_timing(
+                await _emit_timing_async(
                     callback=callback,
                     logger=active_logger,
                     level=level,
@@ -149,3 +150,34 @@ def _emit_timing(
         )
     if metrics_hook is not None:
         metrics_hook(info.function, info.duration, info.success)
+
+
+async def _emit_timing_async(
+    *,
+    callback: TimingCallback | None,
+    logger: logging.Logger | None,
+    level: int,
+    metrics_hook: MetricsHook | None,
+    info: TimingInfo,
+) -> None:
+    if callback is not None:
+        result = callback(info)
+        if inspect.isawaitable(result):
+            await result
+    if logger is not None:
+        logger.log(
+            level,
+            "%s completed in %.6g seconds success=%s",
+            info.function,
+            info.duration,
+            info.success,
+            extra={
+                "useful_decorators_function": info.function,
+                "useful_decorators_duration_seconds": info.duration,
+                "useful_decorators_success": info.success,
+            },
+        )
+    if metrics_hook is not None:
+        result = metrics_hook(info.function, info.duration, info.success)
+        if inspect.isawaitable(result):
+            await result

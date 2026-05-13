@@ -728,7 +728,7 @@
 ### Newly Implied `@measure_time` Follow-Ups
 
 - [x] Consider structured logger extras for duration/success fields if logging integrations request them.
-- [ ] Consider async callback/metrics hooks only if users need asynchronous timing sinks.
+- [x] Add async callback/metrics hook support for async `@measure_time` wrappers.
 - [x] Add executable docs examples for `@measure_time`.
 - [x] Consider monotonic-clock source documentation if timing precision questions recur.
 ## 8. Validation and Configuration Decorators Backlog

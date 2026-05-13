@@ -15,10 +15,10 @@ With no callback, logger, or metrics hook, the decorator only measures internall
 
 ## Parameters
 
-- `callback`: optional callable receiving a `TimingInfo` object.
+- `callback`: optional callable receiving a `TimingInfo` object. Async wrappers await it if it returns an awaitable.
 - `logger`: optional `logging.Logger` that receives a duration log line.
 - `level`: integer logging level for logger output. Defaults to `logging.INFO`.
-- `metrics_hook`: optional callable receiving `(function_name, duration, success)`.
+- `metrics_hook`: optional callable receiving `(function_name, duration, success)`. Async wrappers await it if it returns an awaitable.
 - `clock`: injectable clock for deterministic tests.
 
 Invalid configuration raises `ConfigurationError` at decoration time.
