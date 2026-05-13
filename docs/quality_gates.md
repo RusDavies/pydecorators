@@ -43,3 +43,6 @@ python scripts/dogfood_external_project.py
 ## Release posture
 
 Passing the full gate means the local package is mechanically healthy. It does not mean publish immediately. Before TestPyPI or PyPI, re-run the package-name availability check and confirm publishing credentials/protected environments are ready.
+
+
+External link ignore patterns must normally match at least one current docs link. During staged release-maintenance edits, `python scripts/check_external_links.py --allow-stale-ignores` permits temporary unmatched ignore patterns; remove the escape hatch before treating the ignore list as final.
