@@ -28,6 +28,15 @@ def test_require_env_raises_when_variable_missing(monkeypatch: pytest.MonkeyPatc
         call_service()
 
 
+def test_require_env_supports_custom_missing_variable_messages() -> None:
+    @require_env("API_TOKEN", environ={}, messages={"API_TOKEN": "must be configured"})
+    def call_service() -> str:
+        return "ok"
+
+    with pytest.raises(EnvRequirementError, match="'API_TOKEN' must be configured"):
+        call_service()
+
+
 def test_require_env_supports_multiple_names_and_validators() -> None:
     environ = {"API_TOKEN": "abc", "REGION": "ca"}
 
@@ -102,6 +111,8 @@ def test_require_env_preserves_metadata() -> None:
         (("API_TOKEN",), {"validators": {"OTHER": lambda value: True}}, "unknown variable"),
         (("API_TOKEN",), {"validators": {"API_TOKEN": object()}}, "must be callable"),
         (("API_TOKEN",), {"environ": object()}, "environ must be a mapping"),
+        (("API_TOKEN",), {"messages": {"OTHER": "set it"}}, "unknown variable"),
+        (("API_TOKEN",), {"messages": {"API_TOKEN": ""}}, "non-empty string"),
     ],
 )
 def test_require_env_validates_configuration(

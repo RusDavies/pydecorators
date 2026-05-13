@@ -762,7 +762,7 @@
 
 ### Newly Implied `@require_env` Follow-Ups
 
-- [ ] Consider custom error messages for required environment variables if CLI UX needs them.
+- [x] Consider custom error messages for required environment variables if CLI UX needs them.
 - [ ] Consider optional empty-string rejection semantics if users want non-empty environment values by default.
 - [x] Add executable docs examples for `@require_env`.
 - [ ] Consider validator exception wrapping only if callers need normalized environment-check failures.

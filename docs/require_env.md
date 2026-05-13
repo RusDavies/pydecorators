@@ -16,6 +16,7 @@ def call_service() -> str:
 - positional names: required environment variable names.
 - `validators`: optional mapping of variable name to callable. The callable receives the string value and should return `False` to reject it. Returning `True` or `None` accepts the value.
 - `environ`: optional mapping used instead of `os.environ`, mainly for tests.
+- `messages`: optional mapping of variable name to custom missing-variable reason string.
 
 Invalid decorator configuration raises `ConfigurationError` at decoration time.
 
@@ -23,7 +24,7 @@ Invalid decorator configuration raises `ConfigurationError` at decoration time.
 
 Environment variables are checked when the wrapped function is called, not when it is decorated. This lets scripts load `.env` files, test fixtures patch environment values, or deployment platforms inject variables after import. Tiny mercy, because import-time environment checks are how CLIs become haunted furniture.
 
-Missing or invalid variables raise `EnvRequirementError` before the wrapped function runs.
+Missing or invalid variables raise `EnvRequirementError` before the wrapped function runs. Use `messages={"API_TOKEN": "must be configured"}` when a CLI or deployment guide needs friendlier missing-variable wording.
 
 ## Examples
 
