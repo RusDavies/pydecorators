@@ -45,6 +45,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`measure_time_examples.py`](examples/measure_time_examples.py)
 - [`public_exception_examples.py`](examples/public_exception_examples.py)
 - [`rate_limit_examples.py`](examples/rate_limit_examples.py)
+- [`readme_examples.py`](examples/readme_examples.py)
 - [`require_env_examples.py`](examples/require_env_examples.py)
 - [`retry_examples.py`](examples/retry_examples.py)
 - [`retry_idempotency_examples.py`](examples/retry_idempotency_examples.py)
