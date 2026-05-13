@@ -60,6 +60,10 @@ Default in-process cache backend for `cache_result`.
 
 SQLite-backed persistent cache backend for trusted local cache files. Includes `cache_metadata()`, `inspect_integrity()`, `maintain()`, read-only `inspect_entries(...)`, and aggregate `inspect_aggregate(...)` diagnostics. See [`DiskCacheBackend`](disk_cache_backend.md).
 
+### `cache_directory(app_name, *, base_path=None)`
+
+Return a conventional per-application cache directory path without creating directories.
+
 ### `CacheBackend`
 
 Protocol for cache backends.

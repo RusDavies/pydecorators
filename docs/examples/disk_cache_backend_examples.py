@@ -64,6 +64,29 @@ def closed_backend_error_example(cache_path: Path) -> str:
     return "open"
 
 
+def service_shutdown_example(cache_path: Path) -> tuple[str, str]:
+    """Keep a decorator-bound disk backend alive until service shutdown."""
+
+    backend = DiskCacheBackend(cache_path, ttl=300, maxsize=32)
+
+    @cache_result(backend=backend, namespace="service-users")
+    def load_profile(user_id: str) -> str:
+        return f"profile:{user_id}"
+
+    try:
+        loaded = load_profile("user-123")
+    finally:
+        backend.close()
+
+    from useful_decorators import CacheBackendClosedError
+
+    try:
+        load_profile("user-456")
+    except CacheBackendClosedError as exc:
+        return loaded, type(exc).__name__
+    return loaded, "still-open"
+
+
 def persistent_disk_cache_example(cache_path: Path) -> tuple[str, str, int]:
     """Show cached values surviving a new DiskCacheBackend instance."""
 

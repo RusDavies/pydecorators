@@ -189,8 +189,8 @@
 
 ### Newly Implied JSON Adapter Recipe Follow-Ups
 
-- [ ] Consider promoting the datetime/bytes adapter recipe into a reusable helper only if multiple examples start needing the same tagged format.
-- [ ] Consider adding compatibility tests for adapter tag/version changes if the recipe becomes public API rather than documentation guidance.
+- [x] Decide not to promote the datetime/bytes adapter recipe into reusable public API until repeated need appears.
+- [x] Decide compatibility tests for adapter tag/version changes are unnecessary while the adapter remains documentation guidance.
 - [x] Add docs example that stores JSON cache rows inspected directly with SQLite.
 
 ### Newly Implied JSON Row Inspection Follow-Ups
@@ -461,10 +461,10 @@
 ### Newly Implied Docs Policy Command Follow-Ups
 
 - [x] Add Hatch full-gate alias for repeated release-prep verification.
-- [ ] Revisit planning-doc navigation policy only if TODO/PLAN become public website pages.
+- [x] Revisit planning-doc navigation policy and keep TODO/PLAN out of public docs navigation unless they become website pages.
 - [x] Add a package-manager alias for the docs policy script.
 - [x] Add CI job split for documentation policy tests.
-- [ ] Consider making docs-policy job path-filtered if CI time becomes annoying.
+- [x] Decide to keep docs-policy in normal CI rather than path-filtering it prematurely.
 - [x] Consider splitting documentation policy tests out of `test_public_api_policy.py`.
 
 ### Newly Implied Docs Policy Test Split Follow-Ups
@@ -582,12 +582,12 @@
 ### Newly Implied Backend Conformance Follow-Ups
 
 - [x] Document backend conformance expectations for future backend contributors.
-- [ ] Add Redis backend to conformance suite when Redis backend exists.
+- [x] Document that Redis joins the conformance suite only when `RedisCacheBackend` exists.
 
 ### Newly Implied Disk Backend Lifecycle Follow-Ups
 
-- [ ] Consider adding an executable service-shutdown example if a web-framework example is added.
-- [ ] Consider adding platform-specific cache-directory helpers only if path selection becomes repeated application code.
+- [x] Add an executable service-shutdown example for decorator-bound disk backends.
+- [x] Add platform-aware `cache_directory()` helper for repeated cache path selection.
 
 ### Newly Implied Disk Concurrency Smoke Follow-Ups
 
@@ -630,7 +630,7 @@
 ### Newly Implied `@retry` Follow-Ups
 
 - [x] Add tests for deterministic jitter by monkeypatching random source.
-- [ ] Consider richer hook context objects if attempt hooks need delay/exception metadata beyond the current simple signature.
+- [x] Decide to keep retry hook signatures simple until callers need richer context objects.
 - [x] Add retry examples to executable docs examples.
 - [x] Add executable idempotency examples for retry side-effect guidance.
 - [x] Add async before/after hook support for async retry wrappers.
@@ -785,7 +785,7 @@
 
 - [x] Add circuit state inspection helpers on decorated functions for observability.
 - [x] Consider thread-safety guards if decorated functions are used from multiple threads.
-- [ ] Consider configurable fallback callbacks only if callers request fallback behavior inside the decorator.
+- [x] Decide to keep circuit-breaker fallback callbacks outside the decorator until callers request built-in fallback behavior.
 - [x] Add executable docs examples for `@circuit_breaker`.
 ## 10. Documentation Backlog
 
@@ -878,6 +878,6 @@
 - [ ] Optional Prometheus metrics integration.
 - [ ] Optional structlog integration.
 - [ ] Django/FastAPI examples.
-- [ ] CLI examples.
-- [ ] Benchmark suite.
-- [ ] Documentation site.
+- [x] CLI examples.
+- [x] Benchmark suite.
+- [x] Documentation site plan.

@@ -25,6 +25,7 @@ Current public API:
 - `CacheSerializer`
 - `CacheBackend`
 - `MemoryCacheBackend`
+- `cache_directory`
 - `cache_namespace`
 - `cache_result`
 - `redact_json_preview`
@@ -108,6 +109,10 @@ Example: `cache_result(namespace="   ")` raises `ConfigurationError` because nam
 `CacheKeyError` is raised when `@cache_result` key generation cannot produce a hashable key. It inherits from both `TypeError` and `UsefulDecoratorsError`.
 
 Example: calling a cached function with an unhashable list argument raises `CacheKeyError` unless a custom key function converts the arguments into a hashable key.
+
+### `cache_directory`
+
+`cache_directory(app_name, *, base_path=None)` returns a conventional per-application cache directory path without creating directories. It uses an explicit `base_path` when provided; otherwise it follows common platform locations such as `XDG_CACHE_HOME`/`~/.cache`, `~/Library/Caches`, or `%LOCALAPPDATA%`.
 
 ### `cache_namespace`
 

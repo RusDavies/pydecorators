@@ -79,6 +79,35 @@ def test_cache_backend_closed_error_documentation_example_executes(tmp_path: Pat
     )
 
 
+def test_service_shutdown_documentation_example_executes(tmp_path: Path) -> None:
+    examples = load_docs_example("disk_cache_backend_examples")
+
+    loaded, closed_signal = examples.service_shutdown_example(tmp_path / "service-cache.sqlite3")
+
+    assert_example_result(loaded, "profile:user-123")
+    assert_example_result(closed_signal, "CacheBackendClosedError")
+
+
+def test_cli_documentation_examples_execute(tmp_path: Path) -> None:
+    examples = load_docs_example("cli_examples")
+
+    cache_path = examples.resolve_cache_path("demo-cli", base_path=tmp_path)
+    first, second, calls = examples.cached_cli_lookup_example(cache_path)
+
+    assert_example_result(cache_path, tmp_path / "demo-cli" / "cache.sqlite3")
+    assert_example_result(first, "user:123")
+    assert_example_result(second, "user:123")
+    assert_example_result(calls, 1)
+    assert_example_result(
+        examples.cli_main_style_example(tmp_path / "cli-main.sqlite3", "42"),
+        0,
+    )
+    assert_example_result(
+        examples.cli_main_style_example(tmp_path / "cli-main-error.sqlite3", ""),
+        2,
+    )
+
+
 def test_json_datetime_bytes_serializer_documentation_example_executes(
     tmp_path: Path,
 ) -> None:

@@ -615,6 +615,8 @@ with DiskCacheBackend(".cache/tool.sqlite3", ttl=60, maxsize=16) as backend:
     entry = backend.get("answer")
 ```
 
+For decorator-bound service caches, keep the backend alive as long as decorated functions can be called and close it from the application's shutdown hook. Executable example: `docs/examples/disk_cache_backend_examples.py::service_shutdown_example`.
+
 Do not wrap a decorator-bound backend in a short `with` block unless all decorated calls happen before the block exits. Once the context manager closes the backend, later decorated calls will fail with `CacheBackendClosedError`.
 
 
@@ -638,7 +640,7 @@ Cache files are disposable local artifacts, but their contents may still be sens
 
 Recommended locations:
 
-- CLI tools: use a user-owned cache directory such as `~/.cache/<app>/cache.sqlite3` on Linux, or the platform equivalent chosen by the application. Avoid the current working directory unless the tool explicitly documents that behavior.
+- CLI tools: use a user-owned cache directory such as `~/.cache/<app>/cache.sqlite3` on Linux, or the platform equivalent chosen by the application. `cache_directory("app")` centralizes common user-cache path selection without creating directories. Avoid the current working directory unless the tool explicitly documents that behavior.
 - Services: use an application-owned state/cache directory such as `/var/cache/<app>/` or a private runtime volume. Keep it separate from web roots, public artifact directories, and backup/export paths that are not intended to contain cache data.
 - Tests/examples: use temporary directories or project-local `.cache/` paths that are ignored by version control.
 
