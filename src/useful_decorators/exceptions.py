@@ -1,5 +1,9 @@
 """Public exception hierarchy for useful-decorators."""
 
+from __future__ import annotations
+
+from dataclasses import dataclass
+
 
 class UsefulDecoratorsError(Exception):
     """Base class for all package-specific exceptions."""
@@ -9,8 +13,14 @@ class ConfigurationError(ValueError, UsefulDecoratorsError):
     """Raised when a decorator receives invalid configuration."""
 
 
+@dataclass(frozen=True, slots=True)
 class RateLimitExceeded(UsefulDecoratorsError):
     """Raised when a rate-limited call exceeds its configured allowance."""
+
+    retry_after: float
+
+    def __str__(self) -> str:
+        return f"rate limit exceeded; retry after {self.retry_after:.6g} seconds"
 
 
 class FunctionTimedOut(TimeoutError, UsefulDecoratorsError):

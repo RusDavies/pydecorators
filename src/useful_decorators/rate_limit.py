@@ -50,7 +50,7 @@ def rate_limit(
                             result = await result
                         return result
                     if mode == "raise":
-                        raise RateLimitExceeded(_rate_limit_message(wait_seconds))
+                        raise RateLimitExceeded(retry_after=wait_seconds)
                     await async_sleep_func(wait_seconds)
 
             return mirror_metadata(cast(Callable[P, R], async_wrapper), cast(Callable[P, R], func))
@@ -64,7 +64,7 @@ def rate_limit(
                 if wait_seconds is None:
                     return func(*args, **kwargs)
                 if mode == "raise":
-                    raise RateLimitExceeded(_rate_limit_message(wait_seconds))
+                    raise RateLimitExceeded(retry_after=wait_seconds)
                 sync_sleep_func(wait_seconds)
 
         return mirror_metadata(wrapper, func)
@@ -127,7 +127,3 @@ def _bucket_key(
         return key(*args, **kwargs)
     except TypeError:
         raise
-
-
-def _rate_limit_message(wait_seconds: float) -> str:
-    return f"rate limit exceeded; retry after {wait_seconds:.6g} seconds"

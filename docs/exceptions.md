@@ -108,8 +108,8 @@ def limited() -> str:
 try:
     limited()
     limited()
-except RateLimitExceeded:
-    ...
+except RateLimitExceeded as exc:
+    retry_after = exc.retry_after
 ```
 
 ### `FunctionTimedOut`
