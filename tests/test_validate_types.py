@@ -40,8 +40,21 @@ def test_validate_types_supports_common_container_origins_without_deep_checks() 
         return len(values)
 
     assert count([1, 2, 3]) == 3
+    assert count(["not checked deeply"]) == 1  # type: ignore[list-item]
     with pytest.raises(ValidationError, match="argument 'values' expected list"):
         count((1, 2, 3))  # type: ignore[arg-type]
+
+
+def test_validate_types_can_validate_container_contents_when_deep_enabled() -> None:
+    @validate_types(deep=True, validate_return=True)
+    def normalize(values: list[int], metadata: dict[str, tuple[str, ...]]) -> set[str]:
+        return {str(value) for value in values} | set(metadata["tags"])
+
+    assert normalize([1, 2], {"tags": ("a", "b")}) == {"1", "2", "a", "b"}
+    with pytest.raises(ValidationError, match="argument 'values' expected list"):
+        normalize([1, "bad"], {"tags": ("a",)})  # type: ignore[list-item]
+    with pytest.raises(ValidationError, match="argument 'metadata' expected dict"):
+        normalize([1], {1: ("a",)})  # type: ignore[dict-item]
 
 
 def test_validate_types_supports_literal_and_annotated() -> None:
@@ -101,6 +114,8 @@ def test_validate_types_preserves_metadata() -> None:
 def test_validate_types_validates_configuration() -> None:
     with pytest.raises(ConfigurationError, match="validate_return must be a boolean"):
         validate_types(validate_return="yes")  # type: ignore[arg-type]
+    with pytest.raises(ConfigurationError, match="deep must be a boolean"):
+        validate_types(deep="yes")  # type: ignore[arg-type]
 
 
 def test_validate_types_ignores_unannotated_arguments_and_any() -> None:

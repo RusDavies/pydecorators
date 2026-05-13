@@ -14,6 +14,7 @@ def greet(name: str, excited: bool = False) -> str:
 ## Parameters
 
 - `validate_return`: when `True`, validate the annotated return value. Defaults to `False`.
+- `deep`: when `True`, validate supported container contents for `list`, `dict`, `tuple`, `set`, and `frozenset`. Defaults to `False`.
 
 Invalid configuration raises `ConfigurationError` at decoration time.
 
@@ -29,7 +30,7 @@ The first implementation intentionally supports a conservative subset:
 - common container origins such as `list[int]`, `dict[str, object]`, `tuple[...]`, `set[...]`, and `frozenset[...]`
 - `Any`, which always passes
 
-Container checks are shallow. `list[int]` checks that the value is a list, not that every element is an `int`. Deep validation belongs in a real validation library, not in a decorator wearing a fake lab coat.
+Container checks are shallow by default. `list[int]` checks that the value is a list, not that every element is an `int`. Pass `deep=True` to recursively validate supported container contents when that extra strictness is useful. Deep mode remains deliberately small; it is not data coercion, schema validation, or a replacement for a real validation library wearing a fake lab coat.
 
 Unsupported or complex annotations are treated as pass-through rather than failing closed. This keeps the decorator useful for simple scripts and tests without pretending it fully implements Python's typing system.
 
@@ -47,7 +48,7 @@ Async functions are supported with the same argument and optional return validat
 
 ## Limitations
 
-`@validate_types` is not a schema validator and not a security boundary. It does not validate nested container contents, protocols, typed dictionaries, callables, generics in depth, constrained values beyond explicit `Literal[...]` membership, data coercion, or user-defined validation rules. Use Pydantic, attrs validators, dataclasses plus explicit checks, or domain-specific validation when that level of enforcement matters.
+`@validate_types` is not a schema validator and not a security boundary. Even in `deep=True` mode, it does not validate protocols, typed dictionaries, callables, arbitrary generics, constrained values beyond explicit `Literal[...]` membership, data coercion, or user-defined validation rules. Use Pydantic, attrs validators, dataclasses plus explicit checks, or domain-specific validation when that level of enforcement matters.
 
 
 ## Executable examples
