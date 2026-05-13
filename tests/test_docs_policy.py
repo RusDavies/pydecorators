@@ -412,6 +412,59 @@ def test_markdown_heading_anchors_include_duplicate_heading_suffixes(tmp_path: P
     }
 
 
+def test_external_link_checker_rejects_unapproved_non_http_schemes(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[email](mailto:security@example.com)\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 1
+    assert "unsupported external link scheme 'mailto'" in result.stderr
+
+
+def test_external_link_checker_allows_intentional_non_http_schemes(
+    tmp_path: Path,
+) -> None:
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("[email](mailto:security@example.com)\n")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+            "--allow-scheme",
+            "mailto",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "syntax-checked 0 external HTTP(S) link(s)" in result.stdout
+
+
 def test_external_link_checker_syntax_only_mode_passes_without_network() -> None:
     import subprocess
     import sys

@@ -52,3 +52,5 @@ External link ignore patterns must normally match at least one current docs link
 `.external-links-ignore` uses Python `fnmatch`-style URL patterns. Use full HTTP(S) URL shapes such as `https://vendor.example.com/docs/*`; `*` matches within the URL string, including path separators, and matching is case-sensitive. Each non-comment pattern must be preceded by a reason comment so temporary ignores do not fossilize into mystery sediment. Reason comments may include `expires: YYYY-MM-DD`; expired ignore patterns fail the checker until they are removed or deliberately renewed.
 
 External link release checks also support `--json` for quiet machine-readable summaries in automation. Combine it with `--syntax-only` for deterministic dry runs or with live checks immediately before release.
+
+Non-HTTP Markdown links are rejected by default during external-link checks. If a docs page intentionally needs a scheme such as `mailto`, pass `--allow-scheme mailto` and document why the link belongs in public docs.
