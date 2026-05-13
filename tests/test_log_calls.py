@@ -62,6 +62,23 @@ def test_log_calls_can_include_redacted_keyword_arguments(caplog: pytest.LogCapt
     assert "secret" not in joined
 
 
+def test_log_calls_can_redact_positional_arguments_by_parameter_name(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    logger = logging.getLogger("tests.log_calls.positional_args")
+
+    @log_calls(logger=logger, include_args=True, redact_args={"password"})
+    def authenticate(username: str, password: str) -> bool:
+        return username == "ada" and password == "secret"
+
+    with caplog.at_level(logging.INFO, logger=logger.name):
+        assert authenticate("ada", "secret") is True
+
+    joined = "\n".join(messages(caplog))
+    assert "args=('ada', '<redacted>')" in joined
+    assert "secret" not in joined
+
+
 def test_log_calls_can_include_summarized_return_value(caplog: pytest.LogCaptureFixture) -> None:
     logger = logging.getLogger("tests.log_calls.result")
 
