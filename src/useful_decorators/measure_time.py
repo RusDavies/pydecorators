@@ -141,6 +141,11 @@ def _emit_timing(
             info.function,
             info.duration,
             info.success,
+            extra={
+                "useful_decorators_function": info.function,
+                "useful_decorators_duration_seconds": info.duration,
+                "useful_decorators_success": info.success,
+            },
         )
     if metrics_hook is not None:
         metrics_hook(info.function, info.duration, info.success)

@@ -21,6 +21,10 @@ def messages(caplog: pytest.LogCaptureFixture) -> list[str]:
     return [record.getMessage() for record in caplog.records]
 
 
+def extra(record: logging.LogRecord, name: str) -> object:
+    return record.__dict__[name]
+
+
 def test_measure_time_calls_callback_for_sync_success() -> None:
     clock = MutableClock()
     timings: list[TimingInfo] = []
@@ -69,6 +73,9 @@ def test_measure_time_logs_duration(caplog: pytest.LogCaptureFixture) -> None:
         assert work() == "ok"
 
     assert messages(caplog)[0].endswith("work completed in 0.5 seconds success=True")
+    assert str(extra(caplog.records[0], "useful_decorators_function")).endswith("work")
+    assert extra(caplog.records[0], "useful_decorators_duration_seconds") == 0.5
+    assert extra(caplog.records[0], "useful_decorators_success") is True
 
 
 def test_measure_time_calls_metrics_hook() -> None:
