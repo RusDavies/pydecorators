@@ -824,7 +824,7 @@
 
 - [x] Upload coverage XML from CI as a workflow artifact.
 - [x] Add clean-wheel smoke test in an isolated venv before release.
-- [ ] Consider adding coverage summary comments if pull-request reporting becomes useful.
+- [x] Consider adding coverage summary comments if pull-request reporting becomes useful.
 - [ ] Consider running pre-commit in CI only if hook runtime stays modest.
 - [x] Add quality-gates docs page for local verification commands.
 ## 12. Release Backlog

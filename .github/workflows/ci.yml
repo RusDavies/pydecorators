@@ -41,6 +41,8 @@ jobs:
         run: python scripts/smoke_examples.py
       - name: Tests
         run: pytest
+      - name: Coverage summary
+        run: python scripts/coverage_summary.py >> "$GITHUB_STEP_SUMMARY"
       - name: Upload coverage XML
         uses: actions/upload-artifact@v4
         with:
