@@ -93,6 +93,9 @@ If a planning/backlog file such as `GOAL.md`, `PLAN.md`, or `TODO.md` becomes us
 
 ## Documentation index inclusion rule
 
+Keep `docs/index.md` grouped by purpose: core project docs, decorator docs, cache backend docs, and executable examples. Add new links to the narrowest matching section rather than using the index as a junk drawer with Markdown syntax.
+
+
 Add a page to `docs/index.md` when it is intended to help users or contributors understand, use, extend, release, or maintain the package. In practice, that includes:
 
 - public API, compatibility, exception, or design policy pages
