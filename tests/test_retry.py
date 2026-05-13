@@ -137,6 +137,41 @@ async def test_retry_supports_async_functions() -> None:
     assert sleeps == [0.2, 0.2]
 
 
+@pytest.mark.asyncio
+async def test_retry_awaits_async_attempt_hooks_for_async_functions() -> None:
+    before: list[int] = []
+    after: list[tuple[int, str | None]] = []
+    calls = 0
+
+    async def record_before(attempt: int) -> None:
+        await asyncio.sleep(0)
+        before.append(attempt)
+
+    async def record_after(attempt: int, exc: BaseException | None) -> None:
+        await asyncio.sleep(0)
+        after.append((attempt, type(exc).__name__ if exc else None))
+
+    async def fake_sleep(seconds: float) -> None:
+        await asyncio.sleep(0)
+
+    @retry(
+        attempts=2,
+        before_attempt=record_before,
+        after_attempt=record_after,
+        sleep=fake_sleep,
+    )
+    async def flaky() -> str:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise ValueError("first")
+        return "ok"
+
+    assert await flaky() == "ok"
+    assert before == [1, 2]
+    assert after == [(1, "ValueError"), (2, None)]
+
+
 def test_retry_preserves_metadata() -> None:
     @retry(attempts=1)
     def documented(value: int) -> int:

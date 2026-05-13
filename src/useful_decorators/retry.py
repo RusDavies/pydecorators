@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import random
 from collections.abc import Callable
 from typing import Any, cast
@@ -51,15 +52,15 @@ def retry(
             async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> object:
                 current_delay = delay
                 for attempt_number in range(1, attempts + 1):
-                    _call_before(before_attempt, attempt_number)
+                    await _call_before_async(before_attempt, attempt_number)
                     try:
                         result = async_func(*args, **kwargs)
                         if hasattr(result, "__await__"):
                             result = await result
-                        _call_after(after_attempt, attempt_number, None)
+                        await _call_after_async(after_attempt, attempt_number, None)
                         return result
                     except exception_types as exc:
-                        _call_after(after_attempt, attempt_number, exc)
+                        await _call_after_async(after_attempt, attempt_number, exc)
                         if not _should_retry(
                             exc,
                             attempt_number=attempt_number,
@@ -184,3 +185,23 @@ def _call_after(
 ) -> None:
     if hook is not None:
         hook(attempt_number, exc)
+
+
+async def _call_before_async(hook: BeforeAttemptHook | None, attempt_number: int) -> None:
+    if hook is None:
+        return
+    result = hook(attempt_number)
+    if inspect.isawaitable(result):
+        await result
+
+
+async def _call_after_async(
+    hook: AfterAttemptHook | None,
+    attempt_number: int,
+    exc: BaseException | None,
+) -> None:
+    if hook is None:
+        return
+    result = hook(attempt_number, exc)
+    if inspect.isawaitable(result):
+        await result

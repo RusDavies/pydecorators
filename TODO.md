@@ -633,7 +633,7 @@
 - [ ] Consider richer hook context objects if attempt hooks need delay/exception metadata beyond the current simple signature.
 - [x] Add retry examples to executable docs examples.
 - [x] Add executable idempotency examples for retry side-effect guidance.
-- [ ] Consider whether async retry should support async before/after hooks if users request them.
+- [x] Add async before/after hook support for async retry wrappers.
 - [x] Document idempotency guidance for retrying side-effecting functions before public release.
 
 ## 5. `@rate_limit`
