@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import json
 import re
 import sys
 import time
@@ -257,6 +258,11 @@ def main() -> int:
             "while staging ignore-list updates with nearby docs changes"
         ),
     )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="emit a quiet machine-readable summary instead of human-readable output",
+    )
     args = parser.parse_args()
 
     root = args.root.resolve()
@@ -281,7 +287,7 @@ def main() -> int:
             )
         return 1
 
-    if args.verbose:
+    if args.verbose and not args.json:
         for pattern, matches in ignore_matches.items():
             for docs_file, link in matches:
                 print(f"ignore pattern {pattern} matches {docs_file}: {link}")
@@ -298,7 +304,7 @@ def main() -> int:
                 ignored_links.append(f"ignored {docs_file}: {link} (matched {ignore_pattern})")
                 continue
             checked += 1
-            if args.verbose:
+            if args.verbose and not args.json:
                 print(f"checking {docs_file}: {link}")
             if not is_valid_external_http_link(link):
                 failures.append(f"{docs_file}: invalid syntax: {link}")
@@ -306,7 +312,7 @@ def main() -> int:
             if args.syntax_only:
                 continue
             reporter = None
-            if args.verbose:
+            if args.verbose and not args.json:
 
                 def reporter(message: str, docs_file: Path = docs_file, link: str = link) -> None:
                     print(f"{docs_file}: {link}: {message}")
@@ -321,8 +327,24 @@ def main() -> int:
             )
             if not ok:
                 failures.append(f"{docs_file}: unreachable external link ({detail}): {link}")
-            elif args.verbose:
+            elif args.verbose and not args.json:
                 print(f"ok {docs_file}: {link} ({detail})")
+
+    mode = "syntax-checked" if args.syntax_only else "checked"
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "mode": mode,
+                    "checked": checked,
+                    "ignored": ignored,
+                    "failures": failures,
+                    "ok": not failures,
+                },
+                sort_keys=True,
+            )
+        )
+        return 1 if failures else 0
 
     if failures:
         for failure in failures:
@@ -333,7 +355,6 @@ def main() -> int:
         for ignored_link in ignored_links:
             print(ignored_link)
 
-    mode = "syntax-checked" if args.syntax_only else "checked"
     ignored_message = f"; ignored {ignored}" if ignored else ""
     print(f"{mode} {checked} external HTTP(S) link(s){ignored_message}")
     return 0

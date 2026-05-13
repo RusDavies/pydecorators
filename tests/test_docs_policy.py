@@ -889,6 +889,46 @@ def test_external_link_checker_can_allow_stale_ignore_patterns(
     assert "syntax-checked 1 external HTTP(S) link(s)" in result.stdout
 
 
+def test_external_link_checker_json_output_is_quiet_for_release_automation(
+    tmp_path: Path,
+) -> None:
+    import json
+    import subprocess
+    import sys
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text(
+        "[ignored](https://ignored.example.com/docs)\n[checked](https://example.com/docs)\n"
+    )
+    (tmp_path / ".external-links-ignore").write_text(
+        "# Intentional unstable test URL.\nhttps://ignored.example.com/*\n"
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path.cwd() / "scripts/check_external_links.py"),
+            "--root",
+            str(tmp_path),
+            "--syntax-only",
+            "--verbose",
+            "--json",
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert json.loads(result.stdout) == {
+        "checked": 1,
+        "failures": [],
+        "ignored": 1,
+        "mode": "syntax-checked",
+        "ok": True,
+    }
+    assert result.stderr == ""
+
+
 def test_external_link_checker_fails_for_expired_ignore_pattern(
     tmp_path: Path,
 ) -> None:
