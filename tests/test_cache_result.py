@@ -1,12 +1,19 @@
 from collections.abc import Hashable
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from threading import Barrier, Event, Lock
 from time import sleep
 from typing import Any, cast
 
 import pytest
 
-from useful_decorators import CacheInfo, MemoryCacheBackend, cache_result
+from useful_decorators import (
+    CacheBackendClosedError,
+    CacheInfo,
+    DiskCacheBackend,
+    MemoryCacheBackend,
+    cache_result,
+)
 from useful_decorators.cache_result import _CacheEntry
 from useful_decorators.exceptions import CacheKeyError, ConfigurationError
 
@@ -452,6 +459,14 @@ def test_cache_result_accepts_custom_backend() -> None:
 
     clear_cache(value)
     assert backend.cleared
+
+
+def test_cache_result_rejects_closed_backend_at_configuration_time(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
+    backend.close()
+
+    with pytest.raises(CacheBackendClosedError, match="cache backend is closed"):
+        cache_result(backend=backend)
 
 
 def test_shared_backend_shares_entries_for_identical_generated_keys() -> None:

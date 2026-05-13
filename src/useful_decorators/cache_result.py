@@ -737,6 +737,8 @@ def cache_result(
         refresh_ttl_on_hit=refresh_ttl_on_hit,
         clock=clock,
     )
+    if backend is not None:
+        cache_backend.info()
 
     def decorator(func: Callable[P, R]) -> Callable[P, R]:
         if is_async_callable(func):

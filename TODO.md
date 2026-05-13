@@ -369,7 +369,7 @@
 ### Newly Implied Closed Backend Regression Follow-Ups
 
 - [x] Add a clearer README warning that context-managed disk backends are not for decorator-bound long-lived functions.
-- [ ] Consider whether `cache_result` should validate closeable backends at decoration time when possible.
+- [x] Validate provided cache backends at configuration time by calling `info()` so closed backends fail early.
 - [x] Document CacheBackendClosedError in README cache section.
 
 ### Newly Implied Closed Backend README Follow-Ups
