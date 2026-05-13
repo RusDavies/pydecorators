@@ -9,7 +9,7 @@ from typing import Any, Union, cast, get_args, get_origin, get_type_hints
 
 from useful_decorators._core import is_async_callable, mirror_metadata
 from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError
+from useful_decorators.exceptions import ConfigurationError, ValidationError
 
 NoneType = type(None)
 
@@ -65,7 +65,7 @@ def _validate_bound_arguments(
         if expected is None:
             continue
         if not _matches_type(value, expected):
-            raise TypeError(
+            raise ValidationError(
                 f"{function_name}() argument {name!r} expected "
                 f"{_format_type(expected)}, got {type(value).__name__}"
             )
@@ -81,7 +81,7 @@ def _validate_return_value(
         return
     expected = hints["return"]
     if not _matches_type(value, expected):
-        raise TypeError(
+        raise ValidationError(
             f"{function_name}() return value expected "
             f"{_format_type(expected)}, got {type(value).__name__}"
         )

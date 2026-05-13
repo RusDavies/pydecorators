@@ -41,3 +41,7 @@ class CacheBackendClosedError(UsefulDecoratorsError):
 
 class UnsupportedCacheSchemaVersionError(UsefulDecoratorsError):
     """Raised when a persistent cache uses a newer unsupported schema."""
+
+
+class ValidationError(TypeError, UsefulDecoratorsError):
+    """Raised when ``@validate_types`` finds an argument or return mismatch."""

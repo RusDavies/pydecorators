@@ -12,6 +12,7 @@ from useful_decorators import (
     FunctionTimedOut,
     PickleCacheSerializer,
     RateLimitExceeded,
+    ValidationError,
     cache_result,
     circuit_breaker,
     rate_limit,
@@ -71,6 +72,22 @@ def cache_serialization_error_example() -> str:
     except CacheSerializationError:
         return "serialization failed"
     return "serialization succeeded"
+
+
+def validation_error_example() -> str:
+    """Handle a runtime type-validation failure."""
+
+    from useful_decorators import validate_types
+
+    @validate_types()
+    def double(value: int) -> int:
+        return value * 2
+
+    try:
+        double("bad")  # type: ignore[arg-type]
+    except ValidationError:
+        return "validation failed"
+    return "validation passed"
 
 
 def rate_limit_exceeded_example() -> str:

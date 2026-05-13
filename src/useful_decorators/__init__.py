@@ -27,6 +27,7 @@ from useful_decorators.exceptions import (
     RateLimitExceeded,
     UnsupportedCacheSchemaVersionError,
     UsefulDecoratorsError,
+    ValidationError,
 )
 from useful_decorators.log_calls import log_calls
 from useful_decorators.measure_time import TimingInfo, measure_time
@@ -60,6 +61,7 @@ __all__ = [
     "TimingInfo",
     "UnsupportedCacheSchemaVersionError",
     "UsefulDecoratorsError",
+    "ValidationError",
     "cache_result",
     "circuit_breaker",
     "deprecated",

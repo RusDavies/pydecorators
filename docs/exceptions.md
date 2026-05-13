@@ -12,6 +12,7 @@ Use the most specific exception when you can recover from a known condition. Cat
 | `ConfigurationError` | `ValueError`, `UsefulDecoratorsError` | A decorator or backend receives invalid configuration. |
 | `CircuitBreakerOpen` | `UsefulDecoratorsError` | A circuit-breaker-protected call is rejected because the circuit is open. |
 | `CacheKeyError` | `TypeError`, `UsefulDecoratorsError` | `@cache_result` cannot build a hashable cache key. |
+| `ValidationError` | `TypeError`, `UsefulDecoratorsError` | `@validate_types` finds an argument or return value mismatch. |
 | `CacheSerializationError` | `UsefulDecoratorsError` | Cache payload serialization or deserialization fails. |
 | `CacheBackendClosedError` | `UsefulDecoratorsError` | A closeable cache backend such as `DiskCacheBackend` is used after `close()`. |
 | `UnsupportedCacheSchemaVersionError` | `UsefulDecoratorsError` | A persistent cache file uses a newer schema version than this package supports. |
@@ -106,6 +107,21 @@ try:
     DiskCacheBackend(".cache/example.sqlite3")
 except UnsupportedCacheSchemaVersionError:
     # Upgrade useful-decorators, choose a compatible cache file, or rebuild the cache.
+    ...
+```
+
+### `ValidationError`
+
+```python
+from useful_decorators import ValidationError, validate_types
+
+@validate_types()
+def double(value: int) -> int:
+    return value * 2
+
+try:
+    double("bad")
+except ValidationError:
     ...
 ```
 

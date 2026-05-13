@@ -33,13 +33,13 @@ Current public API:
 - `measure_time`
 - `TimingInfo`
 - `validate_types`
+- `ValidationError`
 - `require_env`
 - `EnvRequirementError`
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `RateLimitExceeded`
 - `FunctionTimedOut`
-- `UnsupportedCacheSchemaVersionError`
 
 ## Internal API
 
@@ -189,7 +189,11 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `validate_types`
 
-`validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins, `Any`, and optional/union types. It is intentionally not a full schema-validation system. See `docs/validate_types.md` for behavior and limitations.
+`validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins, `Any`, and optional/union types. Validation mismatches raise `ValidationError`, which still inherits from `TypeError` for compatibility with ordinary type-check handling. It is intentionally not a full schema-validation system. See `docs/validate_types.md` for behavior and limitations.
+
+### `ValidationError`
+
+`ValidationError` is raised when `@validate_types` finds an argument or return value that does not match a supported annotation. It inherits from `TypeError` and `UsefulDecoratorsError`, so callers can either treat it like ordinary Python type misuse or catch package-specific validation failures explicitly.
 
 ### `require_env`
 
