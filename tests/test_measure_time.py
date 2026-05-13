@@ -112,6 +112,31 @@ async def test_measure_time_supports_async_functions() -> None:
     assert timings[0].success is True
 
 
+@pytest.mark.asyncio
+async def test_measure_time_awaits_async_callback_and_metrics_hooks() -> None:
+    clock = MutableClock()
+    timings: list[TimingInfo] = []
+    metrics: list[tuple[str, float, bool]] = []
+
+    async def record_timing(info: TimingInfo) -> None:
+        await asyncio.sleep(0)
+        timings.append(info)
+
+    async def record_metric(function: str, duration: float, success: bool) -> None:
+        await asyncio.sleep(0)
+        metrics.append((function, duration, success))
+
+    @measure_time(callback=record_timing, metrics_hook=record_metric, clock=clock)
+    async def async_work() -> str:
+        return "ok"
+
+    assert await async_work() == "ok"
+    assert len(timings) == 1
+    assert timings[0].function.endswith("async_work")
+    assert metrics[0][0].endswith("async_work")
+    assert metrics[0][1:] == (0.5, True)
+
+
 def test_measure_time_preserves_metadata() -> None:
     @measure_time()
     def documented(value: int) -> int:
