@@ -49,4 +49,4 @@ External link ignore patterns must normally match at least one current docs link
 
 ### External link ignore wildcards
 
-`.external-links-ignore` uses Python `fnmatch`-style URL patterns. Use full HTTP(S) URL shapes such as `https://vendor.example.com/docs/*`; `*` matches within the URL string, including path separators, and matching is case-sensitive. Each non-comment pattern must be preceded by a reason comment so temporary ignores do not fossilize into mystery sediment.
+`.external-links-ignore` uses Python `fnmatch`-style URL patterns. Use full HTTP(S) URL shapes such as `https://vendor.example.com/docs/*`; `*` matches within the URL string, including path separators, and matching is case-sensitive. Each non-comment pattern must be preceded by a reason comment so temporary ignores do not fossilize into mystery sediment. Reason comments may include `expires: YYYY-MM-DD`; expired ignore patterns fail the checker until they are removed or deliberately renewed.

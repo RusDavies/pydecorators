@@ -9,6 +9,7 @@ import re
 import sys
 import time
 from collections.abc import Callable
+from datetime import date
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
@@ -33,6 +34,7 @@ def ignore_file_errors(path: Path) -> list[str]:
 
     errors: list[str] = []
     previous_meaningful_line_was_comment = False
+    previous_comment = ""
     for line_number, raw_line in enumerate(path.read_text().splitlines(), start=1):
         line = raw_line.strip()
         if not line:
@@ -40,11 +42,17 @@ def ignore_file_errors(path: Path) -> list[str]:
             continue
         if line.startswith("#"):
             previous_meaningful_line_was_comment = True
+            previous_comment = line
             continue
         if not previous_meaningful_line_was_comment:
             errors.append(
                 f"{path}:{line_number}: ignore pattern must be preceded by a reason comment"
             )
+        expires_match = re.search(r"expires:\s*(\d{4}-\d{2}-\d{2})", previous_comment)
+        if expires_match is not None:
+            expires_on = date.fromisoformat(expires_match.group(1))
+            if expires_on < date.today():
+                errors.append(f"{path}:{line_number}: ignore pattern expired on {expires_on}")
         if not is_valid_external_http_pattern(line):
             errors.append(f"{path}:{line_number}: ignore pattern must be an HTTP(S) URL pattern")
         previous_meaningful_line_was_comment = False
