@@ -59,22 +59,21 @@ def test_disk_cache_backend_design_doc_covers_maintenance_helper_design() -> Non
     text = Path("docs/disk_cache_backend.md").read_text()
 
     for required in [
-        "## Integrity check and maintenance helper design",
+        "## Integrity check and maintenance helper",
         "maintain()",
         "DiskCacheMaintenanceReport",
-        "prune_expired=True",
-        "validate_payloads=True",
-        "serializer mismatch cleanup",
+        "vacuum=False",
+        "serializer_content_type",
         "vacuum=True",
-        "rows_seen",
         "expired_rows_dropped",
         "serializer_mismatch_rows_dropped",
-        "corrupt_payload_rows_dropped",
-        "DiskCacheDropEvent",
+        "corrupt_rows_dropped",
+        "on_drop",
         "Non-goals for the first maintenance helper",
         "repairing corrupted payloads",
         "migrating payload schemas automatically",
         "running `VACUUM` automatically",
+        "raising on corrupt rows by default",
     ]:
         assert required in text
 
