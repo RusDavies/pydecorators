@@ -33,9 +33,11 @@ Unsupported or complex annotations are treated as pass-through rather than faili
 
 ## Errors
 
-Argument validation failures raise `TypeError` with the function name, argument name, expected type, and actual runtime type.
+Argument validation failures raise `ValidationError` with the function name, argument name, expected type, and actual runtime type.
 
-Return validation failures raise `TypeError` with the function name, expected return type, and actual runtime type.
+Return validation failures raise `ValidationError` with the function name, expected return type, and actual runtime type.
+
+`ValidationError` inherits from both `TypeError` and `UsefulDecoratorsError`, so existing callers can catch ordinary type failures while package-aware callers can distinguish validation mismatches from unrelated `TypeError`s.
 
 ## Async support
 

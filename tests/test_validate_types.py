@@ -3,7 +3,7 @@ from typing import Any, cast
 
 import pytest
 
-from useful_decorators import ConfigurationError, validate_types
+from useful_decorators import ConfigurationError, ValidationError, validate_types
 
 
 def test_validate_types_accepts_basic_builtin_types() -> None:
@@ -19,7 +19,7 @@ def test_validate_types_rejects_wrong_argument_type_with_clear_message() -> None
     def double(value: int) -> int:
         return value * 2
 
-    with pytest.raises(TypeError, match="argument 'value' expected int, got str"):
+    with pytest.raises(ValidationError, match="argument 'value' expected int, got str"):
         double("nope")  # type: ignore[arg-type]
 
 
@@ -30,7 +30,7 @@ def test_validate_types_supports_optional_and_union_types() -> None:
 
     assert normalize(None, 3) == "3"
     assert normalize("x", "fallback") == "x"
-    with pytest.raises(TypeError, match="argument 'fallback' expected"):
+    with pytest.raises(ValidationError, match="argument 'fallback' expected"):
         normalize(None, object())  # type: ignore[arg-type]
 
 
@@ -40,7 +40,7 @@ def test_validate_types_supports_common_container_origins_without_deep_checks() 
         return len(values)
 
     assert count([1, 2, 3]) == 3
-    with pytest.raises(TypeError, match="argument 'values' expected list"):
+    with pytest.raises(ValidationError, match="argument 'values' expected list"):
         count((1, 2, 3))  # type: ignore[arg-type]
 
 
@@ -49,7 +49,7 @@ def test_validate_types_can_validate_return_value() -> None:
     def broken() -> int:
         return "not an int"  # type: ignore[return-value]
 
-    with pytest.raises(TypeError, match="return value expected int, got str"):
+    with pytest.raises(ValidationError, match="return value expected int, got str"):
         broken()
 
 
@@ -70,7 +70,7 @@ async def test_validate_types_supports_async_functions() -> None:
         return 1 if value is None else value + 1
 
     assert await add_one(None) == 1
-    with pytest.raises(TypeError, match="argument 'value' expected"):
+    with pytest.raises(ValidationError, match="argument 'value' expected"):
         await add_one("bad")  # type: ignore[arg-type]
 
 

@@ -41,6 +41,7 @@ def test_public_exception_inheritance_matches_documentation() -> None:
         useful_decorators.RateLimitExceeded: "UsefulDecoratorsError",
         useful_decorators.FunctionTimedOut: "TimeoutError",
         useful_decorators.CacheKeyError: "TypeError",
+        useful_decorators.ValidationError: "TypeError",
         useful_decorators.CacheSerializationError: "UsefulDecoratorsError",
         useful_decorators.CacheBackendClosedError: "UsefulDecoratorsError",
         useful_decorators.UnsupportedCacheSchemaVersionError: "UsefulDecoratorsError",

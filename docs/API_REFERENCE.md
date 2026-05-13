@@ -95,6 +95,7 @@ Enum with `CLOSED`, `OPEN`, and `HALF_OPEN` states.
 - `UsefulDecoratorsError`
 - `ConfigurationError`
 - `CacheKeyError`
+- `ValidationError`
 - `CacheSerializationError`
 - `CacheBackendClosedError`
 - `UnsupportedCacheSchemaVersionError`
