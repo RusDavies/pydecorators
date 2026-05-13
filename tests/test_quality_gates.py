@@ -101,3 +101,24 @@ def test_quality_gates_documents_external_link_ignore_wildcards() -> None:
         "reason comment",
     ]:
         assert required in text
+
+
+def test_coverage_summary_script_reports_line_coverage(tmp_path: Path) -> None:
+    import subprocess
+    import sys
+
+    coverage_xml = tmp_path / "coverage.xml"
+    coverage_xml.write_text(
+        "<?xml version='1.0' ?>\n"
+        "<coverage line-rate='0.9721' branch-rate='0' version='7'></coverage>\n"
+    )
+
+    result = subprocess.run(
+        [sys.executable, "scripts/coverage_summary.py", str(coverage_xml)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "## Coverage" in result.stdout
+    assert "Line coverage: 97.21%" in result.stdout
