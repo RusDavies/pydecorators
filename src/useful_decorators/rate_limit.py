@@ -85,8 +85,8 @@ class _SlidingWindowLimiter:
 
         now = self._clock()
         with self._lock:
+            self._prune_idle_windows(now)
             window = self._windows[key]
-            self._prune(window, now)
             if len(window) < self._calls:
                 window.append(now)
                 return None
@@ -97,6 +97,15 @@ class _SlidingWindowLimiter:
         cutoff = now - self._period
         while window and window[0] <= cutoff:
             window.popleft()
+
+    def _prune_idle_windows(self, now: float) -> None:
+        empty_keys = []
+        for key, window in self._windows.items():
+            self._prune(window, now)
+            if not window:
+                empty_keys.append(key)
+        for key in empty_keys:
+            self._windows.pop(key, None)
 
 
 def _validate_rate_limit_config(
