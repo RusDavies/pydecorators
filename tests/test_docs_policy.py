@@ -5,9 +5,12 @@ from types import ModuleType
 
 import pytest
 
+from tests.docs_example_policy_helpers import (
+    asserted_example_function_calls,
+    public_example_functions,
+)
 from tests.docs_policy_helpers import (
     DOCS_INDEX_EXEMPTIONS,
-    asserted_example_function_calls,
     docs_index_local_links,
     docs_index_markdown_links,
     is_external_http_link,
@@ -18,7 +21,6 @@ from tests.docs_policy_helpers import (
     markdown_heading_anchors,
     markdown_links,
     markdown_policy_files,
-    public_example_functions,
 )
 
 pytestmark = pytest.mark.docs_policy
