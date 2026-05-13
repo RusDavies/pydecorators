@@ -293,8 +293,8 @@ Redaction posture:
 
 - Previews should be opt-in at the API call site and clearly documented as potentially sensitive.
 - The library should not promise automatic secret detection. Generic redaction misses too much and creates fake safety.
-- If redaction support is added, it should be explicit and caller-controlled, such as a `preview_redactor` callable or named redaction policy.
-- Built-in redaction, if any, should be conservative and limited to obvious JSON object keys such as `password`, `secret`, `token`, `api_key`, `authorization`, and `cookie`. It should never be the only safety boundary.
+- Redaction support is explicit and caller-controlled with the `preview_redactor` callable.
+- `redact_json_preview()` provides conservative built-in defense-in-depth for obvious JSON object keys such as `password`, `secret`, `token`, `api_key`, and `authorization`. It is not a promise that output is safe to publish.
 - Redaction should happen after bounded decoding/truncation policy is applied, and should preserve the `payload_preview_truncated` signal.
 - Inspection output should not be logged automatically by the library. Callers own where diagnostic reports go.
 - Documentation should warn against enabling previews in shared logs, support bundles, CI artifacts, public bug reports, screenshots, or chat pastebins unless the payload domain is known safe. Yes, this includes pastebins. Especially pastebins.
@@ -343,7 +343,7 @@ CLI design constraints:
 - CLI help text should label row-level output and previews as potentially sensitive.
 - The CLI should never mutate cache stats, TTL, LRU state, or maintenance state during inspection.
 
-Pre-implementation tests should cover default aggregate/no-preview output, row output requiring `--rows`, preview output requiring `--include-payload-preview`, sensitivity warnings, JSON safe defaults, and no mutation during CLI inspection.
+Executable recipe `docs/examples/disk_cache_backend_examples.py::cli_style_inspection_json_example` demonstrates the intended JSON safe defaults: aggregate-only output, no payload previews, metadata fields, and a machine-readable `sensitivity_warning`. Policy tests should keep future CLI/help wording aligned with those defaults.
 
 ## Inspection sensitivity-warning design
 
@@ -358,7 +358,7 @@ Warning expectations:
 - Warnings should mention that metadata can reveal behavior even without payload previews.
 - Warnings should not claim that redaction or no-preview mode makes output safe for public posting.
 
-Pre-implementation tests should cover text warnings, JSON warning fields, stronger preview warnings, quiet-mode documentation, and absence of “safe for public sharing” language.
+Policy tests should cover text warnings, JSON warning fields, stronger preview warnings, quiet-mode documentation, and absence of “safe for public sharing” language.
 
 ## Support-bundle metadata sensitivity
 
@@ -601,7 +601,7 @@ This policy is intentionally conservative for cache data: caches are disposable,
 - `PRAGMA journal_mode = WAL` by default for better local read/write behavior.
 - `wal=False` is available for environments where WAL sidecar files are undesirable.
 
-This remains a single-host local cache. SQLite handles its normal file locking, but this backend is not a distributed cache and does not promise cross-host filesystem semantics.
+This remains a single-host local cache. SQLite handles its normal file locking, but this backend is not a distributed cache and does not promise cross-host filesystem semantics. If SQLite locking behavior needs heavier investigation, `scripts/stress_disk_cache_concurrency.py` provides an optional long-running stress script outside default CI.
 
 ## Scoped context-manager use
 
@@ -672,6 +672,8 @@ For persistent cache reuse, treat cache keys as part of the on-disk compatibilit
 
 ## Integrity check and maintenance helper
 
+`DiskCacheBackend.inspect_integrity()` is the read-only companion for operators that want structured dropped-row counters before cleanup. It counts expired rows, serializer mismatches, and corrupt rows without deleting them or updating hit/miss statistics.
+
 `DiskCacheBackend.maintain()` is explicit operator-facing cleanup, not part of normal `get()` hot-path behavior.
 
 Call shape:
@@ -704,7 +706,7 @@ Non-goals for the first maintenance helper:
 - running `VACUUM` automatically from `get()`, `set_value()`, or `info()`
 - raising on corrupt rows by default
 
-The default posture remains cache-friendly: disposable rows can be pruned, counted, and logged, but normal callers should not fail just because the cache contains stale or malformed data.
+The default posture remains cache-friendly: disposable rows can be pruned, counted, and logged, but normal callers should not fail just because the cache contains stale or malformed data. For strict debugging, `DiskCacheBackend(drop_corrupt_rows=False)` raises `CacheSerializationError` when a matching row cannot be deserialized instead of deleting it as a miss.
 
 ## Cache versioning and schema changes
 
@@ -719,9 +721,11 @@ The first implementation does not provide automatic schema migrations for cached
 
 ## Disk-cache schema metadata table design
 
-If a future release promises disk-cache file compatibility across package versions, add a small metadata table before making that promise. The metadata table should make compatibility checks explicit instead of inferring meaning from table shape, column presence, or vibes.
+`DiskCacheBackend.cache_metadata()` reports the path, SQLite schema version, active serializer content type, busy timeout, and WAL setting. It is diagnostic compatibility metadata, not a long-term promise that every cache file written by every future version will remain readable.
 
-Tentative schema:
+If a future release promises stronger disk-cache file compatibility across package versions, add a small metadata table before making that promise. The metadata table should make compatibility checks explicit instead of inferring meaning from table shape, column presence, or vibes.
+
+Possible future schema:
 
 ```sql
 CREATE TABLE IF NOT EXISTS cache_metadata (

@@ -56,9 +56,9 @@ Reject calls to repeatedly failing sync or async dependencies until a reset time
 
 Default in-process cache backend for `cache_result`.
 
-### `DiskCacheBackend(path, *, ttl=None, maxsize=128, refresh_ttl_on_hit=False, serializer=None, on_drop=None, clock=None, busy_timeout_ms=5000, wal=True)`
+### `DiskCacheBackend(path, *, ttl=None, maxsize=128, refresh_ttl_on_hit=False, serializer=None, on_drop=None, clock=None, busy_timeout_ms=5000, wal=True, drop_corrupt_rows=True)`
 
-SQLite-backed persistent cache backend for trusted local cache files. Includes `maintain()`, read-only `inspect_entries(...)`, and aggregate `inspect_aggregate(...)` diagnostics. See [`DiskCacheBackend`](disk_cache_backend.md).
+SQLite-backed persistent cache backend for trusted local cache files. Includes `cache_metadata()`, `inspect_integrity()`, `maintain()`, read-only `inspect_entries(...)`, and aggregate `inspect_aggregate(...)` diagnostics. See [`DiskCacheBackend`](disk_cache_backend.md).
 
 ### `CacheBackend`
 
@@ -100,9 +100,21 @@ Immutable row-level diagnostic returned by `DiskCacheBackend.inspect_entries()`.
 
 Immutable read-only cache inspection report returned by `DiskCacheBackend.inspect_entries()`.
 
+### `DiskCacheIntegrityReport`
+
+Immutable read-only integrity summary returned by `DiskCacheBackend.inspect_integrity()`.
+
+### `DiskCacheMetadata`
+
+Immutable cache file compatibility metadata returned by `DiskCacheBackend.cache_metadata()`.
+
 ### `DiskCachePreviewContext`
 
 Metadata passed to `preview_redactor` callbacks during payload-preview inspection.
+
+### `redact_json_preview(preview, context=None, *, sensitive_keys=...)`
+
+Best-effort helper for redacting obvious sensitive JSON keys in payload previews.
 
 ## Timing and resilience types
 

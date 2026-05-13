@@ -13,8 +13,13 @@ from useful_decorators import (
     DiskCacheInspectionReport,
     DiskCachePreviewContext,
     JsonCacheSerializer,
+    redact_json_preview,
 )
-from useful_decorators.exceptions import ConfigurationError, UnsupportedCacheSchemaVersionError
+from useful_decorators.exceptions import (
+    CacheSerializationError,
+    ConfigurationError,
+    UnsupportedCacheSchemaVersionError,
+)
 
 
 def table_names(path: Path) -> set[str]:
@@ -250,8 +255,12 @@ def test_disk_cache_backend_can_refresh_ttl_on_hit(tmp_path: Path) -> None:
         backend.set_value("key", "value")
         clock.advance(9)
         assert backend.get("key") is not None
+        [inspection_entry] = backend.inspect_entries().entries
+        assert inspection_entry.expires_at == 119.0
         clock.advance(9)
         assert backend.get("key") is not None
+        [refreshed_entry] = backend.inspect_entries().entries
+        assert refreshed_entry.expires_at == 128.0
         clock.advance(10)
         assert backend.get("key") is None
         assert backend.info().misses == 1
@@ -326,6 +335,25 @@ def test_disk_cache_backend_reports_serializer_content_type_mismatch_drop(
         ]
     finally:
         second.close()
+
+
+def test_disk_cache_backend_metadata_reports_file_compatibility_fields(tmp_path: Path) -> None:
+    backend = DiskCacheBackend(
+        tmp_path / "cache.sqlite3",
+        serializer=JsonCacheSerializer(),
+        busy_timeout_ms=1234,
+        wal=False,
+    )
+    try:
+        metadata = backend.cache_metadata()
+
+        assert metadata.path == tmp_path / "cache.sqlite3"
+        assert metadata.schema_version == 1
+        assert metadata.serializer_content_type == "application/json"
+        assert metadata.busy_timeout_ms == 1234
+        assert metadata.wal_enabled is False
+    finally:
+        backend.close()
 
 
 def test_disk_cache_backend_reports_corrupt_payload_drop(tmp_path: Path) -> None:
@@ -435,6 +463,90 @@ def test_disk_cache_backend_treats_corrupt_payload_as_miss(tmp_path: Path) -> No
         assert backend.info().misses == 1
         assert backend.info().hits == 0
         assert backend.info().currsize == 0
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_can_raise_instead_of_dropping_corrupt_payload(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "cache.sqlite3"
+    backend = DiskCacheBackend(db_path)
+    serialized_key = backend._serialize_key("key")
+    backend.close()
+
+    with closing(sqlite3.connect(db_path)) as connection:
+        connection.execute(
+            """
+            INSERT INTO cache_entries (
+                key, payload, is_exception, expires_at, last_accessed, created_at,
+                serializer_content_type
+            )
+            VALUES (?, ?, 0, NULL, 100, 100, ?)
+            """,
+            (serialized_key, b"not a pickle payload", "application/python-pickle"),
+        )
+        connection.commit()
+
+    backend = DiskCacheBackend(db_path, drop_corrupt_rows=False)
+    try:
+        with pytest.raises(CacheSerializationError, match="failed to deserialize cache value"):
+            backend.get("key")
+        assert backend.info().currsize == 1
+    finally:
+        backend.close()
+
+
+def test_disk_cache_backend_integrity_report_counts_drop_candidates_without_mutating(
+    tmp_path: Path,
+) -> None:
+    clock = MutableClock()
+    db_path = tmp_path / "cache.sqlite3"
+    backend = DiskCacheBackend(db_path, ttl=10, clock=clock)
+    corrupt_key = backend._serialize_key("corrupt")
+    incompatible_key = backend._serialize_key("incompatible")
+    backend.set_value("stale", "old")
+    backend.close()
+
+    with closing(sqlite3.connect(db_path)) as connection:
+        connection.execute(
+            """
+            INSERT INTO cache_entries (
+                key, payload, is_exception, expires_at, last_accessed, created_at,
+                serializer_content_type
+            )
+            VALUES (?, ?, 0, NULL, 100, 100, ?)
+            """,
+            (corrupt_key, b"not a pickle payload", "application/python-pickle"),
+        )
+        connection.execute(
+            """
+            INSERT INTO cache_entries (
+                key, payload, is_exception, expires_at, last_accessed, created_at,
+                serializer_content_type
+            )
+            VALUES (?, ?, 0, NULL, 100, 100, ?)
+            """,
+            (incompatible_key, b"{}", "application/x-other"),
+        )
+        connection.commit()
+
+    clock.advance(11)
+    backend = DiskCacheBackend(db_path, ttl=10, clock=clock)
+    try:
+        before_count = backend._connection.execute("SELECT COUNT(*) FROM cache_entries").fetchone()[
+            0
+        ]
+        report = backend.inspect_integrity()
+        after_count = backend._connection.execute("SELECT COUNT(*) FROM cache_entries").fetchone()[
+            0
+        ]
+
+        assert report.total_entries == 3
+        assert report.expired_rows == 1
+        assert report.corrupt_rows == 1
+        assert report.serializer_mismatch_rows == 1
+        assert before_count == after_count == 3
     finally:
         backend.close()
 
@@ -551,6 +663,18 @@ def test_disk_cache_backend_inspection_supports_bounded_redacted_payload_preview
         assert seen_contexts[0].payload_size_bytes == entry.payload_size_bytes
     finally:
         backend.close()
+
+
+def test_redact_json_preview_redacts_obvious_sensitive_keys() -> None:
+    preview = '{"token":"abc","nested":{"password":"secret"},"name":"Ada"}'
+
+    assert redact_json_preview(preview) == (
+        '{"token":"<redacted>","nested":{"password":"<redacted>"},"name":"Ada"}'
+    )
+
+
+def test_redact_json_preview_leaves_non_json_preview_unchanged() -> None:
+    assert redact_json_preview("not json…") == "not json…"
 
 
 def test_disk_cache_backend_inspection_tracks_redaction_failures(tmp_path: Path) -> None:

@@ -98,6 +98,31 @@ def test_json_datetime_bytes_serializer_documentation_example_executes(
     assert_example_result(digest, b"abc123")
 
 
+def test_cli_style_inspection_json_documentation_example_executes(
+    tmp_path: Path,
+) -> None:
+    examples = load_docs_example("disk_cache_backend_examples")
+
+    output = examples.cli_style_inspection_json_example(tmp_path / "cli-inspect-cache.sqlite3")
+
+    assert_example_result(output["mode"], "aggregate")
+    assert_example_result(output["includes_payload_previews"], False)
+    assert "sensitivity_warning" in output
+    assert "--rows" in output["cli_help"]
+    assert "--include-payload-preview" in output["cli_help"]
+    assert "entries" not in output
+
+
+def test_preview_redaction_documentation_example_executes(tmp_path: Path) -> None:
+    examples = load_docs_example("disk_cache_backend_examples")
+
+    preview = examples.preview_redaction_example(tmp_path / "redacted-cache.sqlite3")
+
+    assert preview is not None
+    assert '"token":"<redacted>"' in preview
+    assert "secret" not in preview
+
+
 def test_json_cache_row_inspection_documentation_example_executes(
     tmp_path: Path,
 ) -> None:

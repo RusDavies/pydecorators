@@ -61,6 +61,28 @@ class DiskCacheDropEvent:
 
 
 @dataclass(frozen=True, slots=True)
+class DiskCacheMetadata:
+    """Stable disk-cache file metadata for diagnostics and compatibility checks."""
+
+    path: Path
+    schema_version: int
+    serializer_content_type: str
+    busy_timeout_ms: int
+    wal_enabled: bool
+
+
+@dataclass(frozen=True, slots=True)
+class DiskCacheIntegrityReport:
+    """Read-only count of rows that maintenance would drop."""
+
+    total_entries: int
+    expired_rows: int
+    corrupt_rows: int
+    serializer_mismatch_rows: int
+    sensitivity_warning: str = "Cache integrity reports may expose operational metadata."
+
+
+@dataclass(frozen=True, slots=True)
 class DiskCacheMaintenanceReport:
     """Summary returned by ``DiskCacheBackend.maintain()``."""
 
@@ -354,6 +376,7 @@ class DiskCacheBackend:
         clock: Clock | None = None,
         busy_timeout_ms: int = 5_000,
         wal: bool = True,
+        drop_corrupt_rows: bool = True,
     ) -> None:
         if ttl is not None and ttl <= 0:
             raise ConfigurationError("ttl must be greater than zero when provided")
@@ -372,6 +395,7 @@ class DiskCacheBackend:
         self._clock = clock or monotonic
         self._busy_timeout_ms = busy_timeout_ms
         self._wal = wal
+        self._drop_corrupt_rows = drop_corrupt_rows
         self._lock = RLock()
         self._closed = False
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -469,6 +493,8 @@ class DiskCacheBackend:
                 try:
                     deserialized_payload = self._deserialize_payload(payload)
                 except CacheSerializationError as exc:
+                    if not self._drop_corrupt_rows:
+                        raise
                     self._connection.execute(
                         "DELETE FROM cache_entries WHERE key = ?", (serialized_key,)
                     )
@@ -517,6 +543,52 @@ class DiskCacheBackend:
             with self._connection:
                 self._connection.execute("DELETE FROM cache_entries")
                 self._connection.execute("UPDATE cache_stats SET hits = 0, misses = 0 WHERE id = 1")
+
+    def cache_metadata(self) -> DiskCacheMetadata:
+        """Return stable disk-cache file metadata for compatibility diagnostics."""
+
+        with self._lock:
+            self._ensure_open()
+            [schema_version] = self._connection.execute("PRAGMA user_version").fetchone()
+            return DiskCacheMetadata(
+                path=self.path,
+                schema_version=schema_version,
+                serializer_content_type=self.serializer_content_type,
+                busy_timeout_ms=self._busy_timeout_ms,
+                wal_enabled=self._wal,
+            )
+
+    def inspect_integrity(self) -> DiskCacheIntegrityReport:
+        """Count expired/corrupt/incompatible rows without mutating the cache."""
+
+        now = self._clock()
+        with self._lock:
+            self._ensure_open()
+            rows = self._connection.execute(
+                """
+                SELECT payload, expires_at, serializer_content_type
+                FROM cache_entries
+                """
+            ).fetchall()
+
+        expired_rows = 0
+        corrupt_rows = 0
+        serializer_mismatch_rows = 0
+        for payload, expires_at, serializer_content_type in rows:
+            if expires_at is not None and now >= expires_at:
+                expired_rows += 1
+            if serializer_content_type != self.serializer_content_type:
+                serializer_mismatch_rows += 1
+                continue
+            if self._payload_is_corrupt(payload):
+                corrupt_rows += 1
+
+        return DiskCacheIntegrityReport(
+            total_entries=len(rows),
+            expired_rows=expired_rows,
+            corrupt_rows=corrupt_rows,
+            serializer_mismatch_rows=serializer_mismatch_rows,
+        )
 
     def maintain(self, *, vacuum: bool = False) -> DiskCacheMaintenanceReport:
         """Drop expired/corrupt/incompatible rows and optionally run SQLite VACUUM."""
@@ -909,6 +981,36 @@ def _payload_preview(payload: bytes, limit: int) -> str:
     preview = payload[:limit]
     suffix = "…" if len(payload) > limit else ""
     return preview.decode("utf-8", errors="replace") + suffix
+
+
+def redact_json_preview(
+    preview: str,
+    context: DiskCachePreviewContext | None = None,
+    *,
+    sensitive_keys: frozenset[str] = frozenset(
+        {"api_key", "authorization", "password", "secret", "token"}
+    ),
+) -> str:
+    """Redact obvious sensitive keys from a JSON payload preview."""
+
+    suffix = "…" if preview.endswith("…") else ""
+    candidate = preview.removesuffix("…")
+    try:
+        payload = json.loads(candidate)
+    except json.JSONDecodeError:
+        return preview
+
+    def redact(value: object) -> object:
+        if isinstance(value, dict):
+            return {
+                key: "<redacted>" if str(key).lower() in sensitive_keys else redact(item)
+                for key, item in value.items()
+            }
+        if isinstance(value, list):
+            return [redact(item) for item in value]
+        return value
+
+    return json.dumps(redact(payload), ensure_ascii=False, separators=(",", ":")) + suffix
 
 
 def _ensure_hashable(value: object) -> Hashable:
