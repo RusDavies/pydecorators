@@ -9,6 +9,7 @@ Start here when navigating the Useful Decorators documentation.
 - [API design notes](API_DESIGN.md) — broader API design guidance for decorators.
 - [API reference](API_REFERENCE.md) — compact reference for exported decorators, cache APIs, data types, and exceptions.
 - [Decorator composition](composition.md) — practical guidance for stacking wrappers and choosing retry/logging/timing/rate-limit semantics.
+- [Django and FastAPI examples](web_frameworks.md) — framework-adjacent caching/retry placement without adding web-framework dependencies.
 - [Quality gates](quality_gates.md) — local verification commands, Hatch aliases, and release-prep gate meaning.
 - [Documentation site plan](docs_site_plan.md) — site-generator deferral, launch checklist, and Markdown-first docs posture.
 - [Future extension decisions](future_extension_decisions.md) — explicit deferrals for conditional API and tooling ideas.
@@ -55,6 +56,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`retry_idempotency_examples.py`](examples/retry_idempotency_examples.py)
 - [`timeout_examples.py`](examples/timeout_examples.py)
 - [`validate_types_examples.py`](examples/validate_types_examples.py)
+- [`web_framework_examples.py`](examples/web_framework_examples.py)
 
 These examples are exercised by the test suite so documentation drift gets caught before it mutates into folklore.
 
