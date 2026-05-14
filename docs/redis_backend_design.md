@@ -1,6 +1,6 @@
 # Redis Backend Design Notes
 
-`RedisCacheBackend` is not implemented yet. This page records the key-space decisions that should be treated as the starting contract when the optional Redis backend is added.
+`RedisCacheBackend` is implemented as an optional cache backend. This page records the key-space decisions that should be treated as the compatibility contract for the Redis storage format.
 
 ## Key prefix policy
 
@@ -50,6 +50,6 @@ Changing the Redis prefix, schema version, serializer format, or stats key namin
 
 ## Optional dependency behavior
 
-When the Redis backend is eventually implemented, importing the base package must not require Redis dependencies. Missing Redis extras should fail only when the Redis backend is imported or constructed, and the error message should point to the documented extra name.
+The base package must not require Redis dependencies. Importing `useful_decorators.redis_backend` also stays dependency-light. Missing Redis extras fail only when the Redis backend is imported or constructed with `RedisCacheBackend(url=...)`; applications that already own Redis client construction can pass `client=...` without importing `redis-py` through this package.
 
-Until then, tests assert that the base package imports without Redis installed and that `useful_decorators.redis_backend` is not accidentally exposed as a public module before the optional backend exists.
+Tests assert that the base package imports without Redis installed, the backend module imports without Redis installed, and URL construction points users at `blakemere-decorators[redis]` when the optional dependency is missing.

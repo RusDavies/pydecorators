@@ -873,7 +873,7 @@
 
 ## 14. Future Ideas
 
-- [ ] Optional Redis-backed cache.
+- [x] Optional Redis-backed cache.
 - [ ] Optional OpenTelemetry integration.
 - [ ] Optional Prometheus metrics integration.
 - [ ] Optional structlog integration.

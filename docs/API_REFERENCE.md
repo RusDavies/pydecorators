@@ -80,6 +80,14 @@ Default trusted-local serializer for disk cache payloads.
 
 JSON serializer for simple JSON-compatible cache payloads.
 
+### `RedisCacheBackend(*, client=None, url=None, key_prefix, ttl=None, serializer=None)`
+
+Optional Redis-backed cache backend. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-decorators[redis]`.
+
+### `RedisCacheClient`
+
+Small protocol for Redis-like clients accepted by `RedisCacheBackend(client=...)`.
+
 ### `CacheCoalescingInfo`
 
 Duplicate-miss coalescing diagnostics dataclass returned by `cache_coalescing_info()`.

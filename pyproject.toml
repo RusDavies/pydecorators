@@ -33,6 +33,9 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+redis = [
+  "redis>=5",
+]
 dev = [
   "build>=1.2",
   "mypy>=1.14",

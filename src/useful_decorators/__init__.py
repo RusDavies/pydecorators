@@ -42,6 +42,7 @@ from useful_decorators.exceptions import (
 from useful_decorators.log_calls import log_calls
 from useful_decorators.measure_time import TimingInfo, measure_time
 from useful_decorators.rate_limit import rate_limit
+from useful_decorators.redis_backend import RedisCacheBackend, RedisCacheClient
 from useful_decorators.require_env import EnvRequirementError, require_env
 from useful_decorators.retry import retry
 from useful_decorators.timeout import timeout
@@ -75,6 +76,8 @@ __all__ = [
     "MemoryCacheBackend",
     "PickleCacheSerializer",
     "RateLimitExceeded",
+    "RedisCacheBackend",
+    "RedisCacheClient",
     "TimingInfo",
     "UnsupportedCacheSchemaVersionError",
     "UsefulDecoratorsError",

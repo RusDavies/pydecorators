@@ -328,25 +328,25 @@ Future contributors adding a backend should first add a fixture/factory to the c
 
 ## Redis backend optional-extra design
 
-A future `RedisCacheBackend` should be an optional dependency extra, not part of the default install. Suggested packaging shape:
+`RedisCacheBackend` is an optional dependency extra, not part of the default install. Packaging shape:
 
 ```toml
 [project.optional-dependencies]
 redis = ["redis>=5"]
 ```
 
-Public import guidance should make the optional nature clear: installing `blakemere-decorators[redis]` enables Redis support, while the base package remains standard-library-only plus its existing local backends.
+Public import guidance should make the optional nature clear: installing `blakemere-decorators[redis]` enables URL-based Redis client construction, while the base package remains standard-library-only plus its existing local backends.
 
-Design constraints for a first Redis backend:
+Design constraints for the Redis backend:
 
 - Use the same CacheBackend semantics as memory and disk backends, proven through the conformance suite.
 - Use `CacheSerializer` for payloads, with a clear pickle trust-boundary warning for shared Redis deployments.
-- Require an explicit namespace/prefix. Shared Redis instances make accidental key collisions too easy to leave to optimism and duct tape.
+- Require an explicit namespace/prefix via `key_prefix`. Shared Redis instances make accidental key collisions too easy to leave to optimism and duct tape.
 - Prefer Redis TTL primitives for expiry, while keeping `CacheInfo` honest about any statistics limitations.
 - Document that Redis availability, network latency, authentication, TLS, eviction policy, and server-side persistence are operator-owned concerns.
 - Do not add Redis as a hard dependency for users who only need in-process or SQLite caching.
 
-The Redis backend should remain a design item until there is a concrete user need or release scope decision.
+The Redis backend accepts an existing Redis-like `client=` without importing `redis-py`; constructing with `url=` imports the optional dependency and points users at `blakemere-decorators[redis]` if it is missing.
 
 ## Disk backend implementation
 
@@ -356,7 +356,7 @@ Disk payloads use the configured `CacheSerializer`; the default is `PickleCacheS
 
 ## Backend conformance tests
 
-The test suite includes a reusable backend conformance suite that currently runs against `MemoryCacheBackend` and `DiskCacheBackend`. It checks shared `CacheBackend` behavior for hit/miss statistics, clear semantics, cached exceptions, TTL expiry, LRU eviction, and replacement of existing entries. Future backends should join this suite before being considered compatible.
+The test suite includes a reusable backend conformance suite that currently runs against `MemoryCacheBackend`, `DiskCacheBackend`, and `RedisCacheBackend` with a fake Redis client. It checks shared `CacheBackend` behavior for hit/miss statistics, clear semantics, cached exceptions, TTL expiry, LRU eviction, and replacement of existing entries. Future backends should join this suite before being considered compatible.
 
 Malformed disk rows are treated as misses: the disk backend deletes rows whose payload cannot be deserialized, records a miss, and lets the wrapped function recompute the value.
 
