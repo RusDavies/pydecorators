@@ -1196,6 +1196,23 @@ def test_web_framework_docs_stay_dependency_free() -> None:
     assert "import fastapi" not in examples
 
 
+def test_observability_docs_stay_dependency_free() -> None:
+    text = Path("docs/observability_integrations.md").read_text()
+    examples = Path("docs/examples/observability_integration_examples.py").read_text()
+
+    for required in [
+        "dependency-light",
+        "OpenTelemetry-style timing spans",
+        "Prometheus-style duration histograms",
+        "structlog-style `log_calls` adaptation",
+        "structured retry attempt events",
+    ]:
+        assert required in text
+    assert "import opentelemetry" not in examples
+    assert "import prometheus_client" not in examples
+    assert "import structlog" not in examples
+
+
 def test_docs_example_index_checker_is_in_docs_policy_script() -> None:
     script = Path("scripts/docs-policy.sh").read_text()
 

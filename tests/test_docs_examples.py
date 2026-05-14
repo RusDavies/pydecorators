@@ -134,6 +134,32 @@ def test_web_framework_documentation_examples_execute(tmp_path: Path) -> None:
     assert_example_result(retry_attempts, 2)
 
 
+def test_observability_integration_documentation_examples_execute() -> None:
+    examples = load_docs_example("observability_integration_examples")
+
+    otel = examples.opentelemetry_measure_time_example()
+    prometheus = examples.prometheus_measure_time_example()
+    structlog_events = examples.structlog_log_calls_example()
+    retry_events = examples.retry_attempt_logging_example()
+
+    assert_example_result(otel["result"], "profile")
+    assert str(otel["span"]).endswith("load_profile")
+    assert_example_result(otel["attributes"]["decorator.success"], True)
+    assert_example_result(prometheus[0][0], 0.25)
+    assert str(prometheus[0][1]["function"]).endswith("refresh_index")
+    assert_example_result(prometheus[0][1]["success"], "true")
+    assert any(str(event).endswith("list_jobs started") for event, _fields in structlog_events)
+    assert_example_result(
+        retry_events,
+        [
+            ("retry.before_attempt", {"attempt": 1}),
+            ("retry.after_attempt", {"attempt": 1, "exception": "ConnectionError"}),
+            ("retry.before_attempt", {"attempt": 2}),
+            ("retry.after_attempt", {"attempt": 2, "exception": None}),
+        ],
+    )
+
+
 def test_json_datetime_bytes_serializer_documentation_example_executes(
     tmp_path: Path,
 ) -> None:
