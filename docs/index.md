@@ -10,6 +10,7 @@ Start here when navigating the Useful Decorators documentation.
 - [API reference](API_REFERENCE.md) — compact reference for exported decorators, cache APIs, data types, and exceptions.
 - [Decorator composition](composition.md) — practical guidance for stacking wrappers and choosing retry/logging/timing/rate-limit semantics.
 - [Django and FastAPI examples](web_frameworks.md) — framework-adjacent caching/retry placement without adding web-framework dependencies.
+- [Observability integrations](observability_integrations.md) — OpenTelemetry, Prometheus, and structlog adapter patterns without hard dependencies.
 - [Quality gates](quality_gates.md) — local verification commands, Hatch aliases, and release-prep gate meaning.
 - [Documentation site plan](docs_site_plan.md) — site-generator deferral, launch checklist, and Markdown-first docs posture.
 - [Future extension decisions](future_extension_decisions.md) — explicit deferrals for conditional API and tooling ideas.
@@ -48,6 +49,7 @@ Executable documentation examples live under [`examples/`](examples/):
 - [`disk_cache_backend_examples.py`](examples/disk_cache_backend_examples.py)
 - [`log_calls_examples.py`](examples/log_calls_examples.py)
 - [`measure_time_examples.py`](examples/measure_time_examples.py)
+- [`observability_integration_examples.py`](examples/observability_integration_examples.py)
 - [`public_exception_examples.py`](examples/public_exception_examples.py)
 - [`rate_limit_examples.py`](examples/rate_limit_examples.py)
 - [`readme_examples.py`](examples/readme_examples.py)

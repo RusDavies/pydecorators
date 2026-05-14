@@ -874,9 +874,9 @@
 ## 14. Future Ideas
 
 - [x] Optional Redis-backed cache.
-- [ ] Optional OpenTelemetry integration.
-- [ ] Optional Prometheus metrics integration.
-- [ ] Optional structlog integration.
+- [x] Optional OpenTelemetry integration.
+- [x] Optional Prometheus metrics integration.
+- [x] Optional structlog integration.
 - [x] Django/FastAPI examples.
 - [x] CLI examples.
 - [x] Benchmark suite.
