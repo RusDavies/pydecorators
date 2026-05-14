@@ -877,7 +877,7 @@
 - [ ] Optional OpenTelemetry integration.
 - [ ] Optional Prometheus metrics integration.
 - [ ] Optional structlog integration.
-- [ ] Django/FastAPI examples.
+- [x] Django/FastAPI examples.
 - [x] CLI examples.
 - [x] Benchmark suite.
 - [x] Documentation site plan.

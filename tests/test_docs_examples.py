@@ -108,6 +108,32 @@ def test_cli_documentation_examples_execute(tmp_path: Path) -> None:
     )
 
 
+def test_web_framework_documentation_examples_execute(tmp_path: Path) -> None:
+    examples = load_docs_example("web_framework_examples")
+
+    first_response, second_response, django_calls = examples.django_view_cache_example(
+        tmp_path / "django-cache.sqlite3"
+    )
+    first_settings, second_settings, fastapi_calls = examples.fastapi_dependency_cache_example(
+        tmp_path / "fastapi-cache.sqlite3"
+    )
+    status, retry_attempts = examples.retrying_service_client_example()
+
+    assert_example_result(first_response.status_code, 200)
+    assert_example_result(first_response.body, {"id": "123", "name": "User 123"})
+    assert_example_result(second_response.body, first_response.body)
+    assert_example_result(django_calls, 1)
+    assert_example_result(first_settings, {"tenant_id": "acme", "plan": "starter"})
+    assert_example_result(second_settings, first_settings)
+    assert_example_result(fastapi_calls, 1)
+    assert_example_result(
+        examples.service_cache_path_example(tmp_path),
+        tmp_path / "example-web-service" / "cache.sqlite3",
+    )
+    assert_example_result(status, "available:sku-123")
+    assert_example_result(retry_attempts, 2)
+
+
 def test_json_datetime_bytes_serializer_documentation_example_executes(
     tmp_path: Path,
 ) -> None:

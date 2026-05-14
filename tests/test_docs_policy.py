@@ -1180,6 +1180,22 @@ def test_docs_site_plan_defers_generator_until_needed() -> None:
         assert required in text
 
 
+def test_web_framework_docs_stay_dependency_free() -> None:
+    text = Path("docs/web_frameworks.md").read_text()
+    examples = Path("docs/examples/web_framework_examples.py").read_text()
+
+    for required in [
+        "Keep decorators on helpers, not framework wrappers",
+        "Cache lifecycle",
+        "Django-style cached view helpers",
+        "FastAPI-style cached dependency helpers",
+        "intentionally avoid framework imports",
+    ]:
+        assert required in text
+    assert "import django" not in examples
+    assert "import fastapi" not in examples
+
+
 def test_docs_example_index_checker_is_in_docs_policy_script() -> None:
     script = Path("scripts/docs-policy.sh").read_text()
 
