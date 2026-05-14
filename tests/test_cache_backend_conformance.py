@@ -1,10 +1,17 @@
-from collections.abc import Callable, Hashable
+import fnmatch
+from collections.abc import Callable, Hashable, Iterable
 from pathlib import Path
 from typing import Protocol
 
 import pytest
 
-from useful_decorators import CacheBackend, CacheInfo, DiskCacheBackend, MemoryCacheBackend
+from useful_decorators import (
+    CacheBackend,
+    CacheInfo,
+    DiskCacheBackend,
+    MemoryCacheBackend,
+    RedisCacheBackend,
+)
 from useful_decorators.cache_result import _CacheEntry
 
 
@@ -29,13 +36,52 @@ class BackendFactory(Protocol):
     ) -> CacheBackend: ...
 
 
+class FakeRedis:
+    def __init__(self, *, clock: Callable[[], float] | None = None) -> None:
+        self._clock = clock or (lambda: 0.0)
+        self.values: dict[str, bytes | str | int] = {}
+        self.expiries: dict[str, float | None] = {}
+
+    def get(self, name: str) -> bytes | str | int | None:
+        expires_at = self.expiries.get(name)
+        if expires_at is not None and self._clock() >= expires_at:
+            self.delete(name)
+            return None
+        return self.values.get(name)
+
+    def set(self, name: str, value: bytes | str, *, ex: int | None = None) -> object:
+        self.values[name] = value
+        self.expiries[name] = self._clock() + ex if ex is not None else None
+        return True
+
+    def delete(self, *names: str) -> int:
+        deleted = 0
+        for name in names:
+            if name in self.values:
+                deleted += 1
+            self.values.pop(name, None)
+            self.expiries.pop(name, None)
+        return deleted
+
+    def incr(self, name: str) -> int:
+        value = int(self.values.get(name, 0)) + 1
+        self.values[name] = value
+        self.expiries[name] = None
+        return value
+
+    def scan_iter(self, match: str) -> Iterable[str | bytes]:
+        for key in list(self.values):
+            self.get(key)
+        return [key for key in self.values if fnmatch.fnmatch(key, match)]
+
+
 def close_backend(backend: CacheBackend) -> None:
     close = getattr(backend, "close", None)
     if close is not None:
         close()
 
 
-@pytest.fixture(params=["memory", "disk"])
+@pytest.fixture(params=["memory", "disk", "redis"])
 def backend_factory(request: pytest.FixtureRequest, tmp_path: Path) -> BackendFactory:
     def make_backend(
         *,
@@ -45,7 +91,19 @@ def backend_factory(request: pytest.FixtureRequest, tmp_path: Path) -> BackendFa
     ) -> CacheBackend:
         if request.param == "memory":
             return MemoryCacheBackend(ttl=ttl, maxsize=maxsize, clock=clock)
-        return DiskCacheBackend(tmp_path / "cache.sqlite3", ttl=ttl, maxsize=maxsize, clock=clock)
+        if request.param == "disk":
+            return DiskCacheBackend(
+                tmp_path / "cache.sqlite3",
+                ttl=ttl,
+                maxsize=maxsize,
+                clock=clock,
+            )
+        return RedisCacheBackend(
+            client=FakeRedis(clock=clock),
+            key_prefix=f"conformance:{request.param}",
+            ttl=int(ttl) if ttl is not None else None,
+            maxsize=maxsize,
+        )
 
     return make_backend
 

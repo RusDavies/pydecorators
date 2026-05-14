@@ -22,6 +22,8 @@ Current public API:
 - `CacheSerializationError`
 - `PickleCacheSerializer`
 - `JsonCacheSerializer`
+- `RedisCacheBackend`
+- `RedisCacheClient`
 - `CacheSerializer`
 - `CacheBackend`
 - `MemoryCacheBackend`
@@ -137,6 +139,14 @@ Example: calling a cached function with an unhashable list argument raises `Cach
 ### `JsonCacheSerializer`
 
 `JsonCacheSerializer` serializes simple JSON-compatible values as UTF-8 `application/json` bytes for lower-risk or cross-language cache payloads. It is intended for values such as `None`, booleans, numbers, strings, lists, and dictionaries with string keys; it does not preserve arbitrary Python object types. It rejects non-finite numbers and wraps JSON serialization/deserialization failures in `CacheSerializationError`.
+
+### `RedisCacheBackend`
+
+`RedisCacheBackend` is the optional Redis-backed implementation of the cache backend protocol. It uses package-owned `key_prefix` values, versioned entry envelopes, serializer content-type checks, Redis TTLs, and separate hit/miss stats keys. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-decorators[redis]`.
+
+### `RedisCacheClient`
+
+`RedisCacheClient` is the small protocol accepted by `RedisCacheBackend(client=...)`, useful for tests and applications that already own Redis client construction.
 
 ### `CacheSerializationError`
 

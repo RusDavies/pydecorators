@@ -31,4 +31,4 @@ Keep fallback behavior outside `@circuit_breaker` for now. Callers can catch `Ci
 
 ## Redis conformance suite timing
 
-The backend conformance suite is ready for future storage backends, but Redis should only be added to it when `RedisCacheBackend` exists. Until then, tests should continue asserting that the base package imports without Redis installed and that no accidental public Redis module appears.
+`RedisCacheBackend` now participates in the backend conformance suite using a fake Redis client for deterministic local tests. Tests also assert that the base package and Redis backend module import without Redis installed, while URL-based construction points users to the optional extra.
