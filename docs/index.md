@@ -18,6 +18,7 @@ Start here when navigating the Useful Decorators documentation.
 - [Security hardening guide](security_hardening.md) — cache, logging, validation, and in-process control safety checklist.
 - [Markdown anchor policy](markdown_anchor_policy.md) — heading-anchor assumptions used by docs-link policy tests.
 - [Docs index exemption registry](docs_index_exemptions.md) — rules for intentional docs-index exclusions.
+- [Writing style audit](writing_style_audit.md) — review of existing documentation against the project writing style.
 
 ## Decorator docs
 
