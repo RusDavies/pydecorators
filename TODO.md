@@ -885,7 +885,7 @@
 ## Newly Implied Writing Style Follow-Ups
 
 - [x] Review all existing Markdown documentation against `WRITING_STYLE.md` and document findings.
-- [ ] Add a short project documentation style note to `CONTRIBUTING.md`, pointing contributors at `WRITING_STYLE.md` and summarizing local expectations.
+- [x] Add a short project documentation style note to `CONTRIBUTING.md`, pointing contributors at `WRITING_STYLE.md` and summarizing local expectations.
 - [ ] Tighten the opening sections of `docs/PUBLIC_API.md`, `docs/API_REFERENCE.md`, and `docs/API_DESIGN.md` so they explain the practical decision each document supports.
 - [ ] Add failure-mode examples to `docs/composition.md`, `docs/timeout.md`, `docs/rate_limit.md`, and `docs/circuit_breaker.md`.
 - [ ] Reflow long prose lines opportunistically when editing docs; avoid a noisy repo-wide wrap-only change unless explicitly requested.
