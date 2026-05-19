@@ -889,4 +889,4 @@
 - [x] Tighten the opening sections of `docs/PUBLIC_API.md`, `docs/API_REFERENCE.md`, and `docs/API_DESIGN.md` so they explain the practical decision each document supports.
 - [x] Add failure-mode examples to `docs/composition.md`, `docs/timeout.md`, `docs/rate_limit.md`, and `docs/circuit_breaker.md`.
 - [ ] Reflow long prose lines opportunistically when editing docs; avoid a noisy repo-wide wrap-only change unless explicitly requested.
-- [ ] Revisit `docs/redis_backend_design.md` with an operating-model pass before implementing Redis support.
+- [x] Revisit `docs/redis_backend_design.md` with an operating-model pass before implementing Redis support.
