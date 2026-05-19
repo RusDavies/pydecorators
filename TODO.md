@@ -844,7 +844,7 @@
 - [x] Add git tag naming convention for releases.
 - [x] Build package locally.
 - [x] Test install from local wheel.
-- [ ] Run `python scripts/check_package_name_availability.py` immediately before TestPyPI/PyPI publish.
+- [x] Run `python scripts/check_package_name_availability.py` immediately before TestPyPI/PyPI publish.
 - [ ] Publish test release to TestPyPI.
 - [ ] Publish `v0.1.0` to PyPI when ready.
 
