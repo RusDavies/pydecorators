@@ -1,5 +1,21 @@
 # Contributing
 
+## Documentation style
+
+Use `/home/skippy/.openclaw/workspace/WRITING_STYLE.md` as the project writing style when adding or revising documentation.
+
+The short version: write like a capable human who understands the system and is trying to be useful. Start with the point. Define fuzzy terms. Name the trade-off. Explain the practical consequence. Prefer concrete examples over vague reassurance.
+
+Good documentation for this project should be:
+
+- direct, specific, and edited
+- technically credible without sounding academic for sport
+- honest about limits, failure modes, and operating constraints
+- willing to say what not to do
+- dry when the joke helps, not when the reader needs sober warning
+
+Avoid vendor fog and AI filler. If a sentence could survive unchanged in a generic product whitepaper, make it confess what it actually means or delete it.
+
 ## Adding a new decorator
 
 Use this checklist when adding a decorator. Yes, it is mildly bossy. That is the point.
