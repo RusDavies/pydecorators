@@ -1,5 +1,13 @@
 # API Design Notes
 
+These notes capture the API choices that should stay consistent as the library grows.
+
+Decorator libraries become messy when every wrapper invents its own rules for naming,
+configuration, typing, metadata, and sync/async behavior. The result is not flexibility;
+it is archaeology with stack traces. This document keeps those decisions explicit so a
+new decorator feels like part of the same package rather than a clever one-off that
+escaped review.
+
 ## Public naming conventions
 
 - Decorators use short, verb-oriented snake_case names: `retry`, `timeout`, `rate_limit`, `cache_result`, `deprecated`.
