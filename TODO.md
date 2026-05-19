@@ -856,6 +856,7 @@
 - [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
 - [x] Add trusted publishing / API token instructions once the repository and package name are final.
 - [x] Add repeatable checker to re-check `blakemere-decorators` availability immediately before final publish.
+- [ ] Create or connect the GitHub repository `RusDavies/blakemere-decorators` and add it as `origin` before configuring release environments.
 - [ ] Configure GitHub protected environments `testpypi` and `pypi` before running release workflow.
 - [x] Add a release workflow for trusted publishing once GitHub environment names are confirmed.
 - [x] Add executable composition examples.
