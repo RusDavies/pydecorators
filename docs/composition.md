@@ -130,6 +130,26 @@ async def fetch_user(user_id: str) -> str:
 
 The second form can run much longer overall because each retry gets a fresh timeout.
 
+## Failure modes to watch for
+
+Decorator order is not decorative. It changes what the system actually does.
+
+- `@retry` outside `@rate_limit` means each retry attempt may consume a rate-limit slot.
+  That can be correct when protecting a fragile dependency, but it can also exhaust the
+  local allowance with one unlucky user call.
+- `@timeout` inside `@retry` gives each attempt a fresh deadline. Three attempts with a
+  two-second timeout can take roughly six seconds plus retry delays. That is not a
+  two-second user experience; it is a small scheduling ambush.
+- `@log_calls` below `@retry` logs every attempt. Useful for diagnosis, noisy in normal
+  service logs, and especially tedious when an outage turns one error into a thousand
+  identical little postcards from the crater.
+- `@circuit_breaker` inside `@retry` counts each failed attempt toward opening the
+  circuit. That opens faster, but it may also trip the breaker from one logical request
+  instead of sustained dependency failure.
+
+When changing order, name the semantic change in the review. "Looks cleaner" is not a
+reliability argument.
+
 ## Dogfood finding
 
 The local dogfood harness and external-project dogfood both worked without API changes. The main finding was documentation, not code: wrapper order needs to be explicit because `@retry`, `@rate_limit`, `@log_calls`, `@measure_time`, `@timeout`, and `@circuit_breaker` all have reasonable-but-different behavior depending on where they sit in the stack.
