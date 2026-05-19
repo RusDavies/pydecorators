@@ -40,6 +40,24 @@ The rejected sync strategies were:
 
 If sync timeout support is ever added, it needs an explicit design with documented platform and cancellation limitations. The current decision record is [`sync_timeout_decision.md`](sync_timeout_decision.md).
 
+## Failure modes to watch for
+
+`@timeout` is a deadline mechanism, not a safe way to erase work from existence.
+
+- Async cancellation is cooperative. If the wrapped coroutine suppresses cancellation,
+  performs blocking sync I/O, or leaves background tasks running, the caller can still
+  see a timeout while other work continues elsewhere. That is how "the request failed"
+  becomes "the side effect happened anyway", a classic little crime scene.
+- Put `@timeout` outside `@retry` when the user-visible operation has one budget. Put it
+  inside `@retry` only when each attempt should get its own budget and the longer total
+  runtime is acceptable.
+- Do not use timeout as an idempotency control. If the operation creates orders, sends
+  messages, charges cards, or mutates external state, keep the operation's own
+  idempotency key or deduplication strategy.
+- Avoid catching `FunctionTimedOut` and immediately retrying in outer application code
+  unless you have checked the total deadline. Otherwise the decorator is just producing
+  expensive pauses between attempts.
+
 ## Examples
 
 Custom message and exception:

@@ -62,6 +62,26 @@ except CircuitBreakerOpen:
 
 This is an in-process circuit breaker. It is not shared across processes, containers, or hosts. For distributed systems, pair it with service-level timeouts, retries, backoff, and observability. Software reliability: one decorator helps; it does not replace architecture, no matter how much we squint at it.
 
+## Failure modes to watch for
+
+A circuit breaker protects callers from repeatedly hitting a failing dependency. It can
+also make a bad threshold look like wisdom, so configure it deliberately.
+
+- A threshold that is too low can open the circuit during a brief network wobble. That
+  fails fast, but it may also deny calls while the dependency is already healthy again.
+- A reset timeout that is too short can create probe storms against a sick dependency.
+  Too long, and recovery is delayed for no useful reason. Pick a value that matches the
+  dependency's failure and recovery pattern, not the nearest round number.
+- Catching `CircuitBreakerOpen` and immediately calling the same dependency through a
+  different path defeats the point. If there is a fallback, make it genuinely separate:
+  cached data, degraded response, queued work, or a clear failure to the caller.
+- The breaker state is local to one decorated function in one process. In a scaled
+  service, different workers can disagree about whether the circuit is open. That is not
+  a bug in this decorator; it is the operating model.
+- Placing the breaker inside `@retry` counts individual attempts. Placing it outside
+  counts logical operations after retries are exhausted. Choose the failure signal you
+  actually want.
+
 
 ## Executable examples
 

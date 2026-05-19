@@ -52,6 +52,24 @@ Use rate limiting to protect dependencies, quotas, local tools, and best-effort 
 
 If the protected dependency has its own retry-after or quota headers, prefer feeding those signals into caller behavior instead of assuming this local limiter has a complete picture. Local politeness is useful; it is not a treaty with the universe.
 
+## Failure modes to watch for
+
+Rate limiting is about admission control. It does not guarantee fairness, idempotency,
+or distributed correctness by itself.
+
+- The default bucket is global for the decorated function. One noisy tenant or caller can
+  consume the allowance for everyone unless you provide a `key=` function.
+- Keyed buckets are only as good as the key. A key that ignores tenant, credential, or
+  endpoint boundaries can accidentally couple workloads that should be isolated.
+- In `"block"` mode, callers wait inside the wrapper. That can be fine for scripts and
+  small tools, but in a service it can tie up workers and turn quota pressure into
+  latency pressure.
+- In `"raise"` mode, callers need a plan for `RateLimitExceeded.retry_after`. Ignoring
+  it usually creates a tight retry loop, which is just a denial-of-service attack with
+  better variable names.
+- The limiter is in-process. Multiple processes, containers, or hosts each have their own
+  bucket unless a shared backend is added later.
+
 ## Notes
 
 This is an in-process rate limiter. It is suitable for scripts, local tools, tests, and single-process services. It is not a distributed quota system. Multiple processes or hosts each have their own counters unless a future shared backend is added.
