@@ -1,6 +1,13 @@
 # Public API Policy
 
-This project keeps its public API deliberately small.
+This policy defines which names users can build on and which names remain project
+machinery.
+
+That boundary matters. If a name is public, changing it creates work for users. If a
+name is internal, maintainers can still fix the plumbing without turning every refactor
+into a compatibility incident. The useful trade-off is a small, boring public API with
+enough documented surface area to solve real problems and enough private space to keep
+improving the implementation.
 
 ## Public API
 

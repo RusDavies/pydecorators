@@ -1,6 +1,12 @@
 # API Reference
 
-This page is a compact reference for the public names exported by `useful_decorators`.
+This page is the quick map of the supported surface area: decorators, cache backends,
+serializers, result types, and public exceptions exported by `useful_decorators`.
+
+Use it to answer two practical questions: "What can I import?" and "Where do I go for
+the behavior details?" It is intentionally compact. The reference names the public
+object and its contract; the linked design pages explain the edge cases, failure modes,
+and trade-offs. Nobody benefits from pretending a reference page is a novella.
 
 For stability rules, see [Public API policy](PUBLIC_API.md). For exception inheritance and handling examples, see [Public exceptions](exceptions.md).
 
