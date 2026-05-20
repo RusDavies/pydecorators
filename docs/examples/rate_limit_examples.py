@@ -1,6 +1,6 @@
 """Executable examples for @rate_limit documentation."""
 
-from useful_decorators import RateLimitExceeded, rate_limit
+from pydecorators import RateLimitExceeded, rate_limit
 
 
 class ExampleClock:

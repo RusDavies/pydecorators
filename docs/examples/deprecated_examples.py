@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 @deprecated

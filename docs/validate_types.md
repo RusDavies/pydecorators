@@ -3,7 +3,7 @@
 `@validate_types` performs small, standard-library runtime checks against function annotations.
 
 ```python
-from useful_decorators import validate_types
+from pydecorators import validate_types
 
 
 @validate_types()

@@ -3,7 +3,7 @@
 import asyncio
 from contextlib import suppress
 
-from useful_decorators import CircuitBreakerOpen, circuit_breaker
+from pydecorators import CircuitBreakerOpen, circuit_breaker
 
 
 class ExampleClock:

@@ -8,13 +8,13 @@ from collections.abc import Iterable
 
 import pytest
 
-from useful_decorators import (
+from pydecorators import (
     CacheSerializationError,
     ConfigurationError,
     RedisCacheBackend,
     cache_result,
 )
-from useful_decorators.redis_backend import RedisCacheClient
+from pydecorators.redis_backend import RedisCacheClient
 
 
 class FakeRedis:
@@ -126,7 +126,7 @@ def test_redis_backend_validates_configuration() -> None:
 
 def test_redis_backend_requires_optional_dependency_for_url() -> None:
     if importlib.util.find_spec("redis") is None:
-        with pytest.raises(ConfigurationError, match=r"blakemere-decorators\[redis\]"):
+        with pytest.raises(ConfigurationError, match=r"pydecorators\[redis\]"):
             RedisCacheBackend(url="redis://localhost", key_prefix="demo")
 
 

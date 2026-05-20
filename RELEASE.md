@@ -1,6 +1,6 @@
 # RELEASE.md — Release Checklist
 
-Use this checklist before publishing `blakemere-decorators` releases. The goal is to make releases boring, repeatable, and hard to mess up. Revolutionary concept, apparently.
+Use this checklist before publishing `pydecorators` releases. The goal is to make releases boring, repeatable, and hard to mess up. Revolutionary concept, apparently.
 
 ## Release scope
 
@@ -8,13 +8,13 @@ Use this checklist before publishing `blakemere-decorators` releases. The goal i
 - [ ] Confirm the release type: patch, minor, major, or pre-1.0 compatibility-breaking release.
 - [ ] Review `TODO.md` for any release-blocking items.
 - [ ] Confirm all intended public APIs are documented.
-- [ ] Confirm all public APIs are exported from `useful_decorators.__all__`.
+- [ ] Confirm all public APIs are exported from `pydecorators.__all__`.
 - [ ] Confirm `docs/PUBLIC_API.md` matches the exported public API.
 
 ## Versioning
 
 - [ ] Update `pyproject.toml` version.
-- [ ] Update `src/useful_decorators/__init__.py` `__version__`.
+- [ ] Update `src/pydecorators/__init__.py` `__version__`.
 - [ ] Run the version consistency test.
 - [ ] Confirm the version is not already published on PyPI/TestPyPI.
 
@@ -124,8 +124,8 @@ Then confirm:
 
 - [ ] Create a clean virtual environment.
 - [ ] Install the built wheel locally.
-- [ ] Import `useful_decorators`.
-- [ ] Import every public name from `useful_decorators.__all__`.
+- [ ] Import `pydecorators`.
+- [ ] Import every public name from `pydecorators.__all__`.
 - [ ] Run a tiny example using at least one decorator.
 
 ## Dogfood gate
@@ -151,12 +151,12 @@ Do **not** publish from a random developer shell unless there is a deliberate re
 
 ### Preferred path: PyPI/TestPyPI trusted publishing
 
-Use this once the GitHub repository at `https://github.com/RusDavies/blakemere-decorators` exists and `.github/workflows/release.yml` is ready:
+Use this once the GitHub repository at `https://github.com/RusDavies/pydecorators` exists and `.github/workflows/release.yml` is ready:
 
-1. In TestPyPI, create or claim the `blakemere-decorators` project.
+1. In TestPyPI, create or claim the `pydecorators` project.
 2. Add a trusted publisher for the GitHub repository:
    - owner: `RusDavies`
-   - repository: `blakemere-decorators`
+   - repository: `pydecorators`
    - workflow file: `.github/workflows/release.yml`
    - environment: `testpypi`
 3. Repeat the trusted-publisher setup in PyPI for the production project, using the separate protected environment `pypi`.
@@ -175,7 +175,7 @@ Use this once the GitHub repository at `https://github.com/RusDavies/blakemere-d
 Use API tokens only if trusted publishing is unavailable. If tokens are used:
 
 1. Create separate tokens for TestPyPI and PyPI.
-2. Scope each token to only the `blakemere-decorators` project after the project exists. For the first upload, a broader token may be unavoidable; rotate it immediately after the project is created and replace it with a project-scoped token.
+2. Scope each token to only the `pydecorators` project after the project exists. For the first upload, a broader token may be unavoidable; rotate it immediately after the project is created and replace it with a project-scoped token.
 3. Store tokens only in the CI secret store or a local password manager. Never commit tokens to this repository. Yes, even “temporarily”. Especially “temporarily”.
 4. Use Twine for token publishing:
 
@@ -192,7 +192,7 @@ Use API tokens only if trusted publishing is unavailable. If tokens are used:
 
 ### Final pre-publish checks
 
-Immediately before publishing, re-check that `blakemere-decorators` still resolves as expected on PyPI and TestPyPI, confirm the built version is not already present, and verify `pyproject.toml` project URLs point to the intended public repository. Use the repeatable checker:
+Immediately before publishing, re-check that `pydecorators` still resolves as expected on PyPI and TestPyPI, confirm the built version is not already present, and verify `pyproject.toml` project URLs point to the intended public repository. Use the repeatable checker:
 
    ```bash
    python scripts/check_package_name_availability.py
@@ -221,7 +221,7 @@ For first release, use TestPyPI before PyPI. The included `.github/workflows/rel
 
 ## Package name availability
 
-As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project. Russ chose `blakemere-decorators` as the replacement distribution name, and PyPI/TestPyPI returned 404 Not Found for that name when checked before updating `pyproject.toml`. Re-check availability immediately before publishing with `python scripts/check_package_name_availability.py` because package names are mutable external state, annoyingly.
+As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project. Russ chose `pydecorators` as the replacement distribution name, and PyPI/TestPyPI returned 404 Not Found for that name when checked before updating `pyproject.toml`. Re-check availability immediately before publishing with `python scripts/check_package_name_availability.py` because package names are mutable external state, annoyingly.
 
 ## Tagging convention
 

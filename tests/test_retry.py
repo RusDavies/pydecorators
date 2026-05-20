@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from useful_decorators import ConfigurationError, retry
+from pydecorators import ConfigurationError, retry
 
 
 def test_retry_succeeds_after_transient_failure() -> None:
@@ -203,7 +203,7 @@ def test_retry_validates_configuration(kwargs: dict[str, Any], message: str) -> 
 def test_retry_applies_deterministic_jitter(monkeypatch: pytest.MonkeyPatch) -> None:
     sleeps: list[float] = []
     jitter_values = iter([0.25, 0.75])
-    retry_module = importlib.import_module("useful_decorators.retry")
+    retry_module = importlib.import_module("pydecorators.retry")
 
     monkeypatch.setattr(
         retry_module.random,
@@ -231,7 +231,7 @@ async def test_retry_applies_deterministic_jitter_for_async_functions(
     async def fake_sleep(seconds: float) -> None:
         sleeps.append(seconds)
 
-    retry_module = importlib.import_module("useful_decorators.retry")
+    retry_module = importlib.import_module("pydecorators.retry")
     monkeypatch.setattr(
         retry_module.random,
         "uniform",

@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-import useful_decorators
+import pydecorators
 
 
 def documented_public_api_names() -> set[str]:
@@ -11,7 +11,7 @@ def documented_public_api_names() -> set[str]:
 
 
 def test_documented_public_api_matches_all_exports() -> None:
-    assert documented_public_api_names() == set(useful_decorators.__all__)
+    assert documented_public_api_names() == set(pydecorators.__all__)
 
 
 def test_ci_matrix_includes_minimum_supported_python_version() -> None:

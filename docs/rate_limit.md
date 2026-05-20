@@ -3,7 +3,7 @@
 `@rate_limit` limits how often a sync or async function may be called. It uses a sliding-window policy so old calls expire continuously rather than only at fixed wall-clock boundaries.
 
 ```python
-from useful_decorators import rate_limit
+from pydecorators import rate_limit
 
 
 @rate_limit(calls=10, period=60)

@@ -2,7 +2,7 @@
 
 import asyncio
 
-from useful_decorators import retry
+from pydecorators import retry
 
 
 def transient_success_example() -> tuple[str, list[float], list[int]]:

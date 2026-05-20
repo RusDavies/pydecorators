@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from useful_decorators import (
+from pydecorators import (
     DiskCacheBackend,
     JsonCacheSerializer,
     cache_result,
@@ -52,7 +52,7 @@ def scoped_disk_cache_example(cache_path: Path) -> tuple[str | None, int]:
 def closed_backend_error_example(cache_path: Path) -> str:
     """Handle CacheBackendClosedError from a closed disk backend."""
 
-    from useful_decorators import CacheBackendClosedError
+    from pydecorators import CacheBackendClosedError
 
     backend = DiskCacheBackend(cache_path)
     backend.close()
@@ -78,7 +78,7 @@ def service_shutdown_example(cache_path: Path) -> tuple[str, str]:
     finally:
         backend.close()
 
-    from useful_decorators import CacheBackendClosedError
+    from pydecorators import CacheBackendClosedError
 
     try:
         load_profile("user-456")
@@ -129,7 +129,7 @@ class DateTimeBytesJsonSerializer:
         import json
         from datetime import datetime
 
-        from useful_decorators import CacheSerializationError
+        from pydecorators import CacheSerializationError
 
         def encode(item: object) -> object:
             if isinstance(item, datetime):
@@ -162,7 +162,7 @@ class DateTimeBytesJsonSerializer:
         import json
         from datetime import datetime
 
-        from useful_decorators import CacheSerializationError
+        from pydecorators import CacheSerializationError
 
         def decode(item: object) -> object:
             if isinstance(item, list):
@@ -253,7 +253,7 @@ def inspect_json_cache_row_example(cache_path: Path) -> tuple[str, str, str]:
     import sqlite3
     from contextlib import closing
 
-    from useful_decorators import JsonCacheSerializer
+    from pydecorators import JsonCacheSerializer
 
     backend = DiskCacheBackend(
         cache_path,

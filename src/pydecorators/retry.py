@@ -7,9 +7,9 @@ import random
 from collections.abc import Callable
 from typing import Any, cast
 
-from useful_decorators._core import async_sleep, is_async_callable, mirror_metadata, sync_sleep
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators._core import async_sleep, is_async_callable, mirror_metadata, sync_sleep
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError
 
 RetryPredicate = Callable[[BaseException], bool]
 BeforeAttemptHook = Callable[[int], object]

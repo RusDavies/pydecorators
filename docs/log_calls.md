@@ -3,7 +3,7 @@
 `@log_calls` logs call start, completion duration, optional argument metadata, optional summarized return values, and exceptions for sync and async functions.
 
 ```python
-from useful_decorators import log_calls
+from pydecorators import log_calls
 
 
 @log_calls()
@@ -26,7 +26,7 @@ Invalid configuration raises `ConfigurationError` at decoration time.
 
 ## Structured log fields
 
-Every emitted record includes `useful_decorators_function` and `useful_decorators_event` (`"started"`, `"finished"`, or `"failed"`) in `logging`'s `extra` data. Finished and failed records also include `useful_decorators_duration_seconds` and `useful_decorators_success` so log pipelines can filter or aggregate without parsing the human-readable message.
+Every emitted record includes `pydecorators_function` and `pydecorators_event` (`"started"`, `"finished"`, or `"failed"`) in `logging`'s `extra` data. Finished and failed records also include `pydecorators_duration_seconds` and `pydecorators_success` so log pipelines can filter or aggregate without parsing the human-readable message.
 
 Durations use Python's monotonic clock by default, not wall-clock time. That keeps call durations stable across NTP corrections, daylight saving changes, and other clock adjustments. Use `clock=` for tests or custom runtimes, and prefer a monotonic-style source in production.
 

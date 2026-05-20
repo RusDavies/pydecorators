@@ -14,7 +14,7 @@ Clarify the library's position, target users, and first-release scope.
 
 ### Recommended Decisions
 
-- Package/import namespace: `useful_decorators` or `pydecorators` rather than `python_decorators`, because the latter is generic and may be awkward on PyPI.
+- Package/import namespace: `pydecorators` or `pydecorators` rather than `python_decorators`, because the latter is generic and may be awkward on PyPI.
 - Python support: Python 3.10+ or 3.11+.
 - First release: `retry`, `cache_result`, `rate_limit`, `timeout`, `deprecated`.
 - Later releases: `log_calls`, `measure_time`, `validate_types`, `circuit_breaker`, `require_env`.

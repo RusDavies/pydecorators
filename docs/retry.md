@@ -3,7 +3,7 @@
 `@retry` retries a sync or async function when configured exception types are raised. It is configured-only because retry policy should be explicit at the call site.
 
 ```python
-from useful_decorators import retry
+from pydecorators import retry
 
 
 @retry(attempts=3, delay=0.25, backoff=2, exceptions=TimeoutError)

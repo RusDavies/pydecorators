@@ -11,7 +11,7 @@ improving the implementation.
 
 ## Public API
 
-The public API is anything exported from `useful_decorators.__all__` and documented in the README or `docs/`.
+The public API is anything exported from `pydecorators.__all__` and documented in the README or `docs/`.
 
 Current public API:
 
@@ -66,8 +66,8 @@ Modules or names prefixed with `_` are internal. They may change without depreca
 
 Examples:
 
-- `useful_decorators._core`
-- `useful_decorators._typing`
+- `pydecorators._core`
+- `pydecorators._typing`
 
 ## Stability before `1.0`
 
@@ -149,7 +149,7 @@ Example: calling a cached function with an unhashable list argument raises `Cach
 
 ### `RedisCacheBackend`
 
-`RedisCacheBackend` is the optional Redis-backed implementation of the cache backend protocol. It uses package-owned `key_prefix` values, versioned entry envelopes, serializer content-type checks, Redis TTLs, and separate hit/miss stats keys. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-decorators[redis]`.
+`RedisCacheBackend` is the optional Redis-backed implementation of the cache backend protocol. It uses package-owned `key_prefix` values, versioned entry envelopes, serializer content-type checks, Redis TTLs, and separate hit/miss stats keys. Importing the base package does not require Redis; constructing with `url=` requires installing `pydecorators[redis]`.
 
 ### `RedisCacheClient`
 
@@ -168,7 +168,7 @@ Example: `PickleCacheSerializer().dumps(...)` raises `CacheSerializationError` w
 Example:
 
 ```python
-from useful_decorators import CacheBackendClosedError, DiskCacheBackend
+from pydecorators import CacheBackendClosedError, DiskCacheBackend
 
 backend = DiskCacheBackend(".cache/example.sqlite3")
 backend.close()

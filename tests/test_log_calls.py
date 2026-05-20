@@ -4,7 +4,7 @@ from typing import Any, cast
 
 import pytest
 
-from useful_decorators import ConfigurationError, log_calls
+from pydecorators import ConfigurationError, log_calls
 
 
 class MutableClock:
@@ -39,11 +39,11 @@ def test_log_calls_logs_sync_start_finish_and_duration(caplog: pytest.LogCapture
     logged = messages(caplog)
     assert logged[0].endswith("add started")
     assert logged[1].endswith("add finished in 0.25 seconds")
-    assert str(extra(caplog.records[0], "useful_decorators_function")).endswith("add")
-    assert extra(caplog.records[0], "useful_decorators_event") == "started"
-    assert extra(caplog.records[1], "useful_decorators_event") == "finished"
-    assert extra(caplog.records[1], "useful_decorators_duration_seconds") == 0.25
-    assert extra(caplog.records[1], "useful_decorators_success") is True
+    assert str(extra(caplog.records[0], "pydecorators_function")).endswith("add")
+    assert extra(caplog.records[0], "pydecorators_event") == "started"
+    assert extra(caplog.records[1], "pydecorators_event") == "finished"
+    assert extra(caplog.records[1], "pydecorators_duration_seconds") == 0.25
+    assert extra(caplog.records[1], "pydecorators_success") is True
 
 
 def test_log_calls_can_include_redacted_keyword_arguments(caplog: pytest.LogCaptureFixture) -> None:
@@ -111,8 +111,8 @@ def test_log_calls_logs_exceptions_without_swallowing_them(
     joined = "\n".join(messages(caplog))
     assert "broken started" in joined
     assert "broken failed after" in joined
-    assert extra(caplog.records[-1], "useful_decorators_event") == "failed"
-    assert extra(caplog.records[-1], "useful_decorators_success") is False
+    assert extra(caplog.records[-1], "pydecorators_event") == "failed"
+    assert extra(caplog.records[-1], "pydecorators_success") is False
 
 
 @pytest.mark.asyncio

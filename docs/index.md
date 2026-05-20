@@ -1,6 +1,6 @@
 # Documentation Index
 
-Start here when navigating the Useful Decorators documentation.
+Start here when navigating the PyDecorators documentation.
 
 ## Core project docs
 

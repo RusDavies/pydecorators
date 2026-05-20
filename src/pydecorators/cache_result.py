@@ -16,9 +16,9 @@ from pathlib import Path
 from threading import Event, RLock
 from typing import Any, Protocol, cast, runtime_checkable
 
-from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
-from useful_decorators._typing import Clock, P, R
-from useful_decorators.exceptions import (
+from pydecorators._core import is_async_callable, mirror_metadata, monotonic
+from pydecorators._typing import Clock, P, R
+from pydecorators.exceptions import (
     CacheBackendClosedError,
     CacheKeyError,
     CacheSerializationError,

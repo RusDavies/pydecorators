@@ -8,10 +8,10 @@ The goal is a durable cache for CLIs, scripts, local tools, and single-host serv
 
 ```python
 from pathlib import Path
-from useful_decorators import DiskCacheBackend, JsonCacheSerializer, PickleCacheSerializer
+from pydecorators import DiskCacheBackend, JsonCacheSerializer, PickleCacheSerializer
 
 backend = DiskCacheBackend(
-    path=Path(".cache/blakemere-decorators.sqlite3"),
+    path=Path(".cache/pydecorators.sqlite3"),
     ttl=3600,
     maxsize=10_000,
     serializer=PickleCacheSerializer(),
@@ -169,10 +169,10 @@ Use `JsonCacheSerializer` when cached values are JSON-compatible and do not need
 ```python
 from pathlib import Path
 
-from useful_decorators import DiskCacheBackend, JsonCacheSerializer, cache_result
+from pydecorators import DiskCacheBackend, JsonCacheSerializer, cache_result
 
 backend = DiskCacheBackend(
-    Path(".cache/blakemere-decorators.sqlite3"),
+    Path(".cache/pydecorators.sqlite3"),
     serializer=JsonCacheSerializer(),
 )
 
@@ -328,9 +328,9 @@ If a disk-cache inspection CLI is added, its default output should be aggregate-
 Tentative command posture:
 
 ```bash
-python -m useful_decorators inspect-cache path/to/cache.sqlite3
-python -m useful_decorators inspect-cache path/to/cache.sqlite3 --rows --no-payload-preview
-python -m useful_decorators inspect-cache path/to/cache.sqlite3 --rows --include-payload-preview
+python -m pydecorators inspect-cache path/to/cache.sqlite3
+python -m pydecorators inspect-cache path/to/cache.sqlite3 --rows --no-payload-preview
+python -m pydecorators inspect-cache path/to/cache.sqlite3 --rows --include-payload-preview
 ```
 
 CLI design constraints:
@@ -608,7 +608,7 @@ This remains a single-host local cache. SQLite handles its normal file locking, 
 `DiskCacheBackend` can be used as a context manager for short scoped backend operations:
 
 ```python
-from useful_decorators import DiskCacheBackend
+from pydecorators import DiskCacheBackend
 
 with DiskCacheBackend(".cache/tool.sqlite3", ttl=60, maxsize=16) as backend:
     backend.set_value("answer", "cached")
@@ -739,7 +739,7 @@ CREATE TABLE IF NOT EXISTS cache_metadata (
 Initial rows could include:
 
 - `schema_version`: integer string for the SQLite schema contract, starting at `1`.
-- `created_by`: package name, such as `blakemere-decorators`.
+- `created_by`: package name, such as `pydecorators`.
 - `created_with_version`: package version that initialized the file, for diagnostics only.
 - `updated_with_version`: last package version that opened or migrated the file, for diagnostics only.
 

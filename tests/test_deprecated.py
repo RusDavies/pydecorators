@@ -2,8 +2,8 @@ from typing import Any, cast
 
 import pytest
 
-from useful_decorators import deprecated
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators import deprecated
+from pydecorators.exceptions import ConfigurationError
 
 
 def test_deprecated_bare_usage_warns_and_returns_value() -> None:

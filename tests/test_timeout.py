@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from useful_decorators import ConfigurationError, FunctionTimedOut, timeout
+from pydecorators import ConfigurationError, FunctionTimedOut, timeout
 
 
 @pytest.mark.asyncio

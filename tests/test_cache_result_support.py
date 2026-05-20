@@ -1,6 +1,6 @@
 import pytest
 
-from useful_decorators import (
+from pydecorators import (
     CacheInfo,
     CacheKeyError,
     DiskCacheDropEvent,
@@ -8,8 +8,8 @@ from useful_decorators import (
     MemoryCacheBackend,
     PickleCacheSerializer,
 )
-from useful_decorators.cache_result import _CacheEntry
-from useful_decorators.exceptions import UsefulDecoratorsError
+from pydecorators.cache_result import _CacheEntry
+from pydecorators.exceptions import UsefulDecoratorsError
 
 
 def test_cache_info_public_shape() -> None:
@@ -65,7 +65,7 @@ def test_cache_key_error_is_type_error_and_package_error() -> None:
 
 
 def test_memory_cache_backend_implements_cache_backend_protocol() -> None:
-    from useful_decorators import CacheBackend
+    from pydecorators import CacheBackend
 
     assert isinstance(MemoryCacheBackend(), CacheBackend)
 
@@ -114,13 +114,13 @@ def test_json_cache_serializer_round_trips_json_compatible_values() -> None:
 
 
 def test_json_cache_serializer_implements_serializer_protocol() -> None:
-    from useful_decorators import CacheSerializer
+    from pydecorators import CacheSerializer
 
     assert isinstance(JsonCacheSerializer(), CacheSerializer)
 
 
 def test_json_cache_serializer_wraps_serialization_failures() -> None:
-    from useful_decorators import CacheSerializationError
+    from pydecorators import CacheSerializationError
 
     serializer = JsonCacheSerializer()
 
@@ -129,7 +129,7 @@ def test_json_cache_serializer_wraps_serialization_failures() -> None:
 
 
 def test_json_cache_serializer_rejects_non_finite_numbers() -> None:
-    from useful_decorators import CacheSerializationError
+    from pydecorators import CacheSerializationError
 
     serializer = JsonCacheSerializer()
 
@@ -138,7 +138,7 @@ def test_json_cache_serializer_rejects_non_finite_numbers() -> None:
 
 
 def test_json_cache_serializer_wraps_deserialization_failures() -> None:
-    from useful_decorators import CacheSerializationError
+    from pydecorators import CacheSerializationError
 
     serializer = JsonCacheSerializer()
 
@@ -147,13 +147,13 @@ def test_json_cache_serializer_wraps_deserialization_failures() -> None:
 
 
 def test_pickle_cache_serializer_implements_serializer_protocol() -> None:
-    from useful_decorators import CacheSerializer
+    from pydecorators import CacheSerializer
 
     assert isinstance(PickleCacheSerializer(), CacheSerializer)
 
 
 def test_pickle_cache_serializer_wraps_serialization_failures() -> None:
-    from useful_decorators import CacheSerializationError
+    from pydecorators import CacheSerializationError
 
     serializer = PickleCacheSerializer()
 
@@ -162,7 +162,7 @@ def test_pickle_cache_serializer_wraps_serialization_failures() -> None:
 
 
 def test_pickle_cache_serializer_wraps_deserialization_failures() -> None:
-    from useful_decorators import CacheSerializationError
+    from pydecorators import CacheSerializationError
 
     serializer = PickleCacheSerializer()
 

@@ -5,14 +5,14 @@ from typing import Protocol
 
 import pytest
 
-from useful_decorators import (
+from pydecorators import (
     CacheBackend,
     CacheInfo,
     DiskCacheBackend,
     MemoryCacheBackend,
     RedisCacheBackend,
 )
-from useful_decorators.cache_result import _CacheEntry
+from pydecorators.cache_result import _CacheEntry
 
 
 class MutableClock:

@@ -1,6 +1,6 @@
 # Security Hardening Guide
 
-Useful Decorators is a small in-process helper library, not a security product. That distinction matters. The decorators can make unsafe code easier to observe, retry, cache, or validate; they cannot turn unsafe trust boundaries into safe ones by sheer optimism, which remains a poor engineering strategy.
+PyDecorators is a small in-process helper library, not a security product. That distinction matters. The decorators can make unsafe code easier to observe, retry, cache, or validate; they cannot turn unsafe trust boundaries into safe ones by sheer optimism, which remains a poor engineering strategy.
 
 Use this page as the central checklist for cache, logging, validation, and operational hardening before using the package in applications that handle secrets, customer data, or production traffic.
 

@@ -3,7 +3,7 @@
 `@require_env` checks required environment variables at call time before running a sync or async function.
 
 ```python
-from useful_decorators import require_env
+from pydecorators import require_env
 
 
 @require_env("API_TOKEN")

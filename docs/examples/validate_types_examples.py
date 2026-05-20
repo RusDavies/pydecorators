@@ -2,7 +2,7 @@
 
 import asyncio
 
-from useful_decorators import validate_types
+from pydecorators import validate_types
 
 
 def argument_validation_example() -> str:

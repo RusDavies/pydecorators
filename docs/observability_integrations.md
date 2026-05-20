@@ -1,6 +1,6 @@
 # Optional Observability Integrations
 
-`blakemere-decorators` stays dependency-light. OpenTelemetry, Prometheus, and structlog integrations are supported through ordinary callback/logger adapter patterns rather than hard runtime dependencies.
+`pydecorators` stays dependency-light. OpenTelemetry, Prometheus, and structlog integrations are supported through ordinary callback/logger adapter patterns rather than hard runtime dependencies.
 
 ## OpenTelemetry
 

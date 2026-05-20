@@ -40,7 +40,7 @@ def cache_result(
   - Default: `False`.
   - If enabled, exceptions are stored as cache entries.
 - `clock`: injectable monotonic clock for tests.
-  - Defaults to `useful_decorators._core.monotonic`.
+  - Defaults to `pydecorators._core.monotonic`.
 
 ## Bare vs configured usage
 
@@ -275,7 +275,7 @@ Backend instances may be shared deliberately across decorated functions. Shared 
 Use `namespace=` when sharing a backend but keeping decorated functions isolated. `cache_namespace(name, version)` can build a conventional versioned namespace such as `users:v1` for long-lived caches. For CLI tools that also need a conventional cache file location, `cache_directory(app_name)` returns a platform-appropriate cache directory path without creating it.
 
 ```python
-from useful_decorators import cache_namespace
+from pydecorators import cache_namespace
 
 backend = MemoryCacheBackend()
 
@@ -335,7 +335,7 @@ Future contributors adding a backend should first add a fixture/factory to the c
 redis = ["redis>=5"]
 ```
 
-Public import guidance should make the optional nature clear: installing `blakemere-decorators[redis]` enables URL-based Redis client construction, while the base package remains standard-library-only plus its existing local backends.
+Public import guidance should make the optional nature clear: installing `pydecorators[redis]` enables URL-based Redis client construction, while the base package remains standard-library-only plus its existing local backends.
 
 Design constraints for the Redis backend:
 
@@ -346,7 +346,7 @@ Design constraints for the Redis backend:
 - Document that Redis availability, network latency, authentication, TLS, eviction policy, and server-side persistence are operator-owned concerns.
 - Do not add Redis as a hard dependency for users who only need in-process or SQLite caching.
 
-The Redis backend accepts an existing Redis-like `client=` without importing `redis-py`; constructing with `url=` imports the optional dependency and points users at `blakemere-decorators[redis]` if it is missing.
+The Redis backend accepts an existing Redis-like `client=` without importing `redis-py`; constructing with `url=` imports the optional dependency and points users at `pydecorators[redis]` if it is missing.
 
 ## Disk backend implementation
 

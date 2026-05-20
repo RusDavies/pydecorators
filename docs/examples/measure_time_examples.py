@@ -2,7 +2,7 @@
 
 import asyncio
 
-from useful_decorators import TimingInfo, measure_time
+from pydecorators import TimingInfo, measure_time
 
 
 class ExampleClock:

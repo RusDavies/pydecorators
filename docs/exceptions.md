@@ -1,6 +1,6 @@
 # Public Exceptions
 
-This page summarizes the public exception hierarchy exposed by `useful_decorators`.
+This page summarizes the public exception hierarchy exposed by `pydecorators`.
 
 Use the most specific exception when you can recover from a known condition. Catch `UsefulDecoratorsError` when you want to handle package-specific failures without catching unrelated Python exceptions.
 
@@ -27,7 +27,7 @@ Executable examples live in `docs/examples/public_exception_examples.py` and are
 ### `ConfigurationError`
 
 ```python
-from useful_decorators import ConfigurationError, cache_result
+from pydecorators import ConfigurationError, cache_result
 
 try:
     cache_result(namespace="   ")
@@ -38,7 +38,7 @@ except ConfigurationError:
 ### `CircuitBreakerOpen`
 
 ```python
-from useful_decorators import CircuitBreakerOpen, circuit_breaker
+from pydecorators import CircuitBreakerOpen, circuit_breaker
 
 @circuit_breaker(failure_threshold=1, reset_timeout=10)
 def call_service() -> None:
@@ -56,7 +56,7 @@ except RuntimeError:
 ### `CacheKeyError`
 
 ```python
-from useful_decorators import CacheKeyError, cache_result
+from pydecorators import CacheKeyError, cache_result
 
 @cache_result()
 def identity(value: list[int]) -> list[int]:
@@ -71,7 +71,7 @@ except CacheKeyError:
 ### `CacheSerializationError`
 
 ```python
-from useful_decorators import CacheSerializationError, JsonCacheSerializer, PickleCacheSerializer
+from pydecorators import CacheSerializationError, JsonCacheSerializer, PickleCacheSerializer
 
 try:
     PickleCacheSerializer().dumps(lambda value: value)
@@ -87,7 +87,7 @@ except CacheSerializationError:
 ### `CacheBackendClosedError`
 
 ```python
-from useful_decorators import CacheBackendClosedError, DiskCacheBackend
+from pydecorators import CacheBackendClosedError, DiskCacheBackend
 
 backend = DiskCacheBackend(".cache/example.sqlite3")
 backend.close()
@@ -101,7 +101,7 @@ except CacheBackendClosedError:
 ### `UnsupportedCacheSchemaVersionError`
 
 ```python
-from useful_decorators import DiskCacheBackend, UnsupportedCacheSchemaVersionError
+from pydecorators import DiskCacheBackend, UnsupportedCacheSchemaVersionError
 
 try:
     DiskCacheBackend(".cache/example.sqlite3")
@@ -113,7 +113,7 @@ except UnsupportedCacheSchemaVersionError:
 ### `ValidationError`
 
 ```python
-from useful_decorators import ValidationError, validate_types
+from pydecorators import ValidationError, validate_types
 
 @validate_types()
 def double(value: int) -> int:
@@ -128,7 +128,7 @@ except ValidationError:
 ### `RateLimitExceeded`
 
 ```python
-from useful_decorators import RateLimitExceeded, rate_limit
+from pydecorators import RateLimitExceeded, rate_limit
 
 @rate_limit(calls=1, period=60)
 def limited() -> str:
@@ -144,7 +144,7 @@ except RateLimitExceeded as exc:
 ### `FunctionTimedOut`
 
 ```python
-from useful_decorators import FunctionTimedOut, timeout
+from pydecorators import FunctionTimedOut, timeout
 
 @timeout(seconds=0.5)
 async def slow_call() -> str:
@@ -159,7 +159,7 @@ except FunctionTimedOut:
 ### `EnvRequirementError`
 
 ```python
-from useful_decorators import EnvRequirementError, require_env
+from pydecorators import EnvRequirementError, require_env
 
 @require_env("API_TOKEN", environ={})
 def call_service() -> None:

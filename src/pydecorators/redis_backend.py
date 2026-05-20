@@ -9,14 +9,14 @@ import pickle
 from collections.abc import Hashable, Iterable
 from typing import Protocol, cast, runtime_checkable
 
-from useful_decorators.cache_result import (
+from pydecorators.cache_result import (
     CacheInfo,
     CacheSerializer,
     JsonCacheSerializer,
     PickleCacheSerializer,
     _CacheEntry,
 )
-from useful_decorators.exceptions import CacheSerializationError, ConfigurationError
+from pydecorators.exceptions import CacheSerializationError, ConfigurationError
 
 
 @runtime_checkable
@@ -182,7 +182,7 @@ class RedisCacheBackend:
     def _encode_entry(self, value: object, *, is_exception: bool) -> bytes:
         payload = self._serializer.dumps(value)
         envelope = {
-            "schema": "useful_decorators.redis_cache.v1",
+            "schema": "pydecorators.redis_cache.v1",
             "serializer_content_type": self._serializer.content_type,
             "is_exception": is_exception,
             "last_accessed": self._access_counter(),
@@ -193,7 +193,7 @@ class RedisCacheBackend:
     def _decode_entry(self, data: bytes) -> _CacheEntry:
         try:
             envelope = json.loads(data.decode("utf-8"))
-            if envelope["schema"] != "useful_decorators.redis_cache.v1":
+            if envelope["schema"] != "pydecorators.redis_cache.v1":
                 raise CacheSerializationError("unsupported Redis cache entry schema")
             if envelope["serializer_content_type"] != self._serializer.content_type:
                 raise CacheSerializationError("Redis cache serializer content type mismatch")
@@ -220,8 +220,7 @@ def _client_from_url(url: str | None) -> RedisCacheClient:
         from redis import Redis  # type: ignore[import-not-found]
     except ImportError as exc:
         raise ConfigurationError(
-            "RedisCacheBackend requires the optional Redis dependency; "
-            "install blakemere-decorators[redis]"
+            "RedisCacheBackend requires the optional Redis dependency; install pydecorators[redis]"
         ) from exc
     return cast(RedisCacheClient, Redis.from_url(url))
 

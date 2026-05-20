@@ -110,6 +110,6 @@ Changing the Redis prefix, schema version, serializer format, or stats key namin
 
 ## Optional dependency behavior
 
-The base package must not require Redis dependencies. Importing `useful_decorators.redis_backend` also stays dependency-light. Missing Redis extras fail only when the Redis backend is imported or constructed with `RedisCacheBackend(url=...)`; applications that already own Redis client construction can pass `client=...` without importing `redis-py` through this package.
+The base package must not require Redis dependencies. Importing `pydecorators.redis_backend` also stays dependency-light. Missing Redis extras fail only when the Redis backend is imported or constructed with `RedisCacheBackend(url=...)`; applications that already own Redis client construction can pass `client=...` without importing `redis-py` through this package.
 
-Tests assert that the base package imports without Redis installed, the backend module imports without Redis installed, and URL construction points users at `blakemere-decorators[redis]` when the optional dependency is missing.
+Tests assert that the base package imports without Redis installed, the backend module imports without Redis installed, and URL construction points users at `pydecorators[redis]` when the optional dependency is missing.

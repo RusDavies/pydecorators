@@ -2,7 +2,7 @@
 
 import asyncio
 
-from useful_decorators import EnvRequirementError, require_env
+from pydecorators import EnvRequirementError, require_env
 
 
 def required_variables_example() -> str:

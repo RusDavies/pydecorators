@@ -6,9 +6,9 @@ import warnings
 from collections.abc import Callable
 from typing import Any, cast, overload
 
-from useful_decorators._core import is_async_callable, mirror_metadata
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators._core import is_async_callable, mirror_metadata
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError
 
 
 def _build_deprecation_message(
