@@ -6,7 +6,7 @@ The goal is to provide small, typed, well-tested decorators that work in scripts
 
 ## What is included
 
-`v0.1.1` includes the same public API as `v0.1.0`, with cleaned post-release documentation:
+`v0.1.2` includes the same public API as `v0.1.0`, with cleaned post-release documentation and PyPI-safe documentation links:
 
 - `@deprecated` for compatibility warnings.
 - `@cache_result` with in-memory and disk-backed caching.
@@ -55,7 +55,7 @@ Then read the per-decorator docs and `docs/composition.md` before stacking decor
 
 ## Development status
 
-Released as `blakemere-wraptools` `0.1.1`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
+Released as `blakemere-wraptools` `0.1.2`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
 
@@ -97,17 +97,17 @@ python scripts/dogfood_external_project.py
 
 ## Documentation
 
-Start with the [documentation index](docs/index.md), or jump straight to the guide you need:
+Start with the [documentation index](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md), or jump straight to the guide you need:
 
-- [API reference](docs/API_REFERENCE.md): public decorators, backends, serializers, result types, and exceptions.
-- [API design notes](docs/API_DESIGN.md): the conventions behind decorator signatures, typing, and exports.
-- [Public API and compatibility](docs/PUBLIC_API.md): what is stable, what is internal, and what pre-1.0 compatibility means.
-- [Decorator composition](docs/composition.md): practical guidance for stacking decorators without making soup.
-- [Exceptions](docs/exceptions.md): the public exception hierarchy and when each error is raised.
-- [Security hardening](docs/security_hardening.md): cache, logging, validation, and environment-safety notes.
-- [Contributing](CONTRIBUTING.md): how to add decorators, docs, tests, and release checks.
+- [API reference](https://github.com/RusDavies/pydecorators/blob/master/docs/API_REFERENCE.md): public decorators, backends, serializers, result types, and exceptions.
+- [API design notes](https://github.com/RusDavies/pydecorators/blob/master/docs/API_DESIGN.md): the conventions behind decorator signatures, typing, and exports.
+- [Public API and compatibility](https://github.com/RusDavies/pydecorators/blob/master/docs/PUBLIC_API.md): what is stable, what is internal, and what pre-1.0 compatibility means.
+- [Decorator composition](https://github.com/RusDavies/pydecorators/blob/master/docs/composition.md): practical guidance for stacking decorators without making soup.
+- [Exceptions](https://github.com/RusDavies/pydecorators/blob/master/docs/exceptions.md): the public exception hierarchy and when each error is raised.
+- [Security hardening](https://github.com/RusDavies/pydecorators/blob/master/docs/security_hardening.md): cache, logging, validation, and environment-safety notes.
+- [Contributing](https://github.com/RusDavies/pydecorators/blob/master/CONTRIBUTING.md): how to add decorators, docs, tests, and release checks.
 
-Executable examples are collected in [docs/examples](docs/examples/).
+Executable examples are collected in [docs/examples](https://github.com/RusDavies/pydecorators/tree/master/docs/examples/).
 
 ## Release process
 

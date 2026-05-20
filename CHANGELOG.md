@@ -6,6 +6,13 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-05-20
+
+### Changed
+
+- Made README documentation links absolute GitHub URLs so PyPI does not turn them into project-page 404s.
+- Added a dedicated PyPI project metadata documentation URL.
+
 ## [0.1.1] - 2026-05-20
 
 ### Changed
