@@ -217,7 +217,7 @@ def _client_from_url(url: str | None) -> RedisCacheClient:
     if url is None:
         raise ConfigurationError("RedisCacheBackend requires a Redis client or url")
     try:
-        from redis import Redis  # type: ignore[import-not-found]
+        from redis import Redis
     except ImportError as exc:
         raise ConfigurationError(
             "RedisCacheBackend requires the optional Redis dependency; "
