@@ -15,7 +15,7 @@ jobs:
       - name: Install package
         run: python -m pip install -e '.[dev]'
       - name: Documentation policy tests
-        run: pytest -m docs_policy
+        run: ./scripts/docs-policy.sh
 
   test:
     runs-on: ubuntu-latest
