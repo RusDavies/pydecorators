@@ -845,8 +845,8 @@
 - [x] Build package locally.
 - [x] Test install from local wheel.
 - [x] Run `python scripts/check_package_name_availability.py` immediately before TestPyPI/PyPI publish.
-- [ ] Publish test release to TestPyPI.
-- [ ] Publish `v0.1.0` to PyPI when ready.
+- [x] Publish test release to TestPyPI.
+- [x] Publish `v0.1.0` to PyPI.
 
 
 ### Newly Implied Release Blockers / Follow-Ups

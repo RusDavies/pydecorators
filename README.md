@@ -4,35 +4,38 @@ A focused Python library of useful decorators for everyday reliability, caching,
 
 The goal is to provide small, typed, well-tested decorators that work in scripts, CLIs, services, and libraries without requiring a framework or a dependency shrubbery.
 
-## Planned first release
+## What is included
 
-The initial `v0.1.0` scope is:
+`v0.1.0` includes:
 
-- `@deprecated` — implemented
-- `@cache_result` — sync/disk backend implemented
-- `@retry` — implemented
-- `@rate_limit` — implemented
-- `@timeout` — async implementation complete
-- `@log_calls` — implemented
-- `@measure_time` — implemented
-- `@validate_types` — implemented
-- `@require_env` — implemented
-- `@circuit_breaker` — implemented
-
+- `@deprecated` for compatibility warnings.
+- `@cache_result` with in-memory and disk-backed caching.
+- `@retry` for transient failures.
+- `@rate_limit` for simple in-process throttling.
+- `@timeout` for async timeout boundaries.
+- `@log_calls` and `@measure_time` for lightweight observability.
+- `@validate_types` for runtime argument checks.
+- `@require_env` for environment preflight checks.
+- `@circuit_breaker` for failing-fast around unhealthy dependencies.
 
 ## Installation
 
-Not published yet. For local development:
+Install from PyPI:
+
+```bash
+python -m pip install blakemere-wraptools
+```
+
+The distribution name is `blakemere-wraptools`; the import package is `pydecorators`:
+
+```python
+from pydecorators import retry
+```
+
+For local development:
 
 ```bash
 python -m pip install -e '.[dev]'
-```
-
-For a built local wheel:
-
-```bash
-python -m build
-python -m pip install dist/blakemere_wraptools-0.1.0-py3-none-any.whl
 ```
 
 ## Quick start
@@ -52,7 +55,7 @@ Then read the per-decorator docs and `docs/composition.md` before stacking decor
 
 ## Development status
 
-Pre-alpha. The project foundation exists and the first wave of decorators is implemented, including `@deprecated`, `@cache_result`, `@retry`, `@rate_limit`, async `@timeout`, `@log_calls`, `@measure_time`, `@validate_types`, `@require_env`, and `@circuit_breaker`.
+Released as `blakemere-wraptools` `0.1.0`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
 
@@ -83,9 +86,9 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-## Dogfooding before release
+## Dogfooding and release checks
 
-Publishing is intentionally paused while the package is dogfooded locally. See `DOGFOOD.md` and run:
+Dogfood scenarios remain part of the release gate. Run them before cutting a new release:
 
 ```bash
 python scripts/dogfood_local_wheel.py

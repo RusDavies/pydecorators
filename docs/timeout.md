@@ -30,7 +30,7 @@ The first implementation is intentionally async-only and uses `asyncio.wait_for`
 
 ## Sync behavior
 
-Synchronous timeout support is deliberately not implemented for the first release. Decorating a sync function raises `ConfigurationError`.
+Synchronous timeout support is deliberately not implemented in the current release. Decorating a sync function raises `ConfigurationError`.
 
 The rejected sync strategies were:
 

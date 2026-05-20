@@ -280,7 +280,7 @@ def test_readme_python_code_blocks_parse() -> None:
 
     code_blocks = readme_python_code_blocks()
 
-    assert len(code_blocks) == 12
+    assert len(code_blocks) == 13
     for code_block in code_blocks:
         ast.parse(code_block)
 
@@ -323,10 +323,10 @@ def test_redis_backend_design_records_key_naming_decisions() -> None:
     design = Path("docs/redis_backend_design.md").read_text()
 
     for required in [
-        "useful-decorators:{schema_version}:{namespace}:{key_digest}",
+        "blakemere-wraptools:{schema_version}:{namespace}:{key_digest}",
         "SHA-256 hex digest",
         "not the raw argument representation",
-        "useful-decorators:{schema_version}:{namespace}:stats",
+        "blakemere-wraptools:{schema_version}:{namespace}:stats",
         "hits",
         "misses",
         "Redis hash",

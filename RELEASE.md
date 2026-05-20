@@ -130,14 +130,14 @@ Then confirm:
 
 ## Dogfood gate
 
-Publishing is intentionally paused until local dogfood scenarios have run and findings in `DOGFOOD.md` are reviewed.
+Dogfood scenarios are part of the release gate and should pass before publishing.
 
 ```bash
 python scripts/dogfood_local_wheel.py
 python scripts/dogfood_external_project.py
 ```
 
-Before TestPyPI/PyPI:
+Before publishing:
 
 - [ ] Dogfood scenarios pass from an installed wheel.
 - [ ] External local-project dogfood passes from an installed wheel.
@@ -151,24 +151,24 @@ Do **not** publish from a random developer shell unless there is a deliberate re
 
 ### Preferred path: PyPI/TestPyPI trusted publishing
 
-Use this once the GitHub repository at `https://github.com/RusDavies/pydecorators` exists and `.github/workflows/publish.yml` is ready:
+Use the trusted-publishing setup already configured for `https://github.com/RusDavies/pydecorators` and `.github/workflows/publish.yml`:
 
-1. In TestPyPI, create or claim the `blakemere-wraptools` project.
-2. Add a trusted publisher for the GitHub repository:
+1. Confirm the TestPyPI trusted publisher still matches:
+   - project: `blakemere-wraptools`
    - owner: `RusDavies`
    - repository: `pydecorators`
-   - workflow file: `.github/workflows/publish.yml`
+   - workflow filename: `publish.yml`
    - environment: `testpypi`
-3. Repeat the trusted-publisher setup in PyPI for the production project, using the separate protected environment `pypi`.
-4. Keep TestPyPI and PyPI publishing as separate jobs or separate manual approvals so a test release cannot accidentally become a production release with a moustache.
-5. Build distributions in CI with:
+2. Confirm the PyPI trusted publisher still matches the same repository/workflow with environment `pypi`.
+3. Keep TestPyPI and PyPI publishing as separate jobs or separate manual approvals so a test release cannot accidentally become a production release with a moustache.
+4. Build distributions in CI with:
 
    ```bash
    python -m build
    ```
 
-6. Publish with the Python Packaging Authority publish action in `.github/workflows/publish.yml`. The release job publishes only files from `dist/` produced by the same workflow run.
-7. After publishing to TestPyPI, install from TestPyPI in a clean environment and run the import/decorator smoke checks before approving PyPI.
+5. Publish with the Python Packaging Authority publish action in `.github/workflows/publish.yml`. The release job publishes only files from `dist/` produced by the same workflow run.
+6. After publishing to TestPyPI, install from TestPyPI in a clean environment and run the import/decorator smoke checks before approving PyPI.
 
 ### Fallback path: scoped API tokens
 
@@ -192,7 +192,7 @@ Use API tokens only if trusted publishing is unavailable. If tokens are used:
 
 ### Final pre-publish checks
 
-Immediately before publishing, re-check that `blakemere-wraptools` still resolves as expected on PyPI and TestPyPI, confirm the built version is not already present, and verify `pyproject.toml` project URLs point to the intended public repository. Use the repeatable checker:
+Immediately before publishing a new version, confirm that the built version is not already present on PyPI/TestPyPI and verify `pyproject.toml` project URLs point to the intended public repository. Use the repeatable checker:
 
    ```bash
    python scripts/check_package_name_availability.py
@@ -200,8 +200,9 @@ Immediately before publishing, re-check that `blakemere-wraptools` still resolve
 
 ## Publishing
 
-For first release, use TestPyPI before PyPI. The included `.github/workflows/publish.yml` workflow is manual-only (`workflow_dispatch`) and requires the caller to choose `testpypi` or `pypi` plus the expected version. It builds, verifies, uploads the `dist/` artifacts between jobs, and publishes through trusted publishing using protected environments.
+Use TestPyPI before PyPI unless there is a deliberate emergency reason not to. The included `.github/workflows/publish.yml` workflow is manual-only (`workflow_dispatch`) and requires the caller to choose `testpypi` or `pypi` plus the expected version. It builds, verifies, uploads the `dist/` artifacts between jobs, and publishes through trusted publishing using protected environments.
 
+For each release:
 
 - [ ] Publish to TestPyPI.
 - [ ] Install from TestPyPI in a clean environment.
@@ -219,9 +220,9 @@ For first release, use TestPyPI before PyPI. The included `.github/workflows/pub
 - [ ] Add post-release follow-up items to `TODO.md`.
 - [ ] Start the next `CHANGELOG.md` section.
 
-## Package name availability
+## Package name history
 
-As of 2026-05-12, the PyPI project name `useful-decorators` is already occupied by another project. Russ chose `blakemere-wraptools` as the replacement distribution name, and PyPI/TestPyPI returned 404 Not Found for that name when checked before updating `pyproject.toml`. Re-check availability immediately before publishing with `python scripts/check_package_name_availability.py` because package names are mutable external state, annoyingly.
+The published distribution name is `blakemere-wraptools`; the import package is `pydecorators`. Earlier planning names such as `useful-decorators`, `pydecorators`, and `py-decorators` were not usable or were rejected during publishing setup. Keep future release docs focused on the published distribution unless a rename is deliberately planned.
 
 ## Tagging convention
 

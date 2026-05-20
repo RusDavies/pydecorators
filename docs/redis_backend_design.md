@@ -17,7 +17,7 @@ process or one host. The dull option is often the correct one, which is rude but
 Redis keys should use a package-owned, versioned prefix:
 
 ```text
-useful-decorators:{schema_version}:{namespace}:{key_digest}
+blakemere-wraptools:{schema_version}:{namespace}:{key_digest}
 ```
 
 Initial values:
@@ -33,7 +33,7 @@ The prefix must make unrelated applications unlikely to collide while keeping ra
 Stats should be stored separately from values with an explicit stats marker:
 
 ```text
-useful-decorators:{schema_version}:{namespace}:stats
+blakemere-wraptools:{schema_version}:{namespace}:stats
 ```
 
 The stats value should be a Redis hash with at least:
