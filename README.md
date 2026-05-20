@@ -97,17 +97,17 @@ python scripts/dogfood_external_project.py
 
 ## Documentation
 
-Start with `docs/index.md`, then use the focused pages when you need specifics:
+Start with the [documentation index](docs/index.md), or jump straight to the guide you need:
 
-- `docs/PUBLIC_API.md` — public API and compatibility policy
-- `docs/API_DESIGN.md` — broader API design notes
-- `docs/API_REFERENCE.md` — compact public API reference
-- `docs/composition.md` — decorator stacking guidance
-- `docs/exceptions.md` — public exception behavior
-- `docs/security_hardening.md` — cache/logging/validation safety guidance
-- `CONTRIBUTING.md` — new-decorator and documentation-maintenance checklist
+- [API reference](docs/API_REFERENCE.md): public decorators, backends, serializers, result types, and exceptions.
+- [API design notes](docs/API_DESIGN.md): the conventions behind decorator signatures, typing, and exports.
+- [Public API and compatibility](docs/PUBLIC_API.md): what is stable, what is internal, and what pre-1.0 compatibility means.
+- [Decorator composition](docs/composition.md): practical guidance for stacking decorators without making soup.
+- [Exceptions](docs/exceptions.md): the public exception hierarchy and when each error is raised.
+- [Security hardening](docs/security_hardening.md): cache, logging, validation, and environment-safety notes.
+- [Contributing](CONTRIBUTING.md): how to add decorators, docs, tests, and release checks.
 
-Executable documentation examples live under `docs/examples/`.
+Executable examples are collected in [docs/examples](docs/examples/).
 
 ## Release process
 
