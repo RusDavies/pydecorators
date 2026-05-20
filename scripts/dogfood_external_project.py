@@ -11,8 +11,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = PROJECT_ROOT / "dist"
-WORKSPACE_PROJECTS = PROJECT_ROOT.parent
-TARGET_SCRIPT = WORKSPACE_PROJECTS / "model-gateway-reliability-mini-lab" / "gateway_sim.py"
+TARGET_SCRIPT_ENV = "PYDECORATORS_EXTERNAL_DOGFOOD_SCRIPT"
 
 RUNNER = r"""
 from __future__ import annotations
@@ -84,10 +83,24 @@ def latest_wheel() -> Path:
     return wheels[-1]
 
 
+def target_script() -> Path | None:
+    configured = os.environ.get(TARGET_SCRIPT_ENV)
+    if not configured:
+        return None
+    return Path(configured).expanduser().resolve()
+
+
 def main() -> None:
-    if not TARGET_SCRIPT.exists():
+    target = target_script()
+    if target is None:
+        print(
+            "External dogfood target not configured; "
+            f"set {TARGET_SCRIPT_ENV}=<script.py> to enable optional local-project scenario"
+        )
+        return
+    if not target.exists():
         print("External dogfood target not found; skipping optional local-project scenario")
-        print(TARGET_SCRIPT)
+        print(target)
         return
 
     run([sys.executable, "-m", "build", "--wheel"])
@@ -103,7 +116,7 @@ def main() -> None:
         env = {**os.environ, "PYTHONPATH": ""}
         run([str(python), "-m", "pip", "install", "--upgrade", "pip"], env=env)
         run([str(python), "-m", "pip", "install", str(wheel)], env=env)
-        run([str(python), str(runner_path), str(TARGET_SCRIPT)], cwd=TARGET_SCRIPT.parent, env=env)
+        run([str(python), str(runner_path), str(target)], cwd=target.parent, env=env)
 
     print(f"External project dogfood passed for {wheel.name}")
 

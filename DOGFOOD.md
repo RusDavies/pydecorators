@@ -30,14 +30,14 @@ The harness:
 ## Dogfood scenarios
 
 - `dogfood/service_client.py`: combines `@require_env`, `@rate_limit`, `@retry`, `@timeout`, `@log_calls`, `@measure_time`, and `@circuit_breaker` in service-client-like sync and async flows.
-- `scripts/dogfood_external_project.py`: runs decorators from the installed wheel against `projects/model-gateway-reliability-mini-lab/gateway_sim.py` without modifying that project.
+- `scripts/dogfood_external_project.py`: optionally runs decorators from the installed wheel against a caller-provided external script without modifying that project. Set `PYDECORATORS_EXTERNAL_DOGFOOD_SCRIPT=/path/to/script.py` to enable this scenario; otherwise it skips cleanly.
 
 ## Findings log
 
 Add findings here as dogfood scripts expose sharp edges.
 
 - 2026-05-12: Initial harness added. No API changes required yet; first goal is keeping composition behavior executable from an installed wheel.
-- 2026-05-12: External local-project dogfood against `model-gateway-reliability-mini-lab/gateway_sim.py` passed without API changes. Dynamic wrapping worked, but it reinforced that composition docs should eventually explain decorator order for wrappers that log/retry/measure.
+- 2026-05-12: External local-project dogfood against a sibling project script passed without API changes. Dynamic wrapping worked, but it reinforced that composition docs should eventually explain decorator order for wrappers that log/retry/measure.
 - 2026-05-12: Resolved the wrapper-order documentation finding by adding `docs/composition.md` and linking it from the docs index and README. No API changes required.
 
 ## Release gate

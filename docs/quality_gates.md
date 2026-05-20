@@ -38,7 +38,7 @@ python scripts/dogfood_external_project.py
 - `python -m build`: source distribution and wheel build.
 - `python scripts/smoke_wheel_install.py`: clean virtualenv install/import from the built wheel.
 - `python scripts/dogfood_local_wheel.py`: local wheel dogfood scenarios across the first-release decorators.
-- `python scripts/dogfood_external_project.py`: wheel dogfood against a separate workspace project.
+- `python scripts/dogfood_external_project.py`: optional wheel dogfood against a caller-provided external script when `PYDECORATORS_EXTERNAL_DOGFOOD_SCRIPT` is set.
 
 ## Optional benchmark suite
 
