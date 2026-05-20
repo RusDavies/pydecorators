@@ -86,7 +86,9 @@ def latest_wheel() -> Path:
 
 def main() -> None:
     if not TARGET_SCRIPT.exists():
-        raise SystemExit(f"Dogfood target not found: {TARGET_SCRIPT}")
+        print("External dogfood target not found; skipping optional local-project scenario")
+        print(TARGET_SCRIPT)
+        return
 
     run([sys.executable, "-m", "build", "--wheel"])
     wheel = latest_wheel()
