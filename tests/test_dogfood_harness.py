@@ -9,7 +9,7 @@ def test_dogfood_plan_documents_release_gate_and_harness() -> None:
     assert "python scripts/dogfood_local_wheel.py" in text
     assert "python scripts/dogfood_external_project.py" in text
     assert "dogfood/service_client.py" in text
-    assert "model-gateway-reliability-mini-lab" in text
+    assert "PYDECORATORS_EXTERNAL_DOGFOOD_SCRIPT" in text
     assert "Release gate" in text
 
 

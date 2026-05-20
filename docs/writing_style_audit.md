@@ -1,6 +1,6 @@
 # Writing Style Audit
 
-Reviewed against `/home/skippy/.openclaw/workspace/WRITING_STYLE.md`.
+Reviewed against the project documentation voice described in `CONTRIBUTING.md`.
 
 Scope: all project Markdown documentation under the repository, excluding generated/cache directories. That is 37 files: root docs (`README.md`, `CONTRIBUTING.md`, `RELEASE.md`, `CHANGELOG.md`, `GOAL.md`, `PLAN.md`, `DOGFOOD.md`, `TODO.md`, PR template) plus the `docs/` tree.
 

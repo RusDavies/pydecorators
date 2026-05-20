@@ -2,7 +2,7 @@
 
 ## Documentation style
 
-Use `/home/skippy/.openclaw/workspace/WRITING_STYLE.md` as the project writing style when adding or revising documentation.
+Use the project documentation voice described below when adding or revising documentation.
 
 The short version: write like a capable human who understands the system and is trying to be useful. Start with the point. Define fuzzy terms. Name the trade-off. Explain the practical consequence. Prefer concrete examples over vague reassurance.
 
