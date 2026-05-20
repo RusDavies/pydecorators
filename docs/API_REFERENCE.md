@@ -88,7 +88,7 @@ JSON serializer for simple JSON-compatible cache payloads.
 
 ### `RedisCacheBackend(*, client=None, url=None, key_prefix, ttl=None, serializer=None)`
 
-Optional Redis-backed cache backend. Importing the base package does not require Redis; constructing with `url=` requires installing `pydecorators[redis]`.
+Optional Redis-backed cache backend. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-wraptools[redis]`.
 
 ### `RedisCacheClient`
 

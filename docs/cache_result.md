@@ -335,7 +335,7 @@ Future contributors adding a backend should first add a fixture/factory to the c
 redis = ["redis>=5"]
 ```
 
-Public import guidance should make the optional nature clear: installing `pydecorators[redis]` enables URL-based Redis client construction, while the base package remains standard-library-only plus its existing local backends.
+Public import guidance should make the optional nature clear: installing `blakemere-wraptools[redis]` enables URL-based Redis client construction, while the base package remains standard-library-only plus its existing local backends.
 
 Design constraints for the Redis backend:
 
@@ -346,7 +346,7 @@ Design constraints for the Redis backend:
 - Document that Redis availability, network latency, authentication, TLS, eviction policy, and server-side persistence are operator-owned concerns.
 - Do not add Redis as a hard dependency for users who only need in-process or SQLite caching.
 
-The Redis backend accepts an existing Redis-like `client=` without importing `redis-py`; constructing with `url=` imports the optional dependency and points users at `pydecorators[redis]` if it is missing.
+The Redis backend accepts an existing Redis-like `client=` without importing `redis-py`; constructing with `url=` imports the optional dependency and points users at `blakemere-wraptools[redis]` if it is missing.
 
 ## Disk backend implementation
 

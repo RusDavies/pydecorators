@@ -99,7 +99,7 @@ def test_release_checklist_documents_package_name_and_tagging() -> None:
     assert "## Package name availability" in text
     assert "useful-decorators" in text
     assert "already occupied" in text
-    assert "pydecorators" in text
+    assert "blakemere-wraptools" in text
     assert "PyPI/TestPyPI returned 404 Not Found" in text
     assert "## Tagging convention" in text
     assert "vMAJOR.MINOR.PATCH" in text

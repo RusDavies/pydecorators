@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
-PROJECT_NAME = "pydecorators"
+PROJECT_NAME = "blakemere-wraptools"
 REPOSITORIES = {
     "pypi": "https://pypi.org/pypi/{name}/json",
     "testpypi": "https://test.pypi.org/pypi/{name}/json",
