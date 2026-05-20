@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 def test_release_workflow_is_manual_and_uses_trusted_publishing() -> None:
-    text = Path(".github/workflows/release.yml").read_text()
+    text = Path(".github/workflows/publish.yml").read_text()
 
     assert "workflow_dispatch:" in text
     assert "id-token: write" in text
@@ -16,7 +16,7 @@ def test_release_workflow_is_manual_and_uses_trusted_publishing() -> None:
 
 
 def test_release_workflow_checks_requested_version() -> None:
-    text = Path(".github/workflows/release.yml").read_text()
+    text = Path(".github/workflows/publish.yml").read_text()
 
     assert "Verify requested version matches package metadata" in text
     assert "pyproject.toml" in text
@@ -28,7 +28,7 @@ def test_release_docs_reference_release_workflow_and_credentials() -> None:
     text = Path("RELEASE.md").read_text()
 
     for required in [
-        ".github/workflows/release.yml",
+        ".github/workflows/publish.yml",
         "trusted publishing",
         "workflow_dispatch",
         "testpypi",
