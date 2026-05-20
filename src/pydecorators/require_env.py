@@ -7,9 +7,9 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from typing import Any, cast
 
-from useful_decorators._core import is_async_callable, mirror_metadata
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators._core import is_async_callable, mirror_metadata
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError
 
 EnvValidator = Callable[[str], bool | None]
 

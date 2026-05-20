@@ -3,7 +3,7 @@
 import asyncio
 from contextlib import suppress
 
-from useful_decorators import (
+from pydecorators import (
     CacheKeyError,
     CacheSerializationError,
     CircuitBreakerOpen,
@@ -77,7 +77,7 @@ def cache_serialization_error_example() -> str:
 def validation_error_example() -> str:
     """Handle a runtime type-validation failure."""
 
-    from useful_decorators import validate_types
+    from pydecorators import validate_types
 
     @validate_types()
     def double(value: int) -> int:

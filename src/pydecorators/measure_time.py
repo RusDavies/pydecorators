@@ -8,9 +8,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, cast
 
-from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators._core import is_async_callable, mirror_metadata, monotonic
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,9 +143,9 @@ def _emit_timing(
             info.duration,
             info.success,
             extra={
-                "useful_decorators_function": info.function,
-                "useful_decorators_duration_seconds": info.duration,
-                "useful_decorators_success": info.success,
+                "pydecorators_function": info.function,
+                "pydecorators_duration_seconds": info.duration,
+                "pydecorators_success": info.success,
             },
         )
     if metrics_hook is not None:
@@ -172,9 +172,9 @@ async def _emit_timing_async(
             info.duration,
             info.success,
             extra={
-                "useful_decorators_function": info.function,
-                "useful_decorators_duration_seconds": info.duration,
-                "useful_decorators_success": info.success,
+                "pydecorators_function": info.function,
+                "pydecorators_duration_seconds": info.duration,
+                "pydecorators_success": info.success,
             },
         )
     if metrics_hook is not None:

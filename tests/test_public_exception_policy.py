@@ -2,7 +2,7 @@ import inspect
 import re
 from pathlib import Path
 
-import useful_decorators
+import pydecorators
 
 
 def public_api_note_for(name: str) -> str:
@@ -19,9 +19,9 @@ def public_api_note_for(name: str) -> str:
 def public_exception_names() -> set[str]:
     return {
         name
-        for name in useful_decorators.__all__
-        if inspect.isclass(getattr(useful_decorators, name))
-        and issubclass(getattr(useful_decorators, name), BaseException)
+        for name in pydecorators.__all__
+        if inspect.isclass(getattr(pydecorators, name))
+        and issubclass(getattr(pydecorators, name), BaseException)
     }
 
 
@@ -36,15 +36,15 @@ def test_public_exceptions_are_documented_in_public_api_notes() -> None:
 
 def test_public_exception_inheritance_matches_documentation() -> None:
     inheritance_phrases: dict[type[BaseException], str] = {
-        useful_decorators.UsefulDecoratorsError: "base class for package-specific exceptions",
-        useful_decorators.ConfigurationError: "ValueError",
-        useful_decorators.RateLimitExceeded: "UsefulDecoratorsError",
-        useful_decorators.FunctionTimedOut: "TimeoutError",
-        useful_decorators.CacheKeyError: "TypeError",
-        useful_decorators.ValidationError: "TypeError",
-        useful_decorators.CacheSerializationError: "UsefulDecoratorsError",
-        useful_decorators.CacheBackendClosedError: "UsefulDecoratorsError",
-        useful_decorators.UnsupportedCacheSchemaVersionError: "UsefulDecoratorsError",
+        pydecorators.UsefulDecoratorsError: "base class for package-specific exceptions",
+        pydecorators.ConfigurationError: "ValueError",
+        pydecorators.RateLimitExceeded: "UsefulDecoratorsError",
+        pydecorators.FunctionTimedOut: "TimeoutError",
+        pydecorators.CacheKeyError: "TypeError",
+        pydecorators.ValidationError: "TypeError",
+        pydecorators.CacheSerializationError: "UsefulDecoratorsError",
+        pydecorators.CacheBackendClosedError: "UsefulDecoratorsError",
+        pydecorators.UnsupportedCacheSchemaVersionError: "UsefulDecoratorsError",
     }
 
     for exception_type, expected_phrase in inheritance_phrases.items():

@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from useful_decorators import ConfigurationError, EnvRequirementError, require_env
+from pydecorators import ConfigurationError, EnvRequirementError, require_env
 
 
 def test_require_env_allows_call_when_variable_exists(monkeypatch: pytest.MonkeyPatch) -> None:

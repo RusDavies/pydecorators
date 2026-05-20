@@ -12,7 +12,7 @@ import statistics
 import time
 from collections.abc import Callable
 
-from useful_decorators import cache_result, log_calls, measure_time, retry, validate_types
+from pydecorators import cache_result, log_calls, measure_time, retry, validate_types
 
 
 def _plain(value: int) -> int:
@@ -34,7 +34,7 @@ def _measured(value: int) -> int:
     return value + 1
 
 
-_LOGGER = logging.getLogger("useful_decorators.benchmark")
+_LOGGER = logging.getLogger("pydecorators.benchmark")
 _LOGGER.addHandler(logging.NullHandler())
 _LOGGER.propagate = False
 

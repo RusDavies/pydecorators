@@ -70,7 +70,7 @@ def test_cache_result_design_doc_covers_redis_optional_extra_design() -> None:
     for required in [
         "## Redis backend optional-extra design",
         "optional dependency extra",
-        "blakemere-decorators[redis]",
+        "pydecorators[redis]",
         "redis>=5",
         "base package remains standard-library-only",
         "CacheBackend semantics",

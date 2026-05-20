@@ -1,7 +1,7 @@
 # API Reference
 
 This page is the quick map of the supported surface area: decorators, cache backends,
-serializers, result types, and public exceptions exported by `useful_decorators`.
+serializers, result types, and public exceptions exported by `pydecorators`.
 
 Use it to answer two practical questions: "What can I import?" and "Where do I go for
 the behavior details?" It is intentionally compact. The reference names the public
@@ -88,7 +88,7 @@ JSON serializer for simple JSON-compatible cache payloads.
 
 ### `RedisCacheBackend(*, client=None, url=None, key_prefix, ttl=None, serializer=None)`
 
-Optional Redis-backed cache backend. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-decorators[redis]`.
+Optional Redis-backed cache backend. Importing the base package does not require Redis; constructing with `url=` requires installing `pydecorators[redis]`.
 
 ### `RedisCacheClient`
 

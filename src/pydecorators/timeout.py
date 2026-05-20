@@ -6,9 +6,9 @@ import asyncio
 from collections.abc import Callable
 from typing import Any, cast
 
-from useful_decorators._core import is_async_callable, mirror_metadata
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError, FunctionTimedOut
+from pydecorators._core import is_async_callable, mirror_metadata
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError, FunctionTimedOut
 
 
 def timeout(

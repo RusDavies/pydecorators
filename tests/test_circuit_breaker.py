@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from useful_decorators import CircuitBreakerOpen, CircuitState, ConfigurationError, circuit_breaker
+from pydecorators import CircuitBreakerOpen, CircuitState, ConfigurationError, circuit_breaker
 
 
 class MutableClock:

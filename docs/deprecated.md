@@ -5,7 +5,7 @@ Use `@deprecated` to warn callers that a function remains available for compatib
 ## Bare usage
 
 ```python
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 @deprecated
@@ -18,7 +18,7 @@ Calling `old_function()` emits a `DeprecationWarning`.
 ## Configured usage
 
 ```python
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 @deprecated(
@@ -44,7 +44,7 @@ The warning message includes:
 `@deprecated` supports async functions too:
 
 ```python
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 @deprecated(replacement="fetch_new")
@@ -57,7 +57,7 @@ async def fetch_old() -> str:
 Instance methods and class methods work like normal functions:
 
 ```python
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 class Client:
@@ -97,7 +97,7 @@ Library authors should usually keep the default `DeprecationWarning`; applicatio
 Bare usage preserves the wrapped function signature:
 
 ```python
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 @deprecated
@@ -110,7 +110,7 @@ result: int = old_add(1, 2)
 Configured usage also preserves the wrapped function signature:
 
 ```python
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 @deprecated("Use add instead.", replacement="add")

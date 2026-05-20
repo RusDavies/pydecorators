@@ -10,7 +10,7 @@ import asyncio
 import logging
 from pathlib import Path
 
-from useful_decorators import (
+from pydecorators import (
     CircuitBreakerOpen,
     DiskCacheBackend,
     TimingInfo,
@@ -90,7 +90,7 @@ def logging_readme_example() -> list[str]:
         def emit(self, record: logging.LogRecord) -> None:
             messages.append(record.getMessage())
 
-    logger = logging.getLogger("useful_decorators.readme_examples.logging")
+    logger = logging.getLogger("pydecorators.readme_examples.logging")
     logger.handlers = []
     logger.propagate = False
     logger.setLevel(logging.INFO)

@@ -4,7 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
-from useful_decorators import TimingInfo, log_calls, measure_time, retry
+from pydecorators import TimingInfo, log_calls, measure_time, retry
 
 
 @dataclass

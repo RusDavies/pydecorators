@@ -7,15 +7,15 @@ from collections.abc import Callable, Hashable
 from threading import RLock
 from typing import Any, Literal, cast
 
-from useful_decorators._core import (
+from pydecorators._core import (
     async_sleep,
     is_async_callable,
     mirror_metadata,
     monotonic,
     sync_sleep,
 )
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError, RateLimitExceeded
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError, RateLimitExceeded
 
 RateLimitMode = Literal["raise", "block"]
 RateLimitKey = Callable[..., Hashable]

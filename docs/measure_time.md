@@ -3,7 +3,7 @@
 `@measure_time` records how long a sync or async function takes and emits structured timing data to callbacks, loggers, or simple metrics hooks.
 
 ```python
-from useful_decorators import measure_time
+from pydecorators import measure_time
 
 
 @measure_time()
@@ -23,7 +23,7 @@ With no callback, logger, or metrics hook, the decorator only measures internall
 
 Invalid configuration raises `ConfigurationError` at decoration time.
 
-Logger records include `useful_decorators_function`, `useful_decorators_duration_seconds`, and `useful_decorators_success` in `logging`'s `extra` data so log pipelines can aggregate timing data without parsing the message text.
+Logger records include `pydecorators_function`, `pydecorators_duration_seconds`, and `pydecorators_success` in `logging`'s `extra` data so log pipelines can aggregate timing data without parsing the message text.
 
 Durations use Python's monotonic clock by default. This makes elapsed-time measurement resilient to wall-clock changes such as NTP adjustments, daylight saving transitions, or virtual-machine clock jumps. Inject `clock=` only for deterministic tests or specialized runtime integrations; production clocks should be monotonic-style functions that return increasing seconds.
 
@@ -43,7 +43,7 @@ The decorator records timings for both success and failure paths, then re-raises
 Callback collection:
 
 ```python
-from useful_decorators import TimingInfo, measure_time
+from pydecorators import TimingInfo, measure_time
 
 
 timings: list[TimingInfo] = []
@@ -59,7 +59,7 @@ Logger output:
 ```python
 import logging
 
-from useful_decorators import measure_time
+from pydecorators import measure_time
 
 logger = logging.getLogger("timings")
 

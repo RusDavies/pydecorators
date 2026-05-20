@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from useful_decorators import (
+from pydecorators import (
     DiskCacheBackend,
     cache_directory,
     cache_namespace,

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from useful_decorators import ConfigurationError, cache_directory
+from pydecorators import ConfigurationError, cache_directory
 
 
 def test_cache_directory_uses_explicit_base_path() -> None:

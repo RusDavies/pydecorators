@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from useful_decorators import (
+from pydecorators import (
     DiskCacheBackend,
     cache_directory,
     cache_namespace,

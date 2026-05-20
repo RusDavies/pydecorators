@@ -3,7 +3,7 @@
 import asyncio
 import logging
 
-from useful_decorators import log_calls
+from pydecorators import log_calls
 
 
 class _ListHandler(logging.Handler):

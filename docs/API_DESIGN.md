@@ -13,7 +13,7 @@ escaped review.
 - Decorators use short, verb-oriented snake_case names: `retry`, `timeout`, `rate_limit`, `cache_result`, `deprecated`.
 - Public exceptions use descriptive PascalCase names and inherit from `UsefulDecoratorsError`.
 - Internal helpers live in underscore-prefixed modules and are not part of the public API.
-- Package exports should be deliberate. A decorator becomes public only when added to `useful_decorators.__all__` and documented.
+- Package exports should be deliberate. A decorator becomes public only when added to `pydecorators.__all__` and documented.
 
 ## Bare vs configured usage
 
@@ -33,7 +33,7 @@ Configured-only candidates:
 
 ## Shared typing
 
-Decorator implementations should use shared `ParamSpec` and `TypeVar` helpers from `useful_decorators._typing` so wrapped call signatures remain as precise as practical.
+Decorator implementations should use shared `ParamSpec` and `TypeVar` helpers from `pydecorators._typing` so wrapped call signatures remain as precise as practical.
 
 ## Sync and async support
 

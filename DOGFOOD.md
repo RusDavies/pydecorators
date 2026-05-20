@@ -2,7 +2,7 @@
 
 Public publishing is intentionally paused until the package has been used locally enough to expose awkward APIs, decorator-composition problems, documentation gaps, and release-process surprises.
 
-The current distribution name is `blakemere-decorators`; the import package remains `useful_decorators`.
+The current distribution name is `pydecorators`; the import package remains `pydecorators`.
 
 ## Goals
 
@@ -48,4 +48,4 @@ Before publishing:
 - [ ] Run `python scripts/dogfood_external_project.py`.
 - [ ] Review this findings log.
 - [x] Resolve or explicitly defer any API/documentation issues found during dogfood use.
-- [ ] Re-check `blakemere-decorators` availability on PyPI/TestPyPI.
+- [ ] Re-check `pydecorators` availability on PyPI/TestPyPI.

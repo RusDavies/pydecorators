@@ -3,7 +3,7 @@ from typing import Annotated, Any, Literal, cast
 
 import pytest
 
-from useful_decorators import ConfigurationError, ValidationError, validate_types
+from pydecorators import ConfigurationError, ValidationError, validate_types
 
 
 def test_validate_types_accepts_basic_builtin_types() -> None:

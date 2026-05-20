@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from useful_decorators import DiskCacheBackend
+from pydecorators import DiskCacheBackend
 
 
 def run_stress(cache_path: Path, *, workers: int, operations: int) -> tuple[int, int, int]:

@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import pytest
 
-from useful_decorators import (
+from pydecorators import (
     CacheBackendClosedError,
     CacheCoalescingInfo,
     CacheInfo,
@@ -16,8 +16,8 @@ from useful_decorators import (
     cache_namespace,
     cache_result,
 )
-from useful_decorators.cache_result import _CacheEntry
-from useful_decorators.exceptions import CacheKeyError, ConfigurationError
+from pydecorators.cache_result import _CacheEntry
+from pydecorators.exceptions import CacheKeyError, ConfigurationError
 
 
 def get_cache_info(func: object) -> CacheInfo:

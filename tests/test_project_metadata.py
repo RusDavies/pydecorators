@@ -10,7 +10,7 @@ def project_metadata() -> dict[str, Any]:
 def test_project_metadata_is_release_ready_except_name_decision() -> None:
     project = project_metadata()
 
-    assert project["name"] == "blakemere-decorators"
+    assert project["name"] == "pydecorators"
     assert project["description"]
     assert project["readme"] == "README.md"
     assert project["requires-python"] == ">=3.11"

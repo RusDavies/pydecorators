@@ -32,7 +32,7 @@
 
 - [x] Add tests that every public decorator is listed in `__all__`.
 - [x] Add documentation policy for what counts as public API.
-- [x] Add version consistency check between `pyproject.toml` and `useful_decorators.__version__`.
+- [x] Add version consistency check between `pyproject.toml` and `pydecorators.__version__`.
 - [x] Decide whether internal helpers should use protocols for callable clock/sleep injection.
 - [x] Add contributor guidance for adding a new decorator end-to-end.
 
@@ -855,8 +855,8 @@
 - [x] Update `pyproject.toml` package name after Russ chooses the distribution name.
 - [x] Re-check PyPI/TestPyPI availability for the chosen name before publishing.
 - [x] Add trusted publishing / API token instructions once the repository and package name are final.
-- [x] Add repeatable checker to re-check `blakemere-decorators` availability immediately before final publish.
-- [x] Create or connect the GitHub repository `RusDavies/blakemere-decorators` and add it as `origin` before configuring release environments.
+- [x] Add repeatable checker to re-check `pydecorators` availability immediately before final publish.
+- [x] Create or connect the GitHub repository `RusDavies/pydecorators` and add it as `origin` before configuring release environments.
 - [x] Create GitHub environments `testpypi` and `pypi` for the release workflow / trusted publishing.
 - [ ] Add required-reviewer or wait-timer protection rules to GitHub environments `testpypi` and `pypi` if the account/repo billing plan supports private-repo environment protection rules.
 - [x] Add a release workflow for trusted publishing once GitHub environment names are confirmed.

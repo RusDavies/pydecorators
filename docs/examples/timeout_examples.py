@@ -2,7 +2,7 @@
 
 import asyncio
 
-from useful_decorators import FunctionTimedOut, timeout
+from pydecorators import FunctionTimedOut, timeout
 
 
 async def successful_timeout_example() -> str:

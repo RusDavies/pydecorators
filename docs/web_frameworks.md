@@ -1,6 +1,6 @@
 # Django and FastAPI Usage Examples
 
-These examples show where to put decorators in framework applications without making `blakemere-decorators` depend on Django, FastAPI, Starlette, or ASGI internals.
+These examples show where to put decorators in framework applications without making `pydecorators` depend on Django, FastAPI, Starlette, or ASGI internals.
 
 ## Keep decorators on helpers, not framework wrappers
 

@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from useful_decorators import ConfigurationError, RateLimitExceeded, rate_limit
+from pydecorators import ConfigurationError, RateLimitExceeded, rate_limit
 
 
 class MutableClock:
@@ -95,7 +95,7 @@ def test_rate_limit_key_isolates_buckets() -> None:
 
 
 def test_rate_limit_cleans_up_idle_keyed_buckets() -> None:
-    from useful_decorators.rate_limit import _SlidingWindowLimiter
+    from pydecorators.rate_limit import _SlidingWindowLimiter
 
     clock = MutableClock()
     limiter = _SlidingWindowLimiter(calls=1, period=10, clock=clock)

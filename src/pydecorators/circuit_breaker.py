@@ -8,9 +8,9 @@ from dataclasses import dataclass
 from threading import RLock
 from typing import Any, cast
 
-from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError, UsefulDecoratorsError
+from pydecorators._core import is_async_callable, mirror_metadata, monotonic
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError, UsefulDecoratorsError
 
 
 class CircuitState(enum.Enum):

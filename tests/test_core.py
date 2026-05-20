@@ -3,7 +3,7 @@ from typing import Any, cast
 
 import pytest
 
-from useful_decorators._core import (
+from pydecorators._core import (
     async_sleep,
     is_async_callable,
     mirror_metadata,
@@ -12,7 +12,7 @@ from useful_decorators._core import (
     require_positive_number,
     sync_sleep,
 )
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators.exceptions import ConfigurationError
 
 
 def sync_function() -> str:

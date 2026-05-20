@@ -19,7 +19,7 @@ That means the decorator closest to `def` sees the original function first. The 
 For reliability-style decorators, start with this order and change it only when you want different semantics:
 
 ```python
-from useful_decorators import log_calls, measure_time, rate_limit, retry, validate_types
+from pydecorators import log_calls, measure_time, rate_limit, retry, validate_types
 
 
 @measure_time(callback=timings.append)

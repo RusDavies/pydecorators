@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from useful_decorators import (
+from pydecorators import (
     DiskCacheAggregateInspectionReport,
     DiskCacheBackend,
     DiskCacheInspectionReport,
@@ -15,7 +15,7 @@ from useful_decorators import (
     JsonCacheSerializer,
     redact_json_preview,
 )
-from useful_decorators.exceptions import (
+from pydecorators.exceptions import (
     CacheSerializationError,
     ConfigurationError,
     UnsupportedCacheSchemaVersionError,
@@ -112,7 +112,7 @@ def test_disk_cache_backend_serializes_payloads_with_configured_serializer(tmp_p
 
 
 def test_disk_cache_backend_wraps_payload_serialization_errors(tmp_path: Path) -> None:
-    from useful_decorators import CacheSerializationError
+    from pydecorators import CacheSerializationError
 
     backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
     try:
@@ -212,7 +212,7 @@ def test_disk_cache_backend_persists_values_across_subprocesses(tmp_path: Path) 
     db_path = tmp_path / "cache.sqlite3"
     writer = """
 from pathlib import Path
-from useful_decorators import DiskCacheBackend
+from pydecorators import DiskCacheBackend
 backend = DiskCacheBackend(Path(__CACHE_PATH__))
 try:
     backend.set_value('key', 'from-subprocess')
@@ -221,7 +221,7 @@ finally:
 """.replace("__CACHE_PATH__", repr(str(db_path)))
     reader = """
 from pathlib import Path
-from useful_decorators import DiskCacheBackend
+from pydecorators import DiskCacheBackend
 backend = DiskCacheBackend(Path(__CACHE_PATH__))
 try:
     entry = backend.get('key')
@@ -282,7 +282,7 @@ def test_disk_cache_backend_does_not_refresh_ttl_on_hit_by_default(tmp_path: Pat
 
 
 def test_disk_cache_backend_rejects_operations_after_close(tmp_path: Path) -> None:
-    from useful_decorators import CacheBackendClosedError
+    from pydecorators import CacheBackendClosedError
 
     backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
     backend.close()
@@ -309,7 +309,7 @@ def test_disk_cache_backend_treats_serializer_content_type_mismatch_as_miss(tmp_
 def test_disk_cache_backend_reports_serializer_content_type_mismatch_drop(
     tmp_path: Path,
 ) -> None:
-    from useful_decorators import DiskCacheDropEvent
+    from pydecorators import DiskCacheDropEvent
 
     events: list[DiskCacheDropEvent] = []
     db_path = tmp_path / "cache.sqlite3"
@@ -357,7 +357,7 @@ def test_disk_cache_backend_metadata_reports_file_compatibility_fields(tmp_path:
 
 
 def test_disk_cache_backend_reports_corrupt_payload_drop(tmp_path: Path) -> None:
-    from useful_decorators import DiskCacheDropEvent
+    from pydecorators import DiskCacheDropEvent
 
     events: list[DiskCacheDropEvent] = []
     db_path = tmp_path / "cache.sqlite3"
@@ -418,7 +418,7 @@ def test_disk_cache_backend_drop_hook_failures_do_not_break_cache_miss(
 
 
 def test_cache_result_works_with_disk_cache_backend(tmp_path: Path) -> None:
-    from useful_decorators import cache_result
+    from pydecorators import cache_result
 
     calls = 0
     backend = DiskCacheBackend(tmp_path / "cache.sqlite3")
@@ -831,7 +831,7 @@ def test_disk_cache_backend_rejects_negative_busy_timeout(tmp_path: Path) -> Non
 
 
 def test_decorator_bound_disk_backend_fails_after_context_manager_exit(tmp_path: Path) -> None:
-    from useful_decorators import CacheBackendClosedError, cache_result
+    from pydecorators import CacheBackendClosedError, cache_result
 
     with DiskCacheBackend(tmp_path / "cache.sqlite3") as backend:
 

@@ -3,7 +3,7 @@
 import asyncio
 import logging
 
-from useful_decorators import (
+from pydecorators import (
     CircuitBreakerOpen,
     FunctionTimedOut,
     TimingInfo,

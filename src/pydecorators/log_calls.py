@@ -7,9 +7,9 @@ import logging
 from collections.abc import Callable, Iterable
 from typing import Any, cast
 
-from useful_decorators._core import is_async_callable, mirror_metadata, monotonic
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators._core import is_async_callable, mirror_metadata, monotonic
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError
 
 ResultSummarizer = Callable[[object], object]
 
@@ -255,13 +255,13 @@ def _log_extra(
     success: bool | None = None,
 ) -> dict[str, object]:
     extra: dict[str, object] = {
-        "useful_decorators_function": name,
-        "useful_decorators_event": event,
+        "pydecorators_function": name,
+        "pydecorators_event": event,
     }
     if duration is not None:
-        extra["useful_decorators_duration_seconds"] = duration
+        extra["pydecorators_duration_seconds"] = duration
     if success is not None:
-        extra["useful_decorators_success"] = success
+        extra["pydecorators_success"] = success
     return extra
 
 

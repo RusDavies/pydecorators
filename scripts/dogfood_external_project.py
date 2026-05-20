@@ -22,7 +22,7 @@ import logging
 import sys
 from pathlib import Path
 
-from useful_decorators import log_calls, measure_time, retry, validate_types
+from pydecorators import log_calls, measure_time, retry, validate_types
 
 script = Path(sys.argv[1])
 spec = importlib.util.spec_from_file_location("gateway_sim_dogfood", script)
@@ -76,11 +76,11 @@ def run(command: list[str], *, cwd: Path = PROJECT_ROOT, env: dict[str, str] | N
 
 def latest_wheel() -> Path:
     wheels = sorted(
-        DIST_DIR.glob("blakemere_decorators-*.whl"),
+        DIST_DIR.glob("pydecorators-*.whl"),
         key=lambda path: path.stat().st_mtime,
     )
     if not wheels:
-        raise SystemExit("No blakemere_decorators wheel found in dist/")
+        raise SystemExit("No pydecorators wheel found in dist/")
     return wheels[-1]
 
 
@@ -91,7 +91,7 @@ def main() -> None:
     run([sys.executable, "-m", "build", "--wheel"])
     wheel = latest_wheel()
 
-    with tempfile.TemporaryDirectory(prefix="blakemere-decorators-external-dogfood-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="pydecorators-external-dogfood-") as tmp:
         tmp_path = Path(tmp)
         runner_path = tmp_path / "run_external_dogfood.py"
         runner_path.write_text(RUNNER)

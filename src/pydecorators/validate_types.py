@@ -7,9 +7,9 @@ import types
 from collections.abc import Callable
 from typing import Annotated, Any, Literal, Union, cast, get_args, get_origin, get_type_hints
 
-from useful_decorators._core import is_async_callable, mirror_metadata
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError, ValidationError
+from pydecorators._core import is_async_callable, mirror_metadata
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError, ValidationError
 
 NoneType = type(None)
 

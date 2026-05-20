@@ -3,7 +3,7 @@
 `@timeout` fails an async function when it does not finish before a configured deadline.
 
 ```python
-from useful_decorators import timeout
+from pydecorators import timeout
 
 
 @timeout(seconds=2)

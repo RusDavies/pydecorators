@@ -5,7 +5,7 @@ def test_dogfood_plan_documents_release_pause_and_harness() -> None:
     text = Path("DOGFOOD.md").read_text()
 
     assert "Public publishing is intentionally paused" in text
-    assert "blakemere-decorators" in text
+    assert "pydecorators" in text
     assert "python scripts/dogfood_local_wheel.py" in text
     assert "python scripts/dogfood_external_project.py" in text
     assert "dogfood/service_client.py" in text

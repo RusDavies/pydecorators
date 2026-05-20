@@ -4,7 +4,7 @@ The package is intentionally small and boring: reliability, caching, rate limiti
 timeouts, and developer ergonomics without dragging in a framework-shaped sofa.
 """
 
-from useful_decorators.cache_result import (
+from pydecorators.cache_result import (
     CacheBackend,
     CacheCoalescingInfo,
     CacheInfo,
@@ -26,9 +26,9 @@ from useful_decorators.cache_result import (
     cache_result,
     redact_json_preview,
 )
-from useful_decorators.circuit_breaker import CircuitBreakerOpen, CircuitState, circuit_breaker
-from useful_decorators.deprecated import deprecated
-from useful_decorators.exceptions import (
+from pydecorators.circuit_breaker import CircuitBreakerOpen, CircuitState, circuit_breaker
+from pydecorators.deprecated import deprecated
+from pydecorators.exceptions import (
     CacheBackendClosedError,
     CacheKeyError,
     CacheSerializationError,
@@ -39,14 +39,14 @@ from useful_decorators.exceptions import (
     UsefulDecoratorsError,
     ValidationError,
 )
-from useful_decorators.log_calls import log_calls
-from useful_decorators.measure_time import TimingInfo, measure_time
-from useful_decorators.rate_limit import rate_limit
-from useful_decorators.redis_backend import RedisCacheBackend, RedisCacheClient
-from useful_decorators.require_env import EnvRequirementError, require_env
-from useful_decorators.retry import retry
-from useful_decorators.timeout import timeout
-from useful_decorators.validate_types import validate_types
+from pydecorators.log_calls import log_calls
+from pydecorators.measure_time import TimingInfo, measure_time
+from pydecorators.rate_limit import rate_limit
+from pydecorators.redis_backend import RedisCacheBackend, RedisCacheClient
+from pydecorators.require_env import EnvRequirementError, require_env
+from pydecorators.retry import retry
+from pydecorators.timeout import timeout
+from pydecorators.validate_types import validate_types
 
 __version__ = "0.1.0"
 

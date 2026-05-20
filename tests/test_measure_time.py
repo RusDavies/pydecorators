@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from useful_decorators import ConfigurationError, TimingInfo, measure_time
+from pydecorators import ConfigurationError, TimingInfo, measure_time
 
 
 class MutableClock:
@@ -73,9 +73,9 @@ def test_measure_time_logs_duration(caplog: pytest.LogCaptureFixture) -> None:
         assert work() == "ok"
 
     assert messages(caplog)[0].endswith("work completed in 0.5 seconds success=True")
-    assert str(extra(caplog.records[0], "useful_decorators_function")).endswith("work")
-    assert extra(caplog.records[0], "useful_decorators_duration_seconds") == 0.5
-    assert extra(caplog.records[0], "useful_decorators_success") is True
+    assert str(extra(caplog.records[0], "pydecorators_function")).endswith("work")
+    assert extra(caplog.records[0], "pydecorators_duration_seconds") == 0.5
+    assert extra(caplog.records[0], "pydecorators_success") is True
 
 
 def test_measure_time_calls_metrics_hook() -> None:

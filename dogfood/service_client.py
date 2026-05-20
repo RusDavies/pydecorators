@@ -1,4 +1,4 @@
-"""Dogfood scenarios for blakemere-decorators installed wheel.
+"""Dogfood scenarios for pydecorators installed wheel.
 
 This module intentionally runs outside the normal test suite source imports when
 invoked through scripts/dogfood_local_wheel.py.
@@ -11,7 +11,7 @@ import logging
 import os
 from dataclasses import dataclass
 
-from useful_decorators import (
+from pydecorators import (
     CircuitBreakerOpen,
     circuit_breaker,
     log_calls,

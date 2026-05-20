@@ -1,4 +1,4 @@
-# Useful Decorators
+# PyDecorators
 
 A focused Python library of useful decorators for everyday reliability, caching, rate limiting, timeouts, and developer ergonomics.
 
@@ -32,7 +32,7 @@ For a built local wheel:
 
 ```bash
 python -m build
-python -m pip install dist/blakemere_decorators-0.1.0-py3-none-any.whl
+python -m pip install dist/pydecorators-0.1.0-py3-none-any.whl
 ```
 
 ## Quick start
@@ -40,7 +40,7 @@ python -m pip install dist/blakemere_decorators-0.1.0-py3-none-any.whl
 Pick the smallest decorator that solves the immediate problem:
 
 ```python
-from useful_decorators import retry
+from pydecorators import retry
 
 
 @retry(attempts=3, delay=0.25, backoff=2, exceptions=(ConnectionError, TimeoutError))
@@ -74,7 +74,7 @@ python scripts/dogfood_local_wheel.py
 python scripts/dogfood_external_project.py
 ```
 
-`pytest` enforces coverage for `useful_decorators` with terminal and XML coverage reports.
+`pytest` enforces coverage for `pydecorators` with terminal and XML coverage reports.
 
 Optional local pre-commit hooks are available:
 
@@ -148,7 +148,7 @@ See `docs/security_hardening.md` for the centralized hardening checklist.
 ### Deprecated example
 
 ```python
-from useful_decorators import deprecated
+from pydecorators import deprecated
 
 
 @deprecated("Kept for compatibility.", replacement="new_function", version="0.1.0")
@@ -159,7 +159,7 @@ def old_function() -> str:
 ### Retry example
 
 ```python
-from useful_decorators import retry
+from pydecorators import retry
 
 
 @retry(attempts=3, delay=0.25, backoff=2, exceptions=ConnectionError)
@@ -172,7 +172,7 @@ def call_service() -> str:
 ### Rate-limit example
 
 ```python
-from useful_decorators import rate_limit
+from pydecorators import rate_limit
 
 
 @rate_limit(calls=10, period=60, key=lambda user_id: user_id)
@@ -185,7 +185,7 @@ def call_user_api(user_id: str) -> str:
 ### Timeout example
 
 ```python
-from useful_decorators import timeout
+from pydecorators import timeout
 
 
 @timeout(seconds=2)
@@ -198,7 +198,7 @@ async def fetch_user(user_id: str) -> str:
 ### Logging example
 
 ```python
-from useful_decorators import log_calls
+from pydecorators import log_calls
 
 
 @log_calls(include_args=True, redact_args={"password"})
@@ -211,7 +211,7 @@ def authenticate(*, username: str, password: str) -> bool:
 ### Timing example
 
 ```python
-from useful_decorators import TimingInfo, measure_time
+from pydecorators import TimingInfo, measure_time
 
 
 timings: list[TimingInfo] = []
@@ -227,7 +227,7 @@ def rebuild_index() -> None:
 ### Type-validation example
 
 ```python
-from useful_decorators import validate_types
+from pydecorators import validate_types
 
 
 @validate_types(validate_return=True)
@@ -240,7 +240,7 @@ def double(value: int) -> int:
 ### Environment requirement example
 
 ```python
-from useful_decorators import require_env
+from pydecorators import require_env
 
 
 @require_env("API_TOKEN")
@@ -253,7 +253,7 @@ def call_service() -> str:
 ### Circuit-breaker example
 
 ```python
-from useful_decorators import CircuitBreakerOpen, circuit_breaker
+from pydecorators import CircuitBreakerOpen, circuit_breaker
 
 
 @circuit_breaker(failure_threshold=2, reset_timeout=10)
@@ -272,7 +272,7 @@ except CircuitBreakerOpen:
 ### Cache example
 
 ```python
-from useful_decorators import cache_result
+from pydecorators import cache_result
 
 
 @cache_result(maxsize=128)
@@ -293,10 +293,10 @@ For a trusted local persistent cache, create one `DiskCacheBackend`, pass it to 
 ```python
 from pathlib import Path
 
-from useful_decorators import DiskCacheBackend, cache_namespace, cache_result
+from pydecorators import DiskCacheBackend, cache_namespace, cache_result
 
 backend = DiskCacheBackend(
-    Path(".cache/blakemere-decorators.sqlite3"),
+    Path(".cache/pydecorators.sqlite3"),
     ttl=3600,
     maxsize=10_000,
 )

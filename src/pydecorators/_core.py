@@ -9,8 +9,8 @@ from collections.abc import Awaitable, Callable
 from functools import wraps
 from typing import Any, TypeGuard, cast
 
-from useful_decorators._typing import P, R
-from useful_decorators.exceptions import ConfigurationError
+from pydecorators._typing import P, R
+from pydecorators.exceptions import ConfigurationError
 
 
 def is_async_callable(func: object) -> TypeGuard[Callable[..., Awaitable[Any]]]:

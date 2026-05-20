@@ -1,6 +1,6 @@
 """Executable examples for retry idempotency guidance."""
 
-from useful_decorators import retry
+from pydecorators import retry
 
 
 class PaymentGateway:

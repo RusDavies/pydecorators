@@ -3,7 +3,7 @@
 `@circuit_breaker` stops calling a failing dependency after repeated failures, waits for a reset timeout, then allows one half-open probe call.
 
 ```python
-from useful_decorators import circuit_breaker
+from pydecorators import circuit_breaker
 
 
 @circuit_breaker(failure_threshold=3, reset_timeout=30)
@@ -45,7 +45,7 @@ These helpers are for logs, health checks, and tests. They are snapshots, not sy
 ## Example: service client
 
 ```python
-from useful_decorators import CircuitBreakerOpen, circuit_breaker
+from pydecorators import CircuitBreakerOpen, circuit_breaker
 
 
 @circuit_breaker(failure_threshold=2, reset_timeout=10, exceptions=(TimeoutError, ConnectionError))

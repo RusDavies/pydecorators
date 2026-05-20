@@ -3,7 +3,7 @@ requires = ["hatchling>=1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "blakemere-decorators"
+name = "pydecorators"
 version = "0.1.0"
 description = "A focused library of useful Python decorators for reliability, caching, rate limiting, timeouts, and developer ergonomics."
 readme = "README.md"
@@ -48,12 +48,12 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/RusDavies/blakemere-decorators"
-Repository = "https://github.com/RusDavies/blakemere-decorators"
-Issues = "https://github.com/RusDavies/blakemere-decorators/issues"
+Homepage = "https://github.com/RusDavies/pydecorators"
+Repository = "https://github.com/RusDavies/pydecorators"
+Issues = "https://github.com/RusDavies/pydecorators/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/useful_decorators"]
+packages = ["src/pydecorators"]
 
 [tool.hatch.envs.default.scripts]
 docs-policy = "./scripts/docs-policy.sh"
@@ -91,7 +91,7 @@ warn_unused_configs = true
 files = ["src", "tests"]
 
 [tool.pytest.ini_options]
-addopts = "--strict-markers --strict-config --cov=useful_decorators --cov-report=term-missing --cov-report=xml --cov-fail-under=90"
+addopts = "--strict-markers --strict-config --cov=pydecorators --cov-report=term-missing --cov-report=xml --cov-fail-under=90"
 testpaths = ["tests"]
 markers = [
   "docs_policy: documentation policy, docs example, and release documentation checks",
