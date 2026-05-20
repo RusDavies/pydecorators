@@ -48,7 +48,7 @@ from pydecorators.retry import retry
 from pydecorators.timeout import timeout
 from pydecorators.validate_types import validate_types
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "CacheBackend",

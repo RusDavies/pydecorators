@@ -6,6 +6,15 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-05-20
+
+### Changed
+
+- Cleaned the PyPI-facing README now that the package is published.
+- Replaced stale pre-release and dogfood-blocker wording with current install and release-gate guidance.
+- Polished documentation links so readers see human-facing guide names instead of raw file paths.
+- Clarified that `blakemere-wraptools` is the distribution name and `pydecorators` is the import package.
+
 ### Added
 
 - Aggregate timestamp diagnostic guidance for future disk-cache inspection reports.
