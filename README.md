@@ -32,7 +32,7 @@ For a built local wheel:
 
 ```bash
 python -m build
-python -m pip install dist/pydecorators-0.1.0-py3-none-any.whl
+python -m pip install dist/blakemere_wraptools-0.1.0-py3-none-any.whl
 ```
 
 ## Quick start

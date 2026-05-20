@@ -76,11 +76,11 @@ def run(command: list[str], *, cwd: Path = PROJECT_ROOT, env: dict[str, str] | N
 
 def latest_wheel() -> Path:
     wheels = sorted(
-        DIST_DIR.glob("pydecorators-*.whl"),
+        DIST_DIR.glob("blakemere_wraptools-*.whl"),
         key=lambda path: path.stat().st_mtime,
     )
     if not wheels:
-        raise SystemExit("No pydecorators wheel found in dist/")
+        raise SystemExit("No blakemere-wraptools wheel found in dist/")
     return wheels[-1]
 
 

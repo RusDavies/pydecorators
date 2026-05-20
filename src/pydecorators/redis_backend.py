@@ -220,7 +220,8 @@ def _client_from_url(url: str | None) -> RedisCacheClient:
         from redis import Redis  # type: ignore[import-not-found]
     except ImportError as exc:
         raise ConfigurationError(
-            "RedisCacheBackend requires the optional Redis dependency; install pydecorators[redis]"
+            "RedisCacheBackend requires the optional Redis dependency; "
+            "install blakemere-wraptools[redis]"
         ) from exc
     return cast(RedisCacheClient, Redis.from_url(url))
 

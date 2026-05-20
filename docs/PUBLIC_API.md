@@ -149,7 +149,7 @@ Example: calling a cached function with an unhashable list argument raises `Cach
 
 ### `RedisCacheBackend`
 
-`RedisCacheBackend` is the optional Redis-backed implementation of the cache backend protocol. It uses package-owned `key_prefix` values, versioned entry envelopes, serializer content-type checks, Redis TTLs, and separate hit/miss stats keys. Importing the base package does not require Redis; constructing with `url=` requires installing `pydecorators[redis]`.
+`RedisCacheBackend` is the optional Redis-backed implementation of the cache backend protocol. It uses package-owned `key_prefix` values, versioned entry envelopes, serializer content-type checks, Redis TTLs, and separate hit/miss stats keys. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-wraptools[redis]`.
 
 ### `RedisCacheClient`
 

@@ -2,7 +2,7 @@
 
 Public publishing is intentionally paused until the package has been used locally enough to expose awkward APIs, decorator-composition problems, documentation gaps, and release-process surprises.
 
-The current distribution name is `pydecorators`; the import package remains `pydecorators`.
+The current distribution name is `blakemere-wraptools`; the import package remains `pydecorators`.
 
 ## Goals
 

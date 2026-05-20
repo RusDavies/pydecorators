@@ -12,7 +12,7 @@ def test_check_repository_reports_404_as_available(monkeypatch: pytest.MonkeyPat
 
     monkeypatch.setattr(checker, "urlopen", fake_urlopen)
 
-    status = checker.check_repository("pypi", "pydecorators", timeout=1.0)
+    status = checker.check_repository("pypi", "blakemere-wraptools", timeout=1.0)
 
     assert not status.exists
     assert status.detail == "404 Not Found"
@@ -35,7 +35,7 @@ def test_check_repository_reports_existing_package(monkeypatch: pytest.MonkeyPat
 
     monkeypatch.setattr(checker, "urlopen", fake_urlopen)
 
-    status = checker.check_repository("testpypi", "pydecorators", timeout=1.0)
+    status = checker.check_repository("testpypi", "blakemere-wraptools", timeout=1.0)
 
     assert status.exists
     assert status.detail == "published version 1.2.3"
@@ -51,7 +51,7 @@ def test_check_repository_fails_loudly_on_network_errors(
     monkeypatch.setattr(checker, "urlopen", fake_urlopen)
 
     with pytest.raises(SystemExit, match="failed to check"):
-        checker.check_repository("pypi", "pydecorators", timeout=1.0)
+        checker.check_repository("pypi", "blakemere-wraptools", timeout=1.0)
 
 
 def test_main_returns_nonzero_when_name_exists(monkeypatch: pytest.MonkeyPatch) -> None:

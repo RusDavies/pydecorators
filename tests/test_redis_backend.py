@@ -126,7 +126,7 @@ def test_redis_backend_validates_configuration() -> None:
 
 def test_redis_backend_requires_optional_dependency_for_url() -> None:
     if importlib.util.find_spec("redis") is None:
-        with pytest.raises(ConfigurationError, match=r"pydecorators\[redis\]"):
+        with pytest.raises(ConfigurationError, match=r"blakemere-wraptools\[redis\]"):
             RedisCacheBackend(url="redis://localhost", key_prefix="demo")
 
 
