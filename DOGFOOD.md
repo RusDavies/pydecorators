@@ -1,6 +1,6 @@
 # Dogfood Plan
 
-Public publishing is intentionally paused until the package has been used locally enough to expose awkward APIs, decorator-composition problems, documentation gaps, and release-process surprises.
+Dogfood scenarios are kept as release gates so packaging, install behavior, and realistic decorator composition stay exercised outside the source checkout.
 
 The current distribution name is `blakemere-wraptools`; the import package remains `pydecorators`.
 
@@ -9,7 +9,7 @@ The current distribution name is `blakemere-wraptools`; the import package remai
 - Install the built wheel in a clean virtual environment.
 - Run realistic scripts from outside the source checkout.
 - Exercise decorator composition instead of only single-decorator happy paths.
-- Record findings before TestPyPI/PyPI release.
+- Record findings before each release when dogfood scripts expose sharp edges.
 
 ## Dogfood harness
 
@@ -42,10 +42,12 @@ Add findings here as dogfood scripts expose sharp edges.
 
 ## Release gate
 
-Before publishing:
+Before each release:
 
-- [ ] Run `python scripts/dogfood_local_wheel.py`.
-- [ ] Run `python scripts/dogfood_external_project.py`.
-- [ ] Review this findings log.
+- [x] Run `python scripts/dogfood_local_wheel.py` for `v0.1.0`.
+- [x] Run `python scripts/dogfood_external_project.py` for `v0.1.0`.
+- [x] Review this findings log for `v0.1.0`.
 - [x] Resolve or explicitly defer any API/documentation issues found during dogfood use.
-- [ ] Re-check `pydecorators` availability on PyPI/TestPyPI.
+- [x] Publish `blakemere-wraptools` `0.1.0` to TestPyPI and PyPI.
+
+- 2026-05-20: `blakemere-wraptools` `0.1.0` was published to TestPyPI and PyPI after the dogfood and release workflow gates passed.

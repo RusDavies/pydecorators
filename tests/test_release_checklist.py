@@ -96,11 +96,11 @@ def test_release_checklist_documents_dogfood_gate() -> None:
 def test_release_checklist_documents_package_name_and_tagging() -> None:
     text = Path("RELEASE.md").read_text()
 
-    assert "## Package name availability" in text
+    assert "## Package name history" in text
     assert "useful-decorators" in text
-    assert "already occupied" in text
+    assert "not usable or were rejected" in text
     assert "blakemere-wraptools" in text
-    assert "PyPI/TestPyPI returned 404 Not Found" in text
+    assert "import package is `pydecorators`" in text
     assert "## Tagging convention" in text
     assert "vMAJOR.MINOR.PATCH" in text
     assert "git tag -a v0.1.0" in text

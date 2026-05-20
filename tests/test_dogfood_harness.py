@@ -1,10 +1,10 @@
 from pathlib import Path
 
 
-def test_dogfood_plan_documents_release_pause_and_harness() -> None:
+def test_dogfood_plan_documents_release_gate_and_harness() -> None:
     text = Path("DOGFOOD.md").read_text()
 
-    assert "Public publishing is intentionally paused" in text
+    assert "release gates" in text
     assert "blakemere-wraptools" in text
     assert "python scripts/dogfood_local_wheel.py" in text
     assert "python scripts/dogfood_external_project.py" in text

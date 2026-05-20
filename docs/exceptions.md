@@ -106,7 +106,7 @@ from pydecorators import DiskCacheBackend, UnsupportedCacheSchemaVersionError
 try:
     DiskCacheBackend(".cache/example.sqlite3")
 except UnsupportedCacheSchemaVersionError:
-    # Upgrade useful-decorators, choose a compatible cache file, or rebuild the cache.
+    # Upgrade blakemere-wraptools, choose a compatible cache file, or rebuild the cache.
     ...
 ```
 

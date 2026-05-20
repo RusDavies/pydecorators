@@ -78,7 +78,7 @@ def run(iterations: int, rounds: int) -> dict[str, float]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Benchmark useful-decorators overhead.")
+    parser = argparse.ArgumentParser(description="Benchmark blakemere-wraptools overhead.")
     parser.add_argument("--iterations", type=int, default=100_000)
     parser.add_argument("--rounds", type=int, default=5)
     args = parser.parse_args()

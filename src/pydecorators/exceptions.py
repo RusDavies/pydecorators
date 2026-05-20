@@ -1,4 +1,4 @@
-"""Public exception hierarchy for useful-decorators."""
+"""Public exception hierarchy for blakemere-wraptools."""
 
 from __future__ import annotations
 
