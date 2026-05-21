@@ -890,10 +890,10 @@
 - [x] Add a short project documentation style note to [`CONTRIBUTING.md`](https://github.com/RusDavies/pydecorators/blob/master/CONTRIBUTING.md), pointing contributors at the project writing-style guidance and summarizing local expectations.
 - [x] Tighten the opening sections of [`docs/PUBLIC_API.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/PUBLIC_API.md), [`docs/API_REFERENCE.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/API_REFERENCE.md), and [`docs/API_DESIGN.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/API_DESIGN.md) so they explain the practical decision each document supports.
 - [x] Add failure-mode examples to [`docs/composition.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/composition.md), [`docs/timeout.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/timeout.md), [`docs/rate_limit.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md), and [`docs/circuit_breaker.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/circuit_breaker.md).
-- [ ] Reflow long prose lines opportunistically when editing docs; avoid a noisy repo-wide wrap-only change unless explicitly requested.
+- [x] Reflow long prose lines opportunistically when editing docs; avoid a noisy repo-wide wrap-only change unless explicitly requested.
 - [x] Revisit [`docs/redis_backend_design.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/redis_backend_design.md) with an operating-model pass before implementing Redis support.
 
 ## Newly Implied Maintainer-Operations Follow-Ups
 
 - [x] Create a workspace OpenClaw skill for PyDecorators maintainer operations, release boundaries, verification gates, and security-audit triggers.
-- [ ] Review the PyDecorators maintainer skill after the next substantial release-readiness or security-audit use and split reference files only if the single skill file becomes too bulky.
+- [x] Review the PyDecorators maintainer skill after the next substantial release-readiness or security-audit use and split reference files only if the single skill file becomes too bulky.
