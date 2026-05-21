@@ -6,7 +6,7 @@ The goal is to provide small, typed, well-tested decorators that work in scripts
 
 ## What is included
 
-`v0.1.2` includes the same public API as `v0.1.0`, with cleaned post-release documentation and PyPI-safe documentation links:
+`v0.1.3` includes the same public API as `v0.1.0`, with cleaned post-release documentation, PyPI-safe documentation links, and security hardening for development/release tooling:
 
 - `@deprecated` for compatibility warnings.
 - `@cache_result` with in-memory and disk-backed caching.
@@ -55,7 +55,7 @@ Then read the per-decorator docs and [`docs/composition.md`](https://github.com/
 
 ## Development status
 
-Released as `blakemere-wraptools` `0.1.2`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
+Released as `blakemere-wraptools` `0.1.3`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See [`docs/deprecated.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/deprecated.md) for details.
 
