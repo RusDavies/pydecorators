@@ -51,13 +51,13 @@ def call_service() -> str:
     return "ok"
 ```
 
-Then read the per-decorator docs and `docs/composition.md` before stacking decorators together. Decorator soup is still soup, even when typed.
+Then read the per-decorator docs and [`docs/composition.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/composition.md) before stacking decorators together. Decorator soup is still soup, even when typed.
 
 ## Development status
 
 Released as `blakemere-wraptools` `0.1.2`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
 
-Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See `docs/deprecated.md` for details.
+Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See [`docs/deprecated.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/deprecated.md) for details.
 
 ## Development
 
@@ -111,11 +111,11 @@ Executable examples are collected in [docs/examples](https://github.com/RusDavie
 
 ## Release process
 
-See `RELEASE.md` for the release checklist.
+See [`RELEASE.md`](https://github.com/RusDavies/pydecorators/blob/master/RELEASE.md) for the release checklist.
 
 ## Decorator design docs
 
-See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for retry behavior, `docs/rate_limit.md` for rate limiting, `docs/timeout.md` for async timeout behavior, `docs/log_calls.md` for call logging, `docs/measure_time.md` for timing hooks, `docs/validate_types.md` for lightweight runtime type validation, `docs/require_env.md` for environment checks, `docs/circuit_breaker.md` for circuit-breaker behavior, `docs/composition.md` for stacking guidance, and `docs/API_REFERENCE.md` for a compact API reference.
+See [`docs/cache_result.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/cache_result.md) for the cache decorator design, [`docs/retry.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/retry.md) for retry behavior, [`docs/rate_limit.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md) for rate limiting, [`docs/timeout.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/timeout.md) for async timeout behavior, [`docs/log_calls.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/log_calls.md) for call logging, [`docs/measure_time.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/measure_time.md) for timing hooks, [`docs/validate_types.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/validate_types.md) for lightweight runtime type validation, [`docs/require_env.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/require_env.md) for environment checks, [`docs/circuit_breaker.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/circuit_breaker.md) for circuit-breaker behavior, [`docs/composition.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/composition.md) for stacking guidance, and [`docs/API_REFERENCE.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/API_REFERENCE.md) for a compact API reference.
 
 ## Decorator overview
 
@@ -132,7 +132,7 @@ See `docs/cache_result.md` for the cache decorator design, `docs/retry.md` for r
 
 ## Security and operational notes
 
-See `docs/security_hardening.md` for the centralized hardening checklist.
+See [`docs/security_hardening.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/security_hardening.md) for the centralized hardening checklist.
 
 - Treat `DiskCacheBackend` files as trusted local data. The default pickle serializer must not load untrusted cache databases.
 - Do not put disk cache files in world-writable directories.
@@ -320,6 +320,6 @@ For long-running applications, keep the backend for the application lifetime and
 
 Do **not** create a decorator-bound `DiskCacheBackend` inside a short `with` block unless all decorated calls happen before the block exits. The context manager closes the backend on exit; later calls through the decorated function raise `CacheBackendClosedError`.
 
-Disk backend design lives in `docs/disk_cache_backend.md`; implementation uses SQLite and the cache serializer interface. The default disk payload serializer uses pickle, so cache databases must be treated as trusted local files only — do not load cache DBs from untrusted sources or place them in world-writable directories. For simple JSON-compatible payloads, use `JsonCacheSerializer` instead of pickle when values should be easier to inspect or consume from other languages.
+Disk backend design lives in [`docs/disk_cache_backend.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md); implementation uses SQLite and the cache serializer interface. The default disk payload serializer uses pickle, so cache databases must be treated as trusted local files only — do not load cache DBs from untrusted sources or place them in world-writable directories. For simple JSON-compatible payloads, use `JsonCacheSerializer` instead of pickle when values should be easier to inspect or consume from other languages.
 
 `DiskCacheBackend` is intended for single-host local caching. It uses normal SQLite file locking, requests WAL mode by default, and configures a 5000 ms busy timeout to reduce transient `database is locked` failures. Those settings improve local reader/writer behavior, but they do not make it a distributed cache and they do not promise safe cross-host semantics on shared/network filesystems. If multiple processes use the same cache file, expect normal SQLite contention behavior and keep cached values disposable. If you need visibility into rows dropped because of serializer mismatches or corrupt payloads, pass `on_drop=` to `DiskCacheBackend` and log the `DiskCacheDropEvent`.

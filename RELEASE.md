@@ -1,4 +1,4 @@
-# RELEASE.md — Release Checklist
+# [RELEASE.md](https://github.com/RusDavies/pydecorators/blob/master/RELEASE.md) — Release Checklist
 
 Use this checklist before publishing `blakemere-wraptools` releases. The goal is to make releases boring, repeatable, and hard to mess up. Revolutionary concept, apparently.
 
@@ -6,10 +6,10 @@ Use this checklist before publishing `blakemere-wraptools` releases. The goal is
 
 - [ ] Confirm the target version.
 - [ ] Confirm the release type: patch, minor, major, or pre-1.0 compatibility-breaking release.
-- [ ] Review `TODO.md` for any release-blocking items.
+- [ ] Review [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) for any release-blocking items.
 - [ ] Confirm all intended public APIs are documented.
 - [ ] Confirm all public APIs are exported from `pydecorators.__all__`.
-- [ ] Confirm `docs/PUBLIC_API.md` matches the exported public API.
+- [ ] Confirm [`docs/PUBLIC_API.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/PUBLIC_API.md) matches the exported public API.
 
 ## Versioning
 
@@ -20,11 +20,11 @@ Use this checklist before publishing `blakemere-wraptools` releases. The goal is
 
 ## Changelog and docs
 
-- [ ] Update `CHANGELOG.md` with user-facing changes.
+- [ ] Update [`CHANGELOG.md`](https://github.com/RusDavies/pydecorators/blob/master/CHANGELOG.md) with user-facing changes.
 - [ ] Confirm README examples still match implemented behavior.
 - [ ] Confirm per-decorator docs are current.
 - [ ] Confirm executable docs examples pass.
-- [ ] Confirm `docs/index.md` links current documentation pages.
+- [ ] Confirm [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) links current documentation pages.
 - [ ] Confirm public API stability notes are accurate.
 - [ ] Add migration notes for breaking changes, if any.
 
@@ -35,7 +35,7 @@ Before publishing, check whether this release changes persistent `DiskCacheBacke
 - [ ] Confirm whether cached value semantics, payload shapes, serializers, or trust boundaries changed.
 - [ ] If old persistent rows should not be reused, document the migration path: bump the cache `namespace`, call `cache_clear()`, call backend `clear()`, or tell users to remove the SQLite cache file.
 - [ ] If old rows are still compatible, say so in release notes when persistent disk caching is affected.
-- [ ] Confirm `docs/disk_cache_backend.md` cache versioning guidance is still accurate.
+- [ ] Confirm [`docs/disk_cache_backend.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md) cache versioning guidance is still accurate.
 
 ## Documentation maintenance
 
@@ -70,16 +70,16 @@ For a no-network local preview of the same link set, run:
 ./scripts/check_external_links.py --syntax-only
 ```
 
-See [Quality Gates](docs/quality_gates.md) for what each command checks.
+See [Quality Gates](https://github.com/RusDavies/pydecorators/blob/master/docs/quality_gates.md) for what each command checks.
 
 Then confirm:
 
-- `README.md`, `CONTRIBUTING.md`, and `RELEASE.md` still link to `docs/index.md`.
-- `docs/index.md` links every top-level page in `docs/` except itself.
-- `docs/index.md` lists every executable example in `docs/examples/` except package markers.
+- [`README.md`](https://github.com/RusDavies/pydecorators/blob/master/README.md), [`CONTRIBUTING.md`](https://github.com/RusDavies/pydecorators/blob/master/CONTRIBUTING.md), and [`RELEASE.md`](https://github.com/RusDavies/pydecorators/blob/master/RELEASE.md) still link to [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md).
+- [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) links every top-level page in `docs/` except itself.
+- [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) lists every executable example in `docs/examples/` except package markers.
 - Executable examples are loaded and asserted by `tests/test_docs_examples.py`.
 - Local Markdown links and heading anchors pass the docs policy tests.
-- Planning/backlog docs such as `GOAL.md`, `PLAN.md`, and `TODO.md` remain planning docs unless deliberately promoted to user-facing navigation.
+- Planning/backlog docs such as [`GOAL.md`](https://github.com/RusDavies/pydecorators/blob/master/GOAL.md), [`PLAN.md`](https://github.com/RusDavies/pydecorators/blob/master/PLAN.md), and [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) remain planning docs unless deliberately promoted to user-facing navigation.
 
 ## Quality gates
 
@@ -141,7 +141,7 @@ Before publishing:
 
 - [ ] Dogfood scenarios pass from an installed wheel.
 - [ ] External local-project dogfood passes from an installed wheel.
-- [ ] `DOGFOOD.md` findings are reviewed.
+- [ ] [`DOGFOOD.md`](https://github.com/RusDavies/pydecorators/blob/master/DOGFOOD.md) findings are reviewed.
 - [ ] API/documentation issues found during dogfood use are resolved or explicitly deferred.
 
 
@@ -217,8 +217,8 @@ For each release:
 - [ ] Verify package page metadata and links render correctly.
 - [ ] Verify README renders correctly on PyPI.
 - [ ] Create a GitHub release if the repository is public.
-- [ ] Add post-release follow-up items to `TODO.md`.
-- [ ] Start the next `CHANGELOG.md` section.
+- [ ] Add post-release follow-up items to [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md).
+- [ ] Start the next [`CHANGELOG.md`](https://github.com/RusDavies/pydecorators/blob/master/CHANGELOG.md) section.
 
 ## Package name history
 

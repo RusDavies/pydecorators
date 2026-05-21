@@ -8,17 +8,17 @@ the behavior details?" It is intentionally compact. The reference names the publ
 object and its contract; the linked design pages explain the edge cases, failure modes,
 and trade-offs. Nobody benefits from pretending a reference page is a novella.
 
-For stability rules, see [Public API policy](PUBLIC_API.md). For exception inheritance and handling examples, see [Public exceptions](exceptions.md).
+For stability rules, see [Public API policy](https://github.com/RusDavies/pydecorators/blob/master/docs/PUBLIC_API.md). For exception inheritance and handling examples, see [Public exceptions](https://github.com/RusDavies/pydecorators/blob/master/docs/exceptions.md).
 
 ## Decorators
 
 ### `deprecated(reason=None, *, replacement=None, version=None, category=DeprecationWarning, stacklevel=2)`
 
-Emit a deprecation warning when a sync or async function is called. Supports bare and configured usage. See [`@deprecated`](deprecated.md).
+Emit a deprecation warning when a sync or async function is called. Supports bare and configured usage. See [`@deprecated`](https://github.com/RusDavies/pydecorators/blob/master/docs/deprecated.md).
 
 ### `cache_result(*, ttl=None, maxsize=128, key=None, typed=False, cache_exceptions=False, refresh_ttl_on_hit=False, coalesce_misses=False, clock=None, backend=None, namespace=None)`
 
-Cache sync function results in memory or a configured backend. Supports TTL, maxsize/LRU behavior, custom key functions, namespaces, cached exceptions, miss coalescing diagnostics via `cache_coalescing_info()`, and memory/disk backends. Async callables are rejected until async cache semantics are deliberately designed. See [`@cache_result`](cache_result.md).
+Cache sync function results in memory or a configured backend. Supports TTL, maxsize/LRU behavior, custom key functions, namespaces, cached exceptions, miss coalescing diagnostics via `cache_coalescing_info()`, and memory/disk backends. Async callables are rejected until async cache semantics are deliberately designed. See [`@cache_result`](https://github.com/RusDavies/pydecorators/blob/master/docs/cache_result.md).
 
 ### `cache_namespace(name, version)`
 
@@ -26,35 +26,35 @@ Build a conventional versioned cache namespace string such as `users:v1` for lon
 
 ### `retry(*, attempts, delay=0, backoff=1, max_delay=None, jitter=0, exceptions=(Exception,), retry_if=None, on_attempt=None, sleep=None, async_sleep=None)`
 
-Retry sync or async callables after configured failures. See [`@retry`](retry.md).
+Retry sync or async callables after configured failures. See [`@retry`](https://github.com/RusDavies/pydecorators/blob/master/docs/retry.md).
 
 ### `rate_limit(*, calls, period, key=None, mode="raise", clock=None, sleep=None, async_sleep=None)`
 
-Apply an in-process sliding-window rate limit to sync or async callables. See [`@rate_limit`](rate_limit.md).
+Apply an in-process sliding-window rate limit to sync or async callables. See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md).
 
 ### `timeout(*, seconds, message=None, exception_type=FunctionTimedOut)`
 
-Apply an async timeout using `asyncio.wait_for`. Sync callables are rejected. See [`@timeout`](timeout.md).
+Apply an async timeout using `asyncio.wait_for`. Sync callables are rejected. See [`@timeout`](https://github.com/RusDavies/pydecorators/blob/master/docs/timeout.md).
 
 ### `log_calls(*, logger=None, level=logging.INFO, include_args=False, include_result=False, redact_args=(), summarize_result=None, log_exceptions=True, clock=None)`
 
-Log start, finish duration, optional arguments, optional result summaries, and exceptions for sync or async callables. See [`@log_calls`](log_calls.md).
+Log start, finish duration, optional arguments, optional result summaries, and exceptions for sync or async callables. See [`@log_calls`](https://github.com/RusDavies/pydecorators/blob/master/docs/log_calls.md).
 
 ### `measure_time(*, callback=None, logger=None, level=logging.INFO, metrics_hook=None, clock=None)`
 
-Measure sync or async function duration and emit `TimingInfo` through callbacks, logs, or metrics hooks. See [`@measure_time`](measure_time.md).
+Measure sync or async function duration and emit `TimingInfo` through callbacks, logs, or metrics hooks. See [`@measure_time`](https://github.com/RusDavies/pydecorators/blob/master/docs/measure_time.md).
 
 ### `validate_types(*, validate_return=False, deep=False)`
 
-Perform lightweight runtime checks for annotated arguments and optionally return values. `deep=True` recursively validates supported container contents. See [`@validate_types`](validate_types.md).
+Perform lightweight runtime checks for annotated arguments and optionally return values. `deep=True` recursively validates supported container contents. See [`@validate_types`](https://github.com/RusDavies/pydecorators/blob/master/docs/validate_types.md).
 
 ### `require_env(*names, validators=None, environ=None, messages=None, allow_empty=True)`
 
-Require environment variables at call time before running sync or async functions. See [`@require_env`](require_env.md).
+Require environment variables at call time before running sync or async functions. See [`@require_env`](https://github.com/RusDavies/pydecorators/blob/master/docs/require_env.md).
 
 ### `circuit_breaker(*, failure_threshold=3, reset_timeout=30.0, exceptions=(Exception,), exception_filter=None, clock=None)`
 
-Reject calls to repeatedly failing sync or async dependencies until a reset timeout allows a half-open probe. See [`@circuit_breaker`](circuit_breaker.md).
+Reject calls to repeatedly failing sync or async dependencies until a reset timeout allows a half-open probe. See [`@circuit_breaker`](https://github.com/RusDavies/pydecorators/blob/master/docs/circuit_breaker.md).
 
 ## Cache APIs
 
@@ -64,7 +64,7 @@ Default in-process cache backend for `cache_result`.
 
 ### `DiskCacheBackend(path, *, ttl=None, maxsize=128, refresh_ttl_on_hit=False, serializer=None, on_drop=None, clock=None, busy_timeout_ms=5000, wal=True, drop_corrupt_rows=True)`
 
-SQLite-backed persistent cache backend for trusted local cache files. Includes `cache_metadata()`, `inspect_integrity()`, `maintain()`, read-only `inspect_entries(...)`, and aggregate `inspect_aggregate(...)` diagnostics. See [`DiskCacheBackend`](disk_cache_backend.md).
+SQLite-backed persistent cache backend for trusted local cache files. Includes `cache_metadata()`, `inspect_integrity()`, `maintain()`, read-only `inspect_entries(...)`, and aggregate `inspect_aggregate(...)` diagnostics. See [`DiskCacheBackend`](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md).
 
 ### `cache_directory(app_name, *, base_path=None)`
 
@@ -158,4 +158,4 @@ Enum with `CLOSED`, `OPEN`, and `HALF_OPEN` states.
 - `EnvRequirementError`
 - `CircuitBreakerOpen`
 
-See [Public exceptions](exceptions.md) for details.
+See [Public exceptions](https://github.com/RusDavies/pydecorators/blob/master/docs/exceptions.md) for details.

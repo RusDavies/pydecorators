@@ -2,6 +2,9 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
+REPO_BLOB_BASE = "https://github.com/RusDavies/pydecorators/blob/master/"
+REPO_TREE_BASE = "https://github.com/RusDavies/pydecorators/tree/master/"
+
 DOCS_INDEX_EXEMPTIONS = {
     Path("docs/index.md"),
 }
@@ -32,7 +35,7 @@ def docs_index_markdown_links() -> list[str]:
 
 
 def is_external_or_page_anchor(link: str) -> bool:
-    return "://" in link or link.startswith("#")
+    return link.startswith("#") or ("://" in link and github_repo_link_path(link) is None)
 
 
 def is_external_http_link(link: str) -> bool:
@@ -50,8 +53,19 @@ def is_valid_external_http_link(link: str) -> bool:
 
 
 def local_link_path(source: Path, link: str) -> Path:
+    github_path = github_repo_link_path(link)
+    if github_path is not None:
+        return github_path
     path_part = link.split("#", maxsplit=1)[0]
     return source.parent / path_part
+
+
+def github_repo_link_path(link: str) -> Path | None:
+    link_without_fragment = link.split("#", maxsplit=1)[0]
+    for base in (REPO_BLOB_BASE, REPO_TREE_BASE):
+        if link_without_fragment.startswith(base):
+            return Path(link_without_fragment.removeprefix(base))
+    return None
 
 
 def docs_index_local_links() -> set[Path]:

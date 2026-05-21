@@ -20,7 +20,7 @@ Avoid vendor fog and AI filler. If a sentence could survive unchanged in a gener
 
 Use this checklist when adding a decorator. Yes, it is mildly bossy. That is the point.
 
-1. Update `TODO.md` or the relevant design document with the intended behavior.
+1. Update [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) or the relevant design document with the intended behavior.
 2. Decide whether the decorator supports bare usage, configured usage, or both.
 3. Add implementation under `src/pydecorators/`.
 4. Use shared helpers from `pydecorators._core` where applicable:
@@ -56,7 +56,7 @@ python scripts/dogfood_local_wheel.py
 python scripts/dogfood_external_project.py
 ```
 
-See [Quality Gates](docs/quality_gates.md) for what each command checks.
+See [Quality Gates](https://github.com/RusDavies/pydecorators/blob/master/docs/quality_gates.md) for what each command checks.
 
 The project also ships optional pre-commit hooks. Install them with `pre-commit install` if you want local lint/format/type checks before commits. This is optional because surprise Git hooks are how productivity gets mugged in an alley.
 
@@ -74,7 +74,7 @@ Keep example modules importable without side effects beyond defining small funct
 
 After adding a new example file:
 
-1. Link it from `docs/index.md`.
+1. Link it from [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md).
 2. Load it through `load_docs_example(...)` in `tests/test_docs_examples.py`.
 3. Add at least one assertion for each public top-level example function.
 4. Run the full verification gate.
@@ -83,8 +83,8 @@ After adding a new example file:
 
 When adding or changing docs files, use this checklist before calling the slice done:
 
-1. Link new top-level `docs/*.md` pages from `docs/index.md`, unless the file is intentionally exempt and the docs policy test says why.
-2. Link new executable examples under `docs/examples/` from `docs/index.md`.
+1. Link new top-level `docs/*.md` pages from [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md), unless the file is intentionally exempt and the docs policy test says why.
+2. Link new executable examples under `docs/examples/` from [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md).
 3. Add or update assertions in `tests/test_docs_examples.py` for public top-level example functions.
 4. Add `pytest.mark.docs_policy` coverage when the change introduces a new documentation rule.
 5. Run `./scripts/docs-policy.sh` before the full verification gate.
@@ -93,26 +93,26 @@ README Python code blocks are extracted by docs policy tests. Keep them syntacti
 
 The README is also expected to link the core documentation path for new users and reviewers:
 
-- `docs/index.md`
-- `docs/PUBLIC_API.md`
-- `docs/API_DESIGN.md`
-- `docs/exceptions.md`
-- `docs/deprecated.md`
-- `docs/cache_result.md`
-- `docs/disk_cache_backend.md`
+- [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md)
+- [`docs/PUBLIC_API.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/PUBLIC_API.md)
+- [`docs/API_DESIGN.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/API_DESIGN.md)
+- [`docs/exceptions.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/exceptions.md)
+- [`docs/deprecated.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/deprecated.md)
+- [`docs/cache_result.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/cache_result.md)
+- [`docs/disk_cache_backend.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md)
 
 If that required set changes, update the README and the matching docs policy test in the same branch.
 
 External HTTP(S) links are syntax-checked only. The docs policy tests verify that they have an `http://` or `https://` scheme, a host, and no whitespace, but they do not fetch the network or fail builds because somebody else's server hiccuped. Local links and local Markdown anchors are checked for actual existence.
 
-If a planning/backlog file such as `GOAL.md`, `PLAN.md`, or `TODO.md` becomes user-facing navigation, update the root documentation link policy at the same time.
+If a planning/backlog file such as [`GOAL.md`](https://github.com/RusDavies/pydecorators/blob/master/GOAL.md), [`PLAN.md`](https://github.com/RusDavies/pydecorators/blob/master/PLAN.md), or [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) becomes user-facing navigation, update the root documentation link policy at the same time.
 
 ## Documentation index inclusion rule
 
-Keep `docs/index.md` grouped by purpose: core project docs, decorator docs, cache backend docs, and executable examples. Add new links to the narrowest matching section rather than using the index as a junk drawer with Markdown syntax.
+Keep [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) grouped by purpose: core project docs, decorator docs, cache backend docs, and executable examples. Add new links to the narrowest matching section rather than using the index as a junk drawer with Markdown syntax.
 
 
-Add a page to `docs/index.md` when it is intended to help users or contributors understand, use, extend, release, or maintain the package. In practice, that includes:
+Add a page to [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) when it is intended to help users or contributors understand, use, extend, release, or maintain the package. In practice, that includes:
 
 - public API, compatibility, exception, or design policy pages
 - per-decorator behavior docs
@@ -120,13 +120,13 @@ Add a page to `docs/index.md` when it is intended to help users or contributors 
 - executable documentation examples under `docs/examples/`
 - release, contribution, or documentation-maintenance guidance linked from the docs flow
 
-Do not add raw planning/backlog files such as `GOAL.md`, `PLAN.md`, or `TODO.md` to the docs index unless they are deliberately promoted to user-facing documentation. If a docs file is intentionally not indexed, document the exemption in the relevant `docs_policy` test.
+Do not add raw planning/backlog files such as [`GOAL.md`](https://github.com/RusDavies/pydecorators/blob/master/GOAL.md), [`PLAN.md`](https://github.com/RusDavies/pydecorators/blob/master/PLAN.md), or [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) to the docs index unless they are deliberately promoted to user-facing documentation. If a docs file is intentionally not indexed, document the exemption in the relevant `docs_policy` test.
 
 ## Documentation policy tests
 
 Use the `docs_policy` pytest marker for tests that guard documentation maintenance rather than runtime behavior. Mark tests with `@pytest.mark.docs_policy` or a module-level `pytestmark = pytest.mark.docs_policy` when they check things like:
 
-- `docs/index.md` coverage and navigation rules
+- [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) coverage and navigation rules
 - executable documentation example indexing, naming, loading, or assertion coverage
 - Markdown local-link or heading-anchor validation
 - root documentation link policy
@@ -154,10 +154,10 @@ That alias chains docs policy, Ruff, formatting checks, mypy, smoke imports, smo
 
 ## Root documentation links
 
-Root docs that help users or contributors navigate the project should link to `docs/index.md`. Today that means:
+Root docs that help users or contributors navigate the project should link to [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md). Today that means:
 
-- `README.md`
-- `CONTRIBUTING.md`
-- `RELEASE.md`
+- [`README.md`](https://github.com/RusDavies/pydecorators/blob/master/README.md)
+- [`CONTRIBUTING.md`](https://github.com/RusDavies/pydecorators/blob/master/CONTRIBUTING.md)
+- [`RELEASE.md`](https://github.com/RusDavies/pydecorators/blob/master/RELEASE.md)
 
-Planning/backlog docs such as `GOAL.md`, `PLAN.md`, and `TODO.md` are not required to link the docs index unless they grow into user-facing navigation docs.
+Planning/backlog docs such as [`GOAL.md`](https://github.com/RusDavies/pydecorators/blob/master/GOAL.md), [`PLAN.md`](https://github.com/RusDavies/pydecorators/blob/master/PLAN.md), and [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) are not required to link the docs index unless they grow into user-facing navigation docs.

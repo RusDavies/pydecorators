@@ -1,4 +1,4 @@
-# TODO.md — Detailed Backlog
+# [TODO.md](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) — Detailed Backlog
 
 ## 0. Project Setup
 
@@ -8,8 +8,8 @@
 - [x] Create `pyproject.toml`.
 - [x] Create `src/` package layout.
 - [x] Create `tests/` layout.
-- [x] Add `README.md` with early project description.
-- [x] Add `CHANGELOG.md`.
+- [x] Add [`README.md`](https://github.com/RusDavies/pydecorators/blob/master/README.md) with early project description.
+- [x] Add [`CHANGELOG.md`](https://github.com/RusDavies/pydecorators/blob/master/CHANGELOG.md).
 - [x] Add `.gitignore` for Python artifacts.
 - [x] Add formatter/linter/type-checker configuration.
 - [x] Add basic CI workflow.
@@ -350,7 +350,7 @@
 ### Newly Implied Disk Cache Versioning Follow-Ups
 
 - [x] Consider adding a formal cache-versioning recipe to README if persistent cache reuse becomes part of the public quickstart.
-- [x] Consider adding migration/clear guidance to RELEASE.md before the first public release.
+- [x] Consider adding migration/clear guidance to [RELEASE.md](https://github.com/RusDavies/pydecorators/blob/master/RELEASE.md) before the first public release.
 
 ### Newly Implied Release Cache Compatibility Follow-Ups
 
@@ -425,7 +425,7 @@
 - [x] Add policy test that docs example module names match their linked labels in docs/index.md.
 - [x] Generate/check the executable example list in docs/index.md.
 - [x] Consider moving docs-example policy helpers into a dedicated test module if public API policy tests get too broad.
-- [x] Add policy test that docs/index.md links to the executable example conventions section.
+- [x] Add policy test that [docs/index.md](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) links to the executable example conventions section.
 
 ### Newly Implied Docs Example Conventions Link Follow-Ups
 
@@ -441,18 +441,18 @@
 
 ### Newly Implied Root Docs Link Policy Follow-Ups
 
-- [x] Decide whether `TODO.md` should be included in root Markdown link policy long-term or exempted as mutable backlog.
-- [x] Add policy test that root documentation files mention `docs/index.md` where appropriate.
+- [x] Decide whether [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) should be included in root Markdown link policy long-term or exempted as mutable backlog.
+- [x] Add policy test that root documentation files mention [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) where appropriate.
 
 ### Newly Implied Root Docs Index Mention Follow-Ups
 
-- [x] Decide whether `GOAL.md` and `PLAN.md` should link to docs/index.md or remain project-planning docs.
+- [x] Decide whether [`GOAL.md`](https://github.com/RusDavies/pydecorators/blob/master/GOAL.md) and [`PLAN.md`](https://github.com/RusDavies/pydecorators/blob/master/PLAN.md) should link to [docs/index.md](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) or remain project-planning docs.
 - [x] Consider documenting which root docs are required to link the docs index.
 
 ### Newly Implied Root Docs Policy Docs Follow-Ups
 
 - [x] Add policy test that planning docs stay free of release/user-doc navigation requirements unless promoted.
-- [x] Consider adding a short docs-maintenance section to RELEASE.md before first release.
+- [x] Consider adding a short docs-maintenance section to [RELEASE.md](https://github.com/RusDavies/pydecorators/blob/master/RELEASE.md) before first release.
 
 ### Newly Implied Release Docs Maintenance Follow-Ups
 
@@ -544,7 +544,7 @@
 
 ### Newly Implied Docs Index Guidance Follow-Ups
 
-- [x] Consider adding a docs-index section classifier policy if `docs/index.md` grows more categories.
+- [x] Consider adding a docs-index section classifier policy if [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) grows more categories.
 - [x] Add an explicit docs-index exemption list if intentional unindexed docs appear.
 - [x] Add policy test checking docs links outside docs/index.md.
 - [x] Add release checklist item to update docs index when adding docs pages.
@@ -886,9 +886,9 @@
 
 ## Newly Implied Writing Style Follow-Ups
 
-- [x] Review all existing Markdown documentation against `WRITING_STYLE.md` and document findings.
-- [x] Add a short project documentation style note to `CONTRIBUTING.md`, pointing contributors at `WRITING_STYLE.md` and summarizing local expectations.
-- [x] Tighten the opening sections of `docs/PUBLIC_API.md`, `docs/API_REFERENCE.md`, and `docs/API_DESIGN.md` so they explain the practical decision each document supports.
-- [x] Add failure-mode examples to `docs/composition.md`, `docs/timeout.md`, `docs/rate_limit.md`, and `docs/circuit_breaker.md`.
+- [x] Review all existing Markdown documentation against the project writing-style guidance and document findings.
+- [x] Add a short project documentation style note to [`CONTRIBUTING.md`](https://github.com/RusDavies/pydecorators/blob/master/CONTRIBUTING.md), pointing contributors at the project writing-style guidance and summarizing local expectations.
+- [x] Tighten the opening sections of [`docs/PUBLIC_API.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/PUBLIC_API.md), [`docs/API_REFERENCE.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/API_REFERENCE.md), and [`docs/API_DESIGN.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/API_DESIGN.md) so they explain the practical decision each document supports.
+- [x] Add failure-mode examples to [`docs/composition.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/composition.md), [`docs/timeout.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/timeout.md), [`docs/rate_limit.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md), and [`docs/circuit_breaker.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/circuit_breaker.md).
 - [ ] Reflow long prose lines opportunistically when editing docs; avoid a noisy repo-wide wrap-only change unless explicitly requested.
-- [x] Revisit `docs/redis_backend_design.md` with an operating-model pass before implementing Redis support.
+- [x] Revisit [`docs/redis_backend_design.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/redis_backend_design.md) with an operating-model pass before implementing Redis support.

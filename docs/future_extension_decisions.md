@@ -10,7 +10,7 @@ Because the adapter remains documentation guidance rather than public API, there
 
 ## Planning document navigation
 
-Do not add `TODO.md` or planning notes to the public documentation navigation. If TODO/PLAN files become website pages later, add navigation policy tests at the same time so draft-only planning does not leak into release docs by accident.
+Do not add [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) or planning notes to the public documentation navigation. If TODO/PLAN files become website pages later, add navigation policy tests at the same time so draft-only planning does not leak into release docs by accident.
 
 ## Docs-policy CI path filtering
 

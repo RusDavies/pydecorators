@@ -5,7 +5,7 @@ The first public documentation target is the repository README plus linked Markd
 ## Current posture
 
 - Keep docs as plain Markdown committed under `docs/`.
-- Keep `docs/index.md` as the source-of-truth navigation page.
+- Keep [`docs/index.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/index.md) as the source-of-truth navigation page.
 - Keep executable examples under `docs/examples/` and require `scripts/check_docs_example_index.py` to catch index drift.
 - Keep external link checks opt-in/local so contributors are not blocked by transient network failures.
 
@@ -26,7 +26,7 @@ When the documentation site becomes worthwhile, prefer a small static generator 
 Before enabling a docs site, add:
 
 - a site config file
-- a local preview command in `docs/quality_gates.md` or `CONTRIBUTING.md`
+- a local preview command in [`docs/quality_gates.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/quality_gates.md) or [`CONTRIBUTING.md`](https://github.com/RusDavies/pydecorators/blob/master/CONTRIBUTING.md)
 - link-check coverage for generated URLs or equivalent source Markdown checks
 - a release-docs note describing which URL is canonical
 - a redirect/anchor policy for public pages
