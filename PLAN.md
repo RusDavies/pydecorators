@@ -1,4 +1,4 @@
-# PLAN.md — Python Decorators Library Project Plan
+# [PLAN.md](https://github.com/RusDavies/pydecorators/blob/master/PLAN.md) — Python Decorators Library Project Plan
 
 ## Phase 1 — Product Definition
 

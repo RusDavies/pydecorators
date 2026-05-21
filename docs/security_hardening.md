@@ -29,7 +29,7 @@ Hardening rules:
 - Clear or rotate cache files when serializer behavior, value semantics, or namespace meaning changes.
 - Use `JsonCacheSerializer` for simple JSON-compatible values when cross-language inspection or pickle avoidance matters.
 
-See [`DiskCacheBackend`](disk_cache_backend.md) and [`@cache_result`](cache_result.md) for backend lifecycle and serializer details.
+See [`DiskCacheBackend`](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md) and [`@cache_result`](https://github.com/RusDavies/pydecorators/blob/master/docs/cache_result.md) for backend lifecycle and serializer details.
 
 ## Cache key and value hygiene
 
@@ -62,7 +62,7 @@ Hardening rules:
 - Route logs to systems with appropriate access controls and retention policies.
 - Remember that exception messages may contain sensitive upstream data.
 
-See [`@log_calls`](log_calls.md) for redaction options and logging behavior.
+See [`@log_calls`](https://github.com/RusDavies/pydecorators/blob/master/docs/log_calls.md) for redaction options and logging behavior.
 
 ## Runtime validation limits
 
@@ -70,7 +70,7 @@ See [`@log_calls`](log_calls.md) for redaction options and logging behavior.
 
 Use it to catch obvious mistakes near internal function boundaries. For public APIs, message queues, webhooks, CLI inputs, files, or user-submitted data, use purpose-built validation and parsing at the boundary before values reach business logic.
 
-See [`@validate_types`](validate_types.md) for supported annotations and limitations.
+See [`@validate_types`](https://github.com/RusDavies/pydecorators/blob/master/docs/validate_types.md) for supported annotations and limitations.
 
 ## In-process control limits
 
@@ -83,7 +83,7 @@ For distributed systems:
 - treat decorator-level controls as local defense-in-depth;
 - test multi-worker behavior explicitly instead of assuming one process tells the whole herd what to do. The herd, naturally, has not read your decorator.
 
-See [`@rate_limit`](rate_limit.md), [`@circuit_breaker`](circuit_breaker.md), and [`Decorator composition`](composition.md) for local behavior and stacking guidance.
+See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md), [`@circuit_breaker`](https://github.com/RusDavies/pydecorators/blob/master/docs/circuit_breaker.md), and [`Decorator composition`](https://github.com/RusDavies/pydecorators/blob/master/docs/composition.md) for local behavior and stacking guidance.
 
 ## Environment variables and secrets
 
@@ -96,7 +96,7 @@ Hardening rules:
 - Prefer validators that check shape or presence, not secret contents.
 - Fail closed when required configuration is absent.
 
-See [`@require_env`](require_env.md) for validator behavior.
+See [`@require_env`](https://github.com/RusDavies/pydecorators/blob/master/docs/require_env.md) for validator behavior.
 
 ## Safe defaults checklist
 

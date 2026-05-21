@@ -38,7 +38,7 @@ The rejected sync strategies were:
 - Worker threads: cannot safely stop arbitrary Python code and can leave background work running after the caller sees a timeout.
 - Pretending sync timeouts are simple: a traditional way to manufacture production gremlins.
 
-If sync timeout support is ever added, it needs an explicit design with documented platform and cancellation limitations. The current decision record is [`sync_timeout_decision.md`](sync_timeout_decision.md).
+If sync timeout support is ever added, it needs an explicit design with documented platform and cancellation limitations. The current decision record is [[`sync_timeout_decision.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/sync_timeout_decision.md)](https://github.com/RusDavies/pydecorators/blob/master/docs/sync_timeout_decision.md).
 
 ## Failure modes to watch for
 

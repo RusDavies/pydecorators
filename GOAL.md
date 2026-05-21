@@ -1,4 +1,4 @@
-# GOAL.md — Python Decorators Library
+# [GOAL.md](https://github.com/RusDavies/pydecorators/blob/master/GOAL.md) — Python Decorators Library
 
 ## Project Goal
 

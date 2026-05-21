@@ -11,8 +11,10 @@ from tests.docs_example_policy_helpers import (
 )
 from tests.docs_policy_helpers import (
     DOCS_INDEX_EXEMPTIONS,
+    REPO_BLOB_BASE,
     docs_index_local_links,
     docs_index_markdown_links,
+    github_repo_link_path,
     is_external_http_link,
     is_external_or_page_anchor,
     is_valid_external_http_link,
@@ -45,6 +47,12 @@ def docs_index_section_links(section_name: str) -> list[str]:
     return re.findall(r"\[[^\]]+\]\(([^)]+)\)", match.group("body"))
 
 
+def repo_link_name(link: str) -> str:
+    path = github_repo_link_path(link)
+    assert path is not None, f"expected GitHub repository link: {link}"
+    return path.name
+
+
 def load_external_link_checker_module() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
         "check_external_links", "scripts/check_external_links.py"
@@ -68,11 +76,19 @@ def test_docs_index_sections_follow_expected_classification() -> None:
 
     assert actual_sections == expected_sections
 
-    assert "cache_result.md" not in docs_index_section_links("Core project docs")
-    assert "disk_cache_backend.md" in docs_index_section_links("Cache backend docs")
+    assert "cache_result.md" not in {
+        repo_link_name(link) for link in docs_index_section_links("Core project docs")
+    }
+    assert "disk_cache_backend.md" in {
+        repo_link_name(link) for link in docs_index_section_links("Cache backend docs")
+    }
     for link in docs_index_section_links("Decorator docs"):
-        assert link.endswith(".md")
-        assert link not in {"PUBLIC_API.md", "API_REFERENCE.md", "API_DESIGN.md"}
+        assert repo_link_name(link).endswith(".md")
+        assert repo_link_name(link) not in {
+            "PUBLIC_API.md",
+            "API_REFERENCE.md",
+            "API_DESIGN.md",
+        }
     for link in docs_index_section_links("Executable examples"):
         if link.startswith("examples/") and link != "examples/":
             assert link.endswith("_examples.py")
@@ -147,7 +163,7 @@ def test_docs_index_links_to_executable_example_conventions() -> None:
     docs_index = Path("docs/index.md").read_text()
     contributing = Path("CONTRIBUTING.md").read_text()
 
-    assert "../CONTRIBUTING.md#executable-documentation-examples" in docs_index
+    assert f"{REPO_BLOB_BASE}CONTRIBUTING.md#executable-documentation-examples" in docs_index
     assert "## Executable documentation examples" in contributing
 
 
@@ -156,13 +172,13 @@ def test_docs_index_local_markdown_fragment_links_resolve() -> None:
     fragment_links = [
         link
         for link in docs_index_markdown_links()
-        if "://" not in link and "#" in link and not link.startswith("#")
+        if github_repo_link_path(link) is not None and "#" in link and not link.startswith("#")
     ]
 
     assert fragment_links
     for link in fragment_links:
-        path_part, fragment = link.split("#", maxsplit=1)
-        target = docs_index.parent / path_part
+        target = local_link_path(docs_index, link)
+        _, fragment = link.split("#", maxsplit=1)
         assert target.suffix == ".md"
         assert fragment in markdown_heading_anchors(target), (
             f"missing Markdown anchor target: {link}"
@@ -226,7 +242,7 @@ def test_root_docs_link_to_docs_index_where_appropriate() -> None:
     }
 
     for root_doc in root_docs_that_should_link_index:
-        assert "docs/index.md" in root_doc.read_text()
+        assert f"{REPO_BLOB_BASE}docs/index.md" in root_doc.read_text()
 
 
 def test_contributing_documents_root_docs_index_link_policy() -> None:
@@ -235,10 +251,10 @@ def test_contributing_documents_root_docs_index_link_policy() -> None:
     assert "## Root documentation links" in contributing
     assert (
         "Root docs that help users or contributors navigate the project should link "
-        "to `docs/index.md`." in contributing
+        f"to [`docs/index.md`]({REPO_BLOB_BASE}docs/index.md)." in contributing
     )
     for required_root_doc in ("README.md", "CONTRIBUTING.md", "RELEASE.md"):
-        assert f"- `{required_root_doc}`" in contributing
+        assert f"- [`{required_root_doc}`]({REPO_BLOB_BASE}{required_root_doc})" in contributing
 
 
 def test_contributing_documents_docs_policy_marker_guidance() -> None:
@@ -358,6 +374,41 @@ README_CORE_DOC_LINKS = [
     "docs/cache_result.md",
     "docs/disk_cache_backend.md",
 ]
+
+MARKDOWN_FILE_REFERENCE = re.compile(
+    r"(?<![A-Za-z0-9_./:-])"
+    r"((?:\.github/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.md(?:#[A-Za-z0-9_.-]+)?)"
+    r"(?![A-Za-z0-9_./:-])"
+)
+
+
+def absolute_github_link_text_spans(text: str) -> list[tuple[int, int]]:
+    spans: list[tuple[int, int]] = []
+    for match in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", text):
+        if github_repo_link_path(match.group(2)) is not None:
+            spans.append((match.start(1), match.end(1)))
+    return spans
+
+
+def position_in_spans(position: int, spans: list[tuple[int, int]]) -> bool:
+    return any(start <= position < end for start, end in spans)
+
+
+def test_markdown_file_references_are_absolute_github_links() -> None:
+    docs_files = markdown_policy_files() + sorted(Path(".github").rglob("*.md"))
+
+    assert docs_files
+    for docs_file in docs_files:
+        text = docs_file.read_text()
+        link_text_spans = absolute_github_link_text_spans(text)
+        for match in MARKDOWN_FILE_REFERENCE.finditer(text):
+            raw_path = match.group(1)
+            if raw_path.startswith("https://github.com/"):
+                continue
+            assert position_in_spans(match.start(1), link_text_spans), (
+                f"Markdown file reference should be linked to an absolute GitHub URL: "
+                f"{docs_file}: {raw_path}"
+            )
 
 
 def test_readme_links_to_core_docs_pages() -> None:

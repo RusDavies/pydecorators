@@ -38,7 +38,7 @@ Add findings here as dogfood scripts expose sharp edges.
 
 - 2026-05-12: Initial harness added. No API changes required yet; first goal is keeping composition behavior executable from an installed wheel.
 - 2026-05-12: External local-project dogfood against a sibling project script passed without API changes. Dynamic wrapping worked, but it reinforced that composition docs should eventually explain decorator order for wrappers that log/retry/measure.
-- 2026-05-12: Resolved the wrapper-order documentation finding by adding `docs/composition.md` and linking it from the docs index and README. No API changes required.
+- 2026-05-12: Resolved the wrapper-order documentation finding by adding [`docs/composition.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/composition.md) and linking it from the docs index and README. No API changes required.
 
 ## Release gate
 

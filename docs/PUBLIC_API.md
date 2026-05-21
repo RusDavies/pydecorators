@@ -73,7 +73,7 @@ Examples:
 
 Until `1.0`, public APIs may still change, but breaking changes should be:
 
-- documented in `CHANGELOG.md`
+- documented in [`CHANGELOG.md`](https://github.com/RusDavies/pydecorators/blob/master/CHANGELOG.md)
 - reflected in examples and tests
 - minimized unless they fix a design mistake
 
@@ -93,7 +93,7 @@ CI must include the minimum supported Python version from `pyproject.toml`. For 
 
 ## Public API notes
 
-See `docs/exceptions.md` for a centralized public exception reference.
+See [`docs/exceptions.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/exceptions.md) for a centralized public exception reference.
 
 ### `UsefulDecoratorsError`
 
@@ -224,7 +224,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `circuit_breaker`
 
-`circuit_breaker` stops calling a failing sync or async dependency after a configurable failure threshold, rejects calls while open, and allows a half-open probe after the reset timeout. It supports exception-type filters, an optional exception predicate, injectable clocks for tests, and decorated-function state inspection helpers. See `docs/circuit_breaker.md` for behavior and examples.
+`circuit_breaker` stops calling a failing sync or async dependency after a configurable failure threshold, rejects calls while open, and allows a half-open probe after the reset timeout. It supports exception-type filters, an optional exception predicate, injectable clocks for tests, and decorated-function state inspection helpers. See [`docs/circuit_breaker.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/circuit_breaker.md) for behavior and examples.
 
 ### `CircuitState`
 
@@ -236,19 +236,19 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `retry`
 
-`retry` retries sync and async callables after configured exception types. It is configured-only and supports explicit attempts, delay, exponential backoff, max delay, jitter, exception filtering, a `retry_if` predicate, attempt hooks, and injectable sleep functions for tests. Invalid retry policy raises `ConfigurationError` at decoration time. See `docs/retry.md` for behavior and examples.
+`retry` retries sync and async callables after configured exception types. It is configured-only and supports explicit attempts, delay, exponential backoff, max delay, jitter, exception filtering, a `retry_if` predicate, attempt hooks, and injectable sleep functions for tests. Invalid retry policy raises `ConfigurationError` at decoration time. See [`docs/retry.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/retry.md) for behavior and examples.
 
 ### `rate_limit`
 
-`rate_limit` applies in-process sliding-window limits to sync and async callables. It supports global and keyed buckets, raise or block mode, injectable clocks and sleep functions for tests, and raises `RateLimitExceeded` when a call exceeds the allowance in raise mode. See `docs/rate_limit.md` for behavior and examples.
+`rate_limit` applies in-process sliding-window limits to sync and async callables. It supports global and keyed buckets, raise or block mode, injectable clocks and sleep functions for tests, and raises `RateLimitExceeded` when a call exceeds the allowance in raise mode. See [`docs/rate_limit.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md) for behavior and examples.
 
 ### `log_calls`
 
-`log_calls` logs call start, completion duration, optional argument metadata, optional summarized return values, and exceptions for sync and async callables. Argument and result logging are opt-in because logs are a common place to accidentally preserve secrets. See `docs/log_calls.md` for behavior and security notes.
+`log_calls` logs call start, completion duration, optional argument metadata, optional summarized return values, and exceptions for sync and async callables. Argument and result logging are opt-in because logs are a common place to accidentally preserve secrets. See [`docs/log_calls.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/log_calls.md) for behavior and security notes.
 
 ### `measure_time`
 
-`measure_time` records sync and async function duration and emits timing data through an optional callback, logger, or metrics hook. It records success and failure timings while re-raising wrapped exceptions unchanged. See `docs/measure_time.md` for behavior and examples.
+`measure_time` records sync and async function duration and emits timing data through an optional callback, logger, or metrics hook. It records success and failure timings while re-raising wrapped exceptions unchanged. See [`docs/measure_time.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/measure_time.md) for behavior and examples.
 
 ### `TimingInfo`
 
@@ -256,7 +256,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `validate_types`
 
-`validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins by default, optional deep validation for supported container contents, `Any`, optional/union types, `Literal[...]`, and `Annotated[...]` base-type validation. Validation mismatches raise `ValidationError`, which still inherits from `TypeError` for compatibility with ordinary type-check handling. It is intentionally not a full schema-validation system. See `docs/validate_types.md` for behavior and limitations.
+`validate_types` performs lightweight runtime checks for annotated arguments and optionally annotated return values. It supports common built-in classes, shallow container origins by default, optional deep validation for supported container contents, `Any`, optional/union types, `Literal[...]`, and `Annotated[...]` base-type validation. Validation mismatches raise `ValidationError`, which still inherits from `TypeError` for compatibility with ordinary type-check handling. It is intentionally not a full schema-validation system. See [`docs/validate_types.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/validate_types.md) for behavior and limitations.
 
 ### `ValidationError`
 
@@ -264,7 +264,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `require_env`
 
-`require_env` checks required environment variables at call time before running sync or async functions. It supports multiple required names, custom validators, and injectable environment mappings for tests. Missing or invalid variables raise `EnvRequirementError`. See `docs/require_env.md` for behavior and examples.
+`require_env` checks required environment variables at call time before running sync or async functions. It supports multiple required names, custom validators, and injectable environment mappings for tests. Missing or invalid variables raise `EnvRequirementError`. See [`docs/require_env.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/require_env.md) for behavior and examples.
 
 ### `EnvRequirementError`
 
@@ -276,7 +276,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `timeout`
 
-`timeout` applies an async deadline using `asyncio.wait_for`. It supports `seconds`, optional custom messages, and custom exception types. Synchronous functions are rejected with `ConfigurationError` until a safe sync strategy is deliberately designed. See `docs/timeout.md` for behavior and examples.
+`timeout` applies an async deadline using `asyncio.wait_for`. It supports `seconds`, optional custom messages, and custom exception types. Synchronous functions are rejected with `ConfigurationError` until a safe sync strategy is deliberately designed. See [`docs/timeout.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/timeout.md) for behavior and examples.
 
 ### `FunctionTimedOut`
 
