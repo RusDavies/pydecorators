@@ -18,6 +18,8 @@ from pydecorators.cache_result import (
 )
 from pydecorators.exceptions import CacheSerializationError, ConfigurationError
 
+_REDIS_GLOB_METACHARACTERS = frozenset("*?[]")
+
 
 @runtime_checkable
 class RedisCacheClient(Protocol):
@@ -62,6 +64,10 @@ class RedisCacheBackend:
             raise ConfigurationError("RedisCacheBackend key_prefix must not be empty")
         if any(character.isspace() for character in key_prefix):
             raise ConfigurationError("RedisCacheBackend key_prefix must not contain whitespace")
+        if any(character in _REDIS_GLOB_METACHARACTERS for character in key_prefix):
+            raise ConfigurationError(
+                "RedisCacheBackend key_prefix must not contain Redis glob metacharacters"
+            )
         if ttl is not None and ttl <= 0:
             raise ConfigurationError("ttl must be greater than zero when provided")
         if maxsize is not None and maxsize <= 0:

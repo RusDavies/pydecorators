@@ -40,9 +40,9 @@ Findings:
 
 ## Finding P2 — Redis key-prefix glob metacharacters can widen namespace scans
 
-Status: `plausible_needs_validation`  
-Priority: P2  
-Confidence: high  
+Status: remediated in branch work after the audit
+Priority: P2
+Confidence: high
 Affected file: `src/pydecorators/redis_backend.py`
 
 ### Evidence
@@ -98,11 +98,17 @@ Reject Redis glob metacharacters in `key_prefix`, or encode/hash the logical nam
 using it in Redis key names and scan patterns. Add regression tests for at least `*`, `?`, `[`,
 and `]`, and document that prefixes are literal namespace identifiers.
 
+### Remediation
+
+Follow-up branch work rejects `*`, `?`, `[`, and `]` in `RedisCacheBackend.key_prefix`, adds
+regression coverage for all four metacharacters, and documents the literal-prefix rule in the
+Redis backend design notes.
+
 ## Finding P4 — local coverage XML parser hardening
 
-Status: `unreachable_current_config`  
-Priority: P4  
-Confidence: medium  
+Status: `unreachable_current_config`
+Priority: P4
+Confidence: medium
 Affected file: `scripts/coverage_summary.py`
 
 ### Evidence

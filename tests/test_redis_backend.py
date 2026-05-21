@@ -118,6 +118,9 @@ def test_redis_backend_validates_configuration() -> None:
         RedisCacheBackend(client=FakeRedis(), key_prefix="  ")
     with pytest.raises(ConfigurationError, match="whitespace"):
         RedisCacheBackend(client=FakeRedis(), key_prefix="bad prefix")
+    for metacharacter in "*?[]":
+        with pytest.raises(ConfigurationError, match="glob metacharacters"):
+            RedisCacheBackend(client=FakeRedis(), key_prefix=f"bad{metacharacter}prefix")
     with pytest.raises(ConfigurationError, match="ttl"):
         RedisCacheBackend(client=FakeRedis(), key_prefix="demo", ttl=0)
     with pytest.raises(ConfigurationError, match="either Redis client or url"):
