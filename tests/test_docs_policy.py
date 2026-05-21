@@ -419,6 +419,29 @@ def test_readme_links_to_core_docs_pages() -> None:
         assert required_link in readme
 
 
+def test_readme_pypi_doc_links_are_plain_human_links() -> None:
+    readme = Path("README.md").read_text()
+
+    assert "[`RELEASE.md`]" not in readme
+    assert "[`docs/" not in readme
+    assert "PyPI renders these as normal outbound links" in readme
+    for label in [
+        "release checklist",
+        "Cache decorator design",
+        "Retry behavior",
+        "Rate limiting",
+        "Async timeout behavior",
+        "Call logging",
+        "Timing hooks",
+        "Runtime type validation",
+        "Environment checks",
+        "Circuit-breaker behavior",
+        "Decorator stacking guidance",
+        "Compact API reference",
+    ]:
+        assert f"[{label}](https://github.com/RusDavies/pydecorators/" in readme
+
+
 def test_contributing_documents_readme_core_doc_links() -> None:
     contributing = Path("CONTRIBUTING.md").read_text()
 
