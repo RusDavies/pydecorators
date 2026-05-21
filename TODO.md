@@ -858,7 +858,7 @@
 - [x] Add repeatable checker to re-check `blakemere-wraptools` availability immediately before final publish.
 - [x] Create or connect the GitHub repository `RusDavies/pydecorators` and add it as `origin` before configuring release environments.
 - [x] Create GitHub environments `testpypi` and `pypi` for the release workflow / trusted publishing.
-- [ ] Add required-reviewer or wait-timer protection rules to GitHub environments `testpypi` and `pypi` if the account/repo billing plan supports private-repo environment protection rules.
+- [x] Add required-reviewer or wait-timer protection rules to GitHub environments `testpypi` and `pypi` if the account/repo billing plan supports private-repo environment protection rules.
 - [x] Add a release workflow for trusted publishing once GitHub environment names are confirmed.
 - [x] Add executable composition examples.
 
@@ -896,4 +896,4 @@
 ## Newly Implied Maintainer-Operations Follow-Ups
 
 - [x] Create a workspace OpenClaw skill for PyDecorators maintainer operations, release boundaries, verification gates, and security-audit triggers.
-- [ ] Review the PyDecorators maintainer skill after the next substantial release-readiness or security-audit use and split reference files only if the single `SKILL.md` becomes too bulky.
+- [ ] Review the PyDecorators maintainer skill after the next substantial release-readiness or security-audit use and split reference files only if the single skill file becomes too bulky.

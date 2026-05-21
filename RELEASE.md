@@ -161,14 +161,15 @@ Use the trusted-publishing setup already configured for `https://github.com/RusD
    - environment: `testpypi`
 2. Confirm the PyPI trusted publisher still matches the same repository/workflow with environment `pypi`.
 3. Keep TestPyPI and PyPI publishing as separate jobs or separate manual approvals so a test release cannot accidentally become a production release with a moustache.
-4. Build distributions in CI with:
+4. Confirm both GitHub environments still have the configured 5-minute wait timer before publishing. The delay is intentionally small: long enough to catch fat-fingered manual runs, not long enough to turn release day into geological theatre.
+5. Build distributions in CI with:
 
    ```bash
    python -m build
    ```
 
-5. Publish with the Python Packaging Authority publish action in `.github/workflows/publish.yml`. The release job publishes only files from `dist/` produced by the same workflow run.
-6. After publishing to TestPyPI, install from TestPyPI in a clean environment and run the import/decorator smoke checks before approving PyPI.
+6. Publish with the Python Packaging Authority publish action in `.github/workflows/publish.yml`. The release job publishes only files from `dist/` produced by the same workflow run.
+7. After publishing to TestPyPI, install from TestPyPI in a clean environment and run the import/decorator smoke checks before approving PyPI.
 
 ### Fallback path: scoped API tokens
 
@@ -200,7 +201,7 @@ Immediately before publishing a new version, confirm that the built version is n
 
 ## Publishing
 
-Use TestPyPI before PyPI unless there is a deliberate emergency reason not to. The included `.github/workflows/publish.yml` workflow is manual-only (`workflow_dispatch`) and requires the caller to choose `testpypi` or `pypi` plus the expected version. It builds, verifies, uploads the `dist/` artifacts between jobs, and publishes through trusted publishing using protected environments.
+Use TestPyPI before PyPI unless there is a deliberate emergency reason not to. The included `.github/workflows/publish.yml` workflow is manual-only (`workflow_dispatch`) and requires the caller to choose `testpypi` or `pypi` plus the expected version. It builds, verifies, uploads the `dist/` artifacts between jobs, and publishes through trusted publishing using protected environments. The `testpypi` and `pypi` environments currently use a 5-minute wait timer as a last-chance release brake.
 
 For each release:
 
