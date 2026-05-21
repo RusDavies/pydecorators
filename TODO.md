@@ -897,3 +897,8 @@
 
 - [x] Create a workspace OpenClaw skill for PyDecorators maintainer operations, release boundaries, verification gates, and security-audit triggers.
 - [x] Review the PyDecorators maintainer skill after the next substantial release-readiness or security-audit use and split reference files only if the single skill file becomes too bulky.
+
+## Newly Implied Security Audit Follow-Ups
+
+- [ ] Reject or encode Redis glob metacharacters in `RedisCacheBackend.key_prefix` before using it in scan/delete/eviction patterns.
+- [ ] Decide whether `scripts/coverage_summary.py` should use `defusedxml` or keep the Semgrep XML-parser finding as accepted local-tool risk.

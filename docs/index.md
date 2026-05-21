@@ -16,6 +16,7 @@ Start here when navigating the PyDecorators documentation.
 - [Future extension decisions](https://github.com/RusDavies/pydecorators/blob/master/docs/future_extension_decisions.md) — explicit deferrals for conditional API and tooling ideas.
 - [Release note template](https://github.com/RusDavies/pydecorators/blob/master/docs/release_note_template.md) — compatibility wording for release notes.
 - [Security hardening guide](https://github.com/RusDavies/pydecorators/blob/master/docs/security_hardening.md) — cache, logging, validation, and in-process control safety checklist.
+- [Security audit 2026-05-21](https://github.com/RusDavies/pydecorators/blob/master/docs/security_audit_2026-05-21.md) — evidence-backed local audit findings and follow-up items.
 - [Markdown anchor policy](https://github.com/RusDavies/pydecorators/blob/master/docs/markdown_anchor_policy.md) — heading-anchor assumptions used by docs-link policy tests.
 - [Docs index exemption registry](https://github.com/RusDavies/pydecorators/blob/master/docs/docs_index_exemptions.md) — rules for intentional docs-index exclusions.
 - [Writing style audit](https://github.com/RusDavies/pydecorators/blob/master/docs/writing_style_audit.md) — review of existing documentation against the project writing style.
