@@ -6,6 +6,20 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-05-21
+
+### Changed
+
+- Replaced raw Markdown documentation references with absolute GitHub links so PyPI renders documentation navigation correctly.
+- Added a GitHub documentation project URL for the package.
+- Documented the 2026-05-21 security audit and release-readiness follow-up work.
+- Added GitHub environment wait timers for TestPyPI and PyPI trusted publishing.
+
+### Security
+
+- Rejected Redis glob metacharacters in `RedisCacheBackend.key_prefix` before prefixes are used in Redis scan/delete/eviction patterns.
+- Switched the local coverage-summary helper from `xml.etree.ElementTree` to `defusedxml.ElementTree`.
+
 ## [0.1.2] - 2026-05-20
 
 ### Changed
