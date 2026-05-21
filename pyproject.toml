@@ -38,6 +38,7 @@ redis = [
 ]
 dev = [
   "build>=1.2",
+  "defusedxml>=0.7.1",
   "mypy>=1.14",
   "pytest>=8.3",
   "pytest-asyncio>=0.25",

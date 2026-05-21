@@ -106,7 +106,7 @@ Redis backend design notes.
 
 ## Finding P4 — local coverage XML parser hardening
 
-Status: `unreachable_current_config`
+Status: remediated after Russ chose `defusedxml`
 Priority: P4
 Confidence: medium
 Affected file: `scripts/coverage_summary.py`
@@ -130,6 +130,11 @@ untrusted XML for the concern to matter.
 Either leave as accepted local-tool risk, or switch to `defusedxml` if a dev dependency is
 acceptable. Given the current tiny helper and trusted CI input, this should not block release.
 
+### Remediation
+
+Follow-up branch work switched the helper to `defusedxml.ElementTree` and added `defusedxml`
+to the development dependency set used by local and CI quality gates.
+
 ## Non-findings / guarded areas
 
 - `PickleCacheSerializer` and `DiskCacheBackend` do deserialize pickle payloads, but public docs
@@ -147,5 +152,4 @@ acceptable. Given the current tiny helper and trusted CI input, this should not 
 
 - Reject or encode Redis glob metacharacters in `RedisCacheBackend.key_prefix` before using it in
   scan/delete/eviction patterns.
-- Decide whether `scripts/coverage_summary.py` should use `defusedxml` or keep the Semgrep finding
-  as accepted local-tool risk.
+- Switch `scripts/coverage_summary.py` to `defusedxml` for hardened local XML parsing.
