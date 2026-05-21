@@ -28,6 +28,8 @@ Initial values:
 
 The prefix must make unrelated applications unlikely to collide while keeping raw cache keys out of Redis key listings. Raw keys can contain tenant names, user identifiers, or argument values. Redis key names get logged, monitored, sampled, and pasted into tickets with depressing regularity, so they should be boring digests rather than accidental data exports.
 
+`RedisCacheBackend.key_prefix` is treated as a literal namespace prefix. It must not contain Redis glob metacharacters (`*`, `?`, `[`, or `]`) because backend maintenance operations use Redis `SCAN MATCH` patterns for clear, info, and eviction paths. If an application needs user- or tenant-derived namespace text, validate it against a small allowlist or hash/encode it before passing it as `key_prefix`. Shared-cache namespaces are not where we practice interpretive dance.
+
 ## Stats key naming
 
 Stats should be stored separately from values with an explicit stats marker:

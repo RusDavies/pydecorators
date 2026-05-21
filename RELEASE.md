@@ -37,9 +37,8 @@ releases boring, repeatable, and hard to mess up. Revolutionary concept, apparen
 Before publishing, check whether this release changes persistent `DiskCacheBackend` behavior:
 
 - [ ] Confirm whether cached value semantics, payload shapes, serializers, or trust boundaries changed.
-- [ ] If old persistent rows should not be reused, document the migration path: bump the
-  cache `namespace`, call `cache_clear()`, call backend `clear()`, or tell users to remove
-  the SQLite cache file.
+- [ ] If old persistent rows should not be reused, document the migration path: bump the cache `namespace`,
+  call `cache_clear()`, call backend `clear()`, or tell users to remove the SQLite cache file.
 - [ ] If old rows are still compatible, say so in release notes when persistent disk caching is affected.
 - [ ] Confirm [`docs/disk_cache_backend.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md)
   cache versioning guidance is still accurate.
@@ -267,10 +266,10 @@ For each release:
 
 ## Package name history
 
-The published distribution name is `blakemere-wraptools`; the import package is
-`pydecorators`. Earlier planning names such as `useful-decorators`, `pydecorators`, and
-`py-decorators` were not usable or were rejected during publishing setup. Keep future release
-docs focused on the published distribution unless a rename is deliberately planned.
+The published distribution name is `blakemere-wraptools`; the import package is `pydecorators`.
+Earlier planning names such as `useful-decorators`, `pydecorators`, and `py-decorators` were
+not usable or were rejected during publishing setup. Keep future release docs focused on the
+published distribution unless a rename is deliberately planned.
 
 ## Tagging convention
 
