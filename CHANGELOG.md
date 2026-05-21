@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-05-21
+
+### Fixed
+
+- Changed the PyPI-facing README release and decorator documentation references from code-styled Markdown file paths to normal human-readable outbound GitHub links, so PyPI renders them as obvious clickable documentation links.
+
 ## [0.1.3] - 2026-05-21
 
 ### Changed
