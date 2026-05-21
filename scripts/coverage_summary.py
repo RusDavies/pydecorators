@@ -4,8 +4,9 @@
 from __future__ import annotations
 
 import argparse
-import xml.etree.ElementTree as ET
 from pathlib import Path
+
+import defusedxml.ElementTree as ET
 
 
 def coverage_percent(path: Path) -> float:

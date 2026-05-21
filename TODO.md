@@ -901,4 +901,4 @@
 ## Newly Implied Security Audit Follow-Ups
 
 - [x] Reject or encode Redis glob metacharacters in `RedisCacheBackend.key_prefix` before using it in scan/delete/eviction patterns.
-- [ ] Decide whether `scripts/coverage_summary.py` should use `defusedxml` or keep the Semgrep XML-parser finding as accepted local-tool risk.
+- [x] Decide whether `scripts/coverage_summary.py` should use `defusedxml` or keep the Semgrep XML-parser finding as accepted local-tool risk.
