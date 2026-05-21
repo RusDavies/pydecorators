@@ -905,5 +905,6 @@
 
 ## Newly Implied CI Maintenance Follow-Ups
 
-- [ ] Update GitHub Actions JavaScript actions, or explicitly test Node 24 compatibility, before GitHub forces Node 24 by default on 2026-06-02.
+- [x] Update GitHub Actions JavaScript actions, or explicitly test Node 24 compatibility, before GitHub forces Node 24 by default on 2026-06-02.
   - Evidence: 0.1.3 publish runs reported Node.js 20 deprecation warnings for `actions/checkout@v4`, `actions/setup-python@v5`, and `actions/upload-artifact@v4`.
+  - Resolved by updating workflows to Node 24-backed actions: `actions/checkout@v6`, `actions/setup-python@v6`, `actions/upload-artifact@v7`, and `actions/download-artifact@v8`.

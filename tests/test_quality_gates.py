@@ -21,7 +21,7 @@ def test_ci_runs_quality_gates_and_smoke_tests() -> None:
         "python scripts/smoke_imports.py",
         "python scripts/smoke_examples.py",
         "pytest",
-        "actions/upload-artifact@v4",
+        "actions/upload-artifact@v7",
         "coverage.xml",
         "python -m build",
         "python scripts/smoke_wheel_install.py",
