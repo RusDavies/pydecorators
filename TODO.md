@@ -902,3 +902,8 @@
 
 - [x] Reject or encode Redis glob metacharacters in `RedisCacheBackend.key_prefix` before using it in scan/delete/eviction patterns.
 - [x] Decide whether `scripts/coverage_summary.py` should use `defusedxml` or keep the Semgrep XML-parser finding as accepted local-tool risk.
+
+## Newly Implied CI Maintenance Follow-Ups
+
+- [ ] Update GitHub Actions JavaScript actions, or explicitly test Node 24 compatibility, before GitHub forces Node 24 by default on 2026-06-02.
+  - Evidence: 0.1.3 publish runs reported Node.js 20 deprecation warnings for `actions/checkout@v4`, `actions/setup-python@v5`, and `actions/upload-artifact@v4`.
