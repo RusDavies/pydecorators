@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-05-27
+
+### Changed
+
+- Bumped package metadata and runtime `__version__` for the next patch release.
+
 ## [0.1.4] - 2026-05-21
 
 ### Fixed
