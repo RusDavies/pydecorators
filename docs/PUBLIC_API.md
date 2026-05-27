@@ -151,6 +151,8 @@ Example: calling a cached function with an unhashable list argument raises `Cach
 
 `RedisCacheBackend` is the optional Redis-backed implementation of the cache backend protocol. It uses package-owned `key_prefix` values, versioned entry envelopes, serializer content-type checks, Redis TTLs, and separate hit/miss stats keys. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-wraptools[redis]`.
 
+By default it uses `PickleCacheSerializer`, so Redis values are trusted cache data. Do not connect it to Redis services, key prefixes, backups, imports, or operational paths that untrusted users can write. Use `JsonCacheSerializer` or a reviewed custom serializer when Redis is shared across trust boundaries or pickle is unnecessary.
+
 ### `RedisCacheClient`
 
 `RedisCacheClient` is the small protocol accepted by `RedisCacheBackend(client=...)`, useful for tests and applications that already own Redis client construction.

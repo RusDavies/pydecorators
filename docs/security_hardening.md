@@ -31,6 +31,20 @@ Hardening rules:
 
 See [`DiskCacheBackend`](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md) and [`@cache_result`](https://github.com/RusDavies/pydecorators/blob/master/docs/cache_result.md) for backend lifecycle and serializer details.
 
+## Redis cache trust boundaries
+
+`RedisCacheBackend` is optional shared cache storage. Its default payload serializer is `PickleCacheSerializer`, so Redis payloads are trusted cache data in the same practical sense as trusted local disk cache files.
+
+Hardening rules:
+
+- Do not use the default pickle serializer with Redis services, key prefixes, backup/restore paths, or imports that untrusted users can write.
+- Scope `key_prefix` to the application, environment, and value semantics; do not build it directly from user input.
+- Treat Redis authentication, TLS, ACLs, network exposure, persistence, backups, and operational restore jobs as part of the cache trust boundary.
+- Use `JsonCacheSerializer` for simple JSON-compatible payloads when Redis is shared across trust boundaries or pickle is unnecessary.
+- Use reviewed custom serializers with distinct content types when JSON is too narrow.
+
+See [`RedisCacheBackend`](https://github.com/RusDavies/pydecorators/blob/master/docs/redis_backend_design.md) and [`@cache_result`](https://github.com/RusDavies/pydecorators/blob/master/docs/cache_result.md) for backend lifecycle and serializer details.
+
 ## Cache key and value hygiene
 
 Cache keys and values often preserve more context than intended. A key function that includes a token, email address, tenant identifier, or request object can quietly create a data-retention problem.
@@ -104,6 +118,7 @@ Before production use, confirm:
 
 - [ ] Disk cache files live in restricted, application-owned paths.
 - [ ] Pickle-backed caches are never loaded from untrusted sources.
+- [ ] Redis cache services and prefixes are trusted before using `PickleCacheSerializer`; otherwise use `JsonCacheSerializer` or a reviewed custom serializer.
 - [ ] Cache keys do not include raw secrets.
 - [ ] Cache TTLs and sizes are bounded where retention matters.
 - [ ] Logging of arguments and results is deliberately enabled, not accidental.

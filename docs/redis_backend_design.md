@@ -56,6 +56,18 @@ Each value key should store enough metadata to preserve existing cache semantics
 
 Use native Redis expiry for TTL whenever possible so stale rows disappear without a separate sweeper. Do not use Redis expiry for hit/miss stats keys unless a future design deliberately makes stats disposable per deployment window.
 
+## Serializer trust boundary
+
+`RedisCacheBackend` uses the same `CacheSerializer` protocol as disk caches, and its default payload serializer is `PickleCacheSerializer`. That default is only for trusted Redis data. A Redis value returned from the configured service and `key_prefix` is deserialized after envelope and content-type checks; those checks select the expected format, but they do not make attacker-written pickle bytes safe.
+
+Hardening rules:
+
+- Do not use the default `PickleCacheSerializer` with Redis services, key prefixes, backups, imports, or restore jobs that untrusted users can write.
+- Treat Redis authentication, TLS, network isolation, ACLs, persistence files, backups, and restore paths as part of the cache trust boundary.
+- Use `JsonCacheSerializer` for simple JSON-compatible payloads when Redis is shared across teams, tenants, environments, or other trust boundaries and pickle is unnecessary.
+- Use a reviewed custom serializer with a distinct content type when payloads need an application-specific format.
+- Keep `key_prefix` scoped to an application and environment so one deployment does not deserialize another deployment's cache entries by accident.
+
 ## Operating model
 
 Redis changes five things that callers and maintainers should understand.

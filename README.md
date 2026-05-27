@@ -295,7 +295,7 @@ def expensive_lookup(value: str) -> str:
     return value.upper()
 ```
 
-`@cache_result` uses `MemoryCacheBackend` by default and also includes `DiskCacheBackend` for trusted local persistent caches. Future backend work is planned for Redis storage.
+`@cache_result` uses `MemoryCacheBackend` by default and also includes `DiskCacheBackend` for trusted local persistent caches and `RedisCacheBackend` for optional shared cache storage.
 
 Shared cache backends can be isolated with `namespace=` when multiple decorated functions use the same backend. For persistent disk caches, treat namespace names and custom key functions as part of the cache file's compatibility contract: changing either one can strand old entries, collide with another decorated function, or return values computed under older semantics. Use explicit namespaces for long-lived caches, keep custom key functions stable across releases, and clear or rotate the cache when function behavior, argument meaning, serializer format, or namespace strategy changes.
 
@@ -335,3 +335,5 @@ Do **not** create a decorator-bound `DiskCacheBackend` inside a short `with` blo
 Disk backend design lives in [disk backend design](https://github.com/RusDavies/pydecorators/blob/master/docs/disk_cache_backend.md); implementation uses SQLite and the cache serializer interface. The default disk payload serializer uses pickle, so cache databases must be treated as trusted local files only — do not load cache DBs from untrusted sources or place them in world-writable directories. For simple JSON-compatible payloads, use `JsonCacheSerializer` instead of pickle when values should be easier to inspect or consume from other languages.
 
 `DiskCacheBackend` is intended for single-host local caching. It uses normal SQLite file locking, requests WAL mode by default, and configures a 5000 ms busy timeout to reduce transient `database is locked` failures. Those settings improve local reader/writer behavior, but they do not make it a distributed cache and they do not promise safe cross-host semantics on shared/network filesystems. If multiple processes use the same cache file, expect normal SQLite contention behavior and keep cached values disposable. If you need visibility into rows dropped because of serializer mismatches or corrupt payloads, pass `on_drop=` to `DiskCacheBackend` and log the `DiskCacheDropEvent`.
+
+`RedisCacheBackend` is optional and shares cache entries through a Redis service. With the default `PickleCacheSerializer`, Redis payloads are trusted data: do not point the backend at Redis databases, key prefixes, backups, imports, or services that untrusted users can write to. For shared Redis deployments where payload bytes should avoid pickle, use `JsonCacheSerializer` or a deliberately reviewed custom serializer and keep `key_prefix` scoped to the application/environment.
