@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "blakemere-wraptools"
-version = "0.1.4"
+version = "0.1.5"
 description = "A focused library of useful Python decorators for reliability, caching, rate limiting, timeouts, and developer ergonomics."
 readme = "README.md"
 requires-python = ">=3.11"
