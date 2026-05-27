@@ -90,6 +90,8 @@ JSON serializer for simple JSON-compatible cache payloads.
 
 Optional Redis-backed cache backend. Importing the base package does not require Redis; constructing with `url=` requires installing `blakemere-wraptools[redis]`.
 
+The default serializer is `PickleCacheSerializer`, so Redis entries are trusted cache data. Do not use the default serializer with Redis services, key prefixes, backups, or imported payloads that untrusted users can write. Use `JsonCacheSerializer` or a reviewed custom serializer when shared Redis payloads should avoid pickle.
+
 ### `RedisCacheClient`
 
 Small protocol for Redis-like clients accepted by `RedisCacheBackend(client=...)`.
