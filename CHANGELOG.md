@@ -8,9 +8,14 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [0.1.5] - 2026-05-27
 
-### Changed
+### Documentation
 
-- Bumped package metadata and runtime `__version__` for the next patch release.
+- Clarified Redis cache trust boundaries in the PyPI-facing README, API reference, public API guide, Redis backend design notes, and security hardening guide.
+- Documented that the default `PickleCacheSerializer` makes Redis payloads trusted cache data; users with shared or untrusted Redis write paths should use `JsonCacheSerializer` or a reviewed custom serializer instead.
+
+### Release notes
+
+- This is a documentation/security-guidance patch release. It does not change runtime behavior, public API exports, cache payload formats, or persistent cache compatibility.
 
 ## [0.1.4] - 2026-05-21
 
