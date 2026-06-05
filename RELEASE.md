@@ -6,7 +6,8 @@ releases boring, repeatable, and hard to mess up. Revolutionary concept, apparen
 ## Release scope
 
 - [ ] Confirm the target version.
-- [ ] Confirm the release type: patch, minor, major, or pre-1.0 compatibility-breaking release.
+- [ ] Confirm the release type: patch, minor, major, docs-only patch, or pre-1.0 compatibility-breaking release.
+- [ ] For a docs-only patch release, confirm the changelog names the user-facing documentation or security-guidance change and explicitly says whether runtime behavior, public API exports, and persistent cache compatibility are unchanged.
 - [ ] Review [`TODO.md`](https://github.com/RusDavies/pydecorators/blob/master/TODO.md) for any release-blocking items.
 - [ ] Confirm all intended public APIs are documented.
 - [ ] Confirm all public APIs are exported from `pydecorators.__all__`.
