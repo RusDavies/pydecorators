@@ -6,7 +6,9 @@ def test_release_workflow_is_manual_and_uses_trusted_publishing() -> None:
 
     assert "workflow_dispatch:" in text
     assert "id-token: write" in text
-    assert "pypa/gh-action-pypi-publish@release/v1" in text
+    assert (
+        "pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # release/v1"
+    ) in text
     assert "environment: testpypi" in text
     assert "environment: pypi" in text
     assert "repository-url: https://test.pypi.org/legacy/" in text
