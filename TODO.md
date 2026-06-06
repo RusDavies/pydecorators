@@ -910,4 +910,4 @@
   - Resolved by updating workflows to Node 24-backed actions: `actions/checkout@v6`, `actions/setup-python@v6`, `actions/upload-artifact@v7`, and `actions/download-artifact@v8`.
 ### Newly Implied GitHub Actions Supply-Chain Follow-Ups
 
-- [ ] Pin all GitHub Actions workflow `uses:` entries to full 40-character immutable commit SHAs and add a policy check that rejects moving refs in `.github/workflows/*`, including PyPI/TestPyPI trusted-publishing workflows.
+- [x] Pin all GitHub Actions workflow `uses:` entries to full 40-character immutable commit SHAs and add a policy check that rejects moving refs in `.github/workflows/*`, including PyPI/TestPyPI trusted-publishing workflows.
