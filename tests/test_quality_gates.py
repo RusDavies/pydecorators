@@ -21,7 +21,7 @@ def test_ci_runs_quality_gates_and_smoke_tests() -> None:
         "python scripts/smoke_imports.py",
         "python scripts/smoke_examples.py",
         "pytest",
-        "actions/upload-artifact@v7",
+        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7",
         "coverage.xml",
         "python -m build",
         "python scripts/smoke_wheel_install.py",
@@ -29,6 +29,12 @@ def test_ci_runs_quality_gates_and_smoke_tests() -> None:
         "python scripts/dogfood_external_project.py",
     ]:
         assert required in ci
+
+
+def test_docs_policy_checks_workflow_action_pins() -> None:
+    docs_policy = Path("scripts/docs-policy.sh").read_text()
+
+    assert "python scripts/check_workflow_action_pins.py" in docs_policy
 
 
 def test_smoke_scripts_exist() -> None:
