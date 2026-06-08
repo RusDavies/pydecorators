@@ -667,6 +667,11 @@
 - [x] Add idempotency and distributed-limiter caveats before public release.
 - [x] Add cleanup of idle keyed buckets so long-running keyed limiters do not retain expired buckets forever.
 - [x] Add executable docs examples for `@rate_limit`.
+- [x] Add opt-in same-host interprocess rate limiting backed by SQLite, defaulting to process-local behavior.
+- [x] Document `interprocess`, `storage_path`, and `namespace` behavior and caveats.
+- [x] Add tests that separate decorated functions can share an interprocess namespace and SQLite store.
+- [ ] Add a multiprocessing stress test for SQLite-backed rate limiting if CI proves stable enough for process-level timing tests.
+- [ ] Evaluate a Redis/Postgres rate-limit backend if users need multi-host distributed quota enforcement.
 
 ## 6. `@timeout`
 

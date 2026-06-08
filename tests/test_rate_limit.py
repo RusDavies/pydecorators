@@ -1,5 +1,6 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -125,6 +126,137 @@ def test_rate_limit_block_mode_sleeps_until_slot_available() -> None:
     assert sleeps == [10]
 
 
+def test_rate_limit_interprocess_instances_share_storage(tmp_path: Path) -> None:
+    clock = MutableClock()
+    storage_path = tmp_path / "rate-limit.sqlite3"
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="shared-api",
+    )
+    def first() -> str:
+        return "first"
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="shared-api",
+    )
+    def second() -> str:
+        return "second"
+
+    assert first() == "first"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        second()
+
+    assert exc_info.value.retry_after == 10
+
+
+def test_rate_limit_interprocess_namespaces_are_isolated(tmp_path: Path) -> None:
+    clock = MutableClock()
+    storage_path = tmp_path / "rate-limit.sqlite3"
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="api-a",
+    )
+    def api_a() -> str:
+        return "a"
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="api-b",
+    )
+    def api_b() -> str:
+        return "b"
+
+    assert api_a() == "a"
+    assert api_b() == "b"
+    with pytest.raises(RateLimitExceeded):
+        api_a()
+
+
+def test_rate_limit_interprocess_keyed_buckets_are_isolated(tmp_path: Path) -> None:
+    clock = MutableClock()
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        key=lambda tenant: tenant,
+        clock=clock,
+        interprocess=True,
+        storage_path=tmp_path / "rate-limit.sqlite3",
+    )
+    def limited(tenant: str) -> str:
+        return tenant
+
+    assert limited("a") == "a"
+    assert limited("b") == "b"
+    with pytest.raises(RateLimitExceeded):
+        limited("a")
+
+
+def test_rate_limit_interprocess_sliding_window_resets(tmp_path: Path) -> None:
+    clock = MutableClock()
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        interprocess=True,
+        storage_path=tmp_path / "rate-limit.sqlite3",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    clock.advance(9.9)
+    with pytest.raises(RateLimitExceeded):
+        limited()
+    clock.advance(0.1)
+    assert limited() == "ok"
+
+
+def test_rate_limit_interprocess_block_mode_sleeps_without_reserving_twice(tmp_path: Path) -> None:
+    clock = MutableClock()
+    sleeps: list[float] = []
+
+    def fake_sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        clock.advance(seconds)
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        mode="block",
+        clock=clock,
+        sleep=fake_sleep,
+        interprocess=True,
+        storage_path=tmp_path / "rate-limit.sqlite3",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    assert sleeps == [10]
+
+
 @pytest.mark.asyncio
 async def test_rate_limit_supports_async_raise_mode() -> None:
     clock = MutableClock()
@@ -176,6 +308,11 @@ def test_rate_limit_preserves_metadata() -> None:
         ({"calls": 1, "period": 0}, "period must be greater than zero"),
         ({"calls": 1, "period": 1, "key": object()}, "key must be callable"),
         ({"calls": 1, "period": 1, "mode": "wait"}, "mode must"),
+        ({"calls": 1, "period": 1, "interprocess": True}, "storage_path is required"),
+        (
+            {"calls": 1, "period": 1, "interprocess": True, "storage_path": "x", "namespace": " "},
+            "namespace must not be empty",
+        ),
     ],
 )
 def test_rate_limit_validates_configuration(kwargs: dict[str, Any], message: str) -> None:

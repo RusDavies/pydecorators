@@ -86,13 +86,13 @@ Use it to catch obvious mistakes near internal function boundaries. For public A
 
 See [`@validate_types`](https://github.com/RusDavies/pydecorators/blob/master/docs/validate_types.md) for supported annotations and limitations.
 
-## In-process control limits
+## Local control limits
 
-`@rate_limit` and `@circuit_breaker` protect one Python process. They do not coordinate across multiple workers, containers, hosts, or serverless instances.
+`@rate_limit` protects one Python process by default. Its opt-in `interprocess=True` mode coordinates multiple local processes that share the same SQLite database path and namespace. It does not coordinate across multiple hosts, independent containers without shared storage, or serverless instances. `@circuit_breaker` remains process-local.
 
 For distributed systems:
 
-- enforce rate limits at a shared gateway, proxy, API-management layer, or distributed store;
+- enforce cross-host rate limits at a shared gateway, proxy, API-management layer, or distributed store;
 - use service-level circuit breaking, timeouts, and backpressure where available;
 - treat decorator-level controls as local defense-in-depth;
 - test multi-worker behavior explicitly instead of assuming one process tells the whole herd what to do. The herd, naturally, has not read your decorator.

@@ -242,7 +242,7 @@ For decorator-bound disk backends, prefer keeping the backend alive for the whol
 
 ### `rate_limit`
 
-`rate_limit` applies in-process sliding-window limits to sync and async callables. It supports global and keyed buckets, raise or block mode, injectable clocks and sleep functions for tests, and raises `RateLimitExceeded` when a call exceeds the allowance in raise mode. See [`docs/rate_limit.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md) for behavior and examples.
+`rate_limit` applies sliding-window limits to sync and async callables. It supports global and keyed buckets, raise or block mode, injectable clocks and sleep functions for tests, process-local default storage, and opt-in same-host interprocess coordination through SQLite. It raises `RateLimitExceeded` when a call exceeds the allowance in raise mode. See [`docs/rate_limit.md`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md) for behavior and examples.
 
 ### `log_calls`
 

@@ -6,6 +6,11 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Added
+
+- Added opt-in same-host interprocess coordination for `@rate_limit` through SQLite-backed sliding-window buckets.
+- Added `interprocess`, `storage_path`, and `namespace` options to `@rate_limit` while keeping process-local behavior as the default.
+
 ## [0.1.5] - 2026-05-27
 
 ### Documentation
