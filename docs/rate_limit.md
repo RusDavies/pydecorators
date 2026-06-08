@@ -100,6 +100,59 @@ Redis-backed limiting coordinates callers that can reach the same Redis deployme
 
 The test suite includes live Redis integration coverage gated by `PYDECORATORS_REDIS_URL`. Leave that environment variable unset for normal local runs. Set it to a disposable Redis database URL when you want the integration test to exercise the real Lua script against Redis; the test uses a unique key prefix and removes matching keys afterward.
 
+### Redis outage and fallback policy
+
+Distributed rate limiting adds a new operational dependency: Redis must be reachable for the wrapper to decide whether a call is allowed. The decorator deliberately lets Redis client errors propagate rather than silently choosing a fallback policy for you. That is annoying in the useful way: different systems should fail differently.
+
+Pick and document one of these policies near the call site:
+
+**Fail closed for quota, billing, abuse, or safety boundaries.** If exceeding the limit could create financial exposure, violate a vendor contract, amplify abuse, or trigger account suspension, let the Redis error fail the operation and alert on it.
+
+```python
+@rate_limit(
+    calls=100,
+    period=60,
+    key=lambda user_id: user_id,
+    distributed=True,
+    redis_url="redis://redis.example.internal:6379/0",
+    redis_key_prefix="billing-api:v1",
+    namespace="billable-vendor-api:v1",
+)
+def call_billable_vendor(user_id: str) -> str:
+    ...
+```
+
+In this pattern, Redis outage is a service dependency outage. Handle it the same way you would handle the vendor being unavailable: return a controlled error, trip higher-level circuit breakers, queue work if safe, and page the owner if the dependency matters enough.
+
+**Fail open only for best-effort convenience throttles.** If the limiter is just local politeness around non-critical work, catch Redis errors outside the decorated function and consciously bypass the distributed limiter. Do not use this for quota-protected paid APIs unless you enjoy surprise invoices, which is an eccentric hobby.
+
+```python
+def call_with_best_effort_limit(user_id: str) -> str:
+    try:
+        return distributed_limited_call(user_id)
+    except RedisError:
+        logger.warning("Redis rate limiter unavailable; bypassing best-effort limit")
+        return raw_call(user_id)
+```
+
+**Use a degraded local fallback when partial protection is better than none.** For low-risk workloads, a process-local fallback can reduce blast radius during Redis outages, but it no longer coordinates across workers or hosts. Make the degraded mode visible in logs/metrics so operators know the global limit is not being enforced.
+
+```python
+@rate_limit(calls=20, period=60, key=lambda user_id: user_id)
+def local_fallback_call(user_id: str) -> str:
+    return raw_call(user_id)
+
+
+def call_with_degraded_limit(user_id: str) -> str:
+    try:
+        return distributed_limited_call(user_id)
+    except RedisError:
+        logger.warning("Redis rate limiter unavailable; using process-local fallback")
+        return local_fallback_call(user_id)
+```
+
+Use your Redis client's real exception type in production code. For `redis-py`, import it from `redis.exceptions`. Keep fallback wrappers outside `@rate_limit` so the decorator remains a predictable admission-control primitive rather than a tiny incident commander with delusions of grandeur.
+
 ## Idempotency and side effects
 
 `@rate_limit` does not make an operation idempotent. It only controls how often the wrapped function is allowed to start in the configured process-local, same-host interprocess, or Redis-backed distributed bucket.
