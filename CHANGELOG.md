@@ -9,7 +9,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 ### Added
 
 - Added opt-in same-host interprocess coordination for `@rate_limit` through SQLite-backed sliding-window buckets.
-- Added `interprocess`, `storage_path`, and `namespace` options to `@rate_limit` while keeping process-local behavior as the default.
+- Added opt-in Redis-backed distributed coordination for `@rate_limit` using an atomic Lua script over sorted-set state.
+- Added `interprocess`, `storage_path`, `namespace`, `distributed`, `redis_client`, `redis_url`, and `redis_key_prefix` options to `@rate_limit` while keeping process-local behavior as the default.
 
 ## [0.1.5] - 2026-05-27
 

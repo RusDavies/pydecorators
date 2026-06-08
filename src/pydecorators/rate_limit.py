@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 import os
 import pickle
 import sqlite3
@@ -25,10 +26,39 @@ from pydecorators.exceptions import ConfigurationError, RateLimitExceeded
 RateLimitMode = Literal["raise", "block"]
 RateLimitKey = Callable[..., Hashable]
 
+_REDIS_GLOB_METACHARACTERS = frozenset("*?[]")
+_REDIS_RATE_LIMIT_SCRIPT = """
+local events_key = KEYS[1]
+local sequence_key = KEYS[2]
+local now = tonumber(ARGV[1])
+local period = tonumber(ARGV[2])
+local calls = tonumber(ARGV[3])
+local ttl_ms = math.max(1, math.ceil(period * 1000))
+
+redis.call("ZREMRANGEBYSCORE", events_key, "-inf", now - period)
+local count = redis.call("ZCARD", events_key)
+if count < calls then
+    local sequence = redis.call("INCR", sequence_key)
+    redis.call("ZADD", events_key, now, tostring(now) .. ":" .. tostring(sequence))
+    redis.call("PEXPIRE", events_key, ttl_ms)
+    redis.call("PEXPIRE", sequence_key, ttl_ms)
+    return {0, 0}
+end
+
+local oldest = redis.call("ZRANGE", events_key, 0, 0, "WITHSCORES")[2]
+local wait_ms = math.max(0, math.ceil((tonumber(oldest) + period - now) * 1000))
+return {1, wait_ms}
+"""
+
 
 class _RateLimiter(Protocol):
     def reserve_or_delay(self, key: Hashable) -> float | None:
         """Reserve a call slot or return seconds to wait before retrying."""
+
+
+class _RedisRateLimitClient(Protocol):
+    def eval(self, script: str, numkeys: int, *keys_and_args: object) -> object:
+        """Evaluate a Redis Lua script."""
 
 
 def rate_limit(
@@ -42,6 +72,10 @@ def rate_limit(
     interprocess: bool = False,
     storage_path: str | os.PathLike[str] | None = None,
     namespace: str | None = None,
+    distributed: bool = False,
+    redis_client: object | None = None,
+    redis_url: str | None = None,
+    redis_key_prefix: str | None = None,
 ) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """Limit calls to a sync or async callable over a sliding time window."""
 
@@ -53,13 +87,26 @@ def rate_limit(
         interprocess=interprocess,
         storage_path=storage_path,
         namespace=namespace,
+        distributed=distributed,
+        redis_client=redis_client,
+        redis_url=redis_url,
+        redis_key_prefix=redis_key_prefix,
     )
     clock_func = clock or monotonic
 
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         limiter_namespace = namespace or f"{func.__module__}.{func.__qualname__}"
         limiter: _RateLimiter
-        if interprocess:
+        if distributed:
+            limiter = _RedisSlidingWindowLimiter(
+                calls=calls,
+                period=period,
+                clock=clock_func,
+                client=_redis_client(redis_client=redis_client, redis_url=redis_url),
+                key_prefix=cast(str, redis_key_prefix),
+                namespace=limiter_namespace,
+            )
+        elif interprocess:
             limiter = _SQLiteSlidingWindowLimiter(
                 calls=calls,
                 period=period,
@@ -230,6 +277,51 @@ class _SQLiteSlidingWindowLimiter:
         return connection
 
 
+class _RedisSlidingWindowLimiter:
+    def __init__(
+        self,
+        *,
+        calls: int,
+        period: float,
+        clock: Callable[[], float],
+        client: _RedisRateLimitClient,
+        key_prefix: str,
+        namespace: str,
+    ) -> None:
+        self._calls = calls
+        self._period = period
+        self._clock = clock
+        self._client = client
+        self._key_prefix = key_prefix.strip().rstrip(":")
+        self._namespace = namespace
+
+    def reserve_or_delay(self, key: Hashable) -> float | None:
+        """Reserve a Redis-backed distributed call slot or return seconds to wait."""
+
+        now = self._clock()
+        events_key, sequence_key = self._redis_keys(key)
+        result = self._client.eval(
+            _REDIS_RATE_LIMIT_SCRIPT,
+            2,
+            events_key,
+            sequence_key,
+            repr(now),
+            repr(self._period),
+            str(self._calls),
+        )
+        status, wait_ms = _redis_script_result(result)
+        if status == 0:
+            return None
+        return max(0.0, wait_ms / 1000)
+
+    def _redis_keys(self, key: Hashable) -> tuple[str, str]:
+        namespace_digest = _digest_text(self._namespace)
+        bucket_digest = _stored_bucket_key(key)
+        # The hash tag keeps the event and sequence keys in one Redis Cluster slot.
+        base_key = f"{self._key_prefix}:rate_limit:{{{namespace_digest}:{bucket_digest}}}"
+        return base_key, f"{base_key}:sequence"
+
+
 def _validate_rate_limit_config(
     *,
     calls: int,
@@ -239,6 +331,10 @@ def _validate_rate_limit_config(
     interprocess: bool,
     storage_path: str | os.PathLike[str] | None,
     namespace: str | None,
+    distributed: bool,
+    redis_client: object | None,
+    redis_url: str | None,
+    redis_key_prefix: str | None,
 ) -> None:
     if calls <= 0:
         raise ConfigurationError("calls must be greater than zero")
@@ -250,10 +346,27 @@ def _validate_rate_limit_config(
         raise ConfigurationError('mode must be "raise" or "block"')
     if not isinstance(interprocess, bool):
         raise ConfigurationError("interprocess must be a boolean")
+    if not isinstance(distributed, bool):
+        raise ConfigurationError("distributed must be a boolean")
+    if interprocess and distributed:
+        raise ConfigurationError("interprocess and distributed modes are mutually exclusive")
     if interprocess and storage_path is None:
         raise ConfigurationError("storage_path is required when interprocess is True")
+    if not interprocess and storage_path is not None:
+        raise ConfigurationError("storage_path is only supported when interprocess is True")
     if namespace is not None and not namespace.strip():
         raise ConfigurationError("namespace must not be empty when provided")
+    if not distributed:
+        if redis_client is not None or redis_url is not None or redis_key_prefix is not None:
+            raise ConfigurationError("Redis options require distributed=True")
+        return
+    if redis_client is None and redis_url is None:
+        raise ConfigurationError("redis_client or redis_url is required when distributed is True")
+    if redis_client is not None and redis_url is not None:
+        raise ConfigurationError("provide either Redis client or redis_url, not both")
+    if redis_client is not None and not callable(getattr(redis_client, "eval", None)):
+        raise ConfigurationError("redis_client must provide an eval method")
+    _validate_redis_key_prefix(redis_key_prefix)
 
 
 def _bucket_key(
@@ -274,6 +387,42 @@ def _stored_bucket_key(key: Hashable) -> str:
         key_bytes = pickle.dumps(key, protocol=pickle.HIGHEST_PROTOCOL)
     except Exception as exc:
         raise TypeError(
-            "rate limit bucket key must be pickle-serializable when interprocess is True"
+            "rate limit bucket key must be pickle-serializable when interprocess or distributed "
+            "mode is enabled"
         ) from exc
     return hashlib.sha256(key_bytes).hexdigest()
+
+
+def _digest_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _validate_redis_key_prefix(redis_key_prefix: str | None) -> None:
+    if redis_key_prefix is None or not redis_key_prefix.strip():
+        raise ConfigurationError("redis_key_prefix is required when distributed is True")
+    if any(character.isspace() for character in redis_key_prefix):
+        raise ConfigurationError("redis_key_prefix must not contain whitespace")
+    if any(character in _REDIS_GLOB_METACHARACTERS for character in redis_key_prefix):
+        raise ConfigurationError("redis_key_prefix must not contain Redis glob metacharacters")
+
+
+def _redis_client(*, redis_client: object | None, redis_url: str | None) -> _RedisRateLimitClient:
+    if redis_client is not None:
+        return cast(_RedisRateLimitClient, redis_client)
+    try:
+        import redis
+    except ImportError as exc:
+        raise ConfigurationError(
+            "Redis rate limiting from url requires installing blakemere-wraptools[redis]"
+        ) from exc
+    return cast(_RedisRateLimitClient, redis.Redis.from_url(cast(str, redis_url)))
+
+
+def _redis_script_result(result: object) -> tuple[int, int]:
+    if not isinstance(result, list | tuple) or len(result) != 2:
+        raise RuntimeError("Redis rate limit script returned an invalid result")
+    status = int(result[0])
+    wait_ms = math.ceil(float(result[1]))
+    if status not in {0, 1}:
+        raise RuntimeError("Redis rate limit script returned an invalid status")
+    return status, wait_ms

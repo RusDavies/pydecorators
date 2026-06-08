@@ -1,4 +1,8 @@
 import asyncio
+import importlib.util
+import math
+import multiprocessing
+import queue
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -17,6 +21,53 @@ class MutableClock:
 
     def advance(self, seconds: float) -> None:
         self.now += seconds
+
+
+class FakeRateLimitRedis:
+    def __init__(self) -> None:
+        self.zsets: dict[str, list[tuple[float, str]]] = {}
+        self.counters: dict[str, int] = {}
+
+    def eval(self, script: str, numkeys: int, *keys_and_args: object) -> list[int]:
+        assert "ZREMRANGEBYSCORE" in script
+        assert numkeys == 2
+        events_key = str(keys_and_args[0])
+        sequence_key = str(keys_and_args[1])
+        now = float(str(keys_and_args[2]))
+        period = float(str(keys_and_args[3]))
+        calls = int(str(keys_and_args[4]))
+        window = [entry for entry in self.zsets.get(events_key, []) if entry[0] > now - period]
+        self.zsets[events_key] = window
+        if len(window) < calls:
+            sequence = self.counters.get(sequence_key, 0) + 1
+            self.counters[sequence_key] = sequence
+            window.append((now, f"{now}:{sequence}"))
+            window.sort()
+            return [0, 0]
+        oldest = window[0][0]
+        return [1, math.ceil(max(0.0, oldest + period - now) * 1000)]
+
+
+def _sqlite_rate_limit_worker(
+    storage_path: str,
+    started: multiprocessing.synchronize.Event,
+    results: multiprocessing.Queue[bool],
+) -> None:
+    @rate_limit(
+        calls=3,
+        period=60,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="multiprocessing-stress",
+    )
+    def limited() -> bool:
+        return True
+
+    started.wait(timeout=10)
+    try:
+        results.put(limited())
+    except RateLimitExceeded:
+        results.put(False)
 
 
 def test_rate_limit_allows_calls_within_window() -> None:
@@ -257,6 +308,155 @@ def test_rate_limit_interprocess_block_mode_sleeps_without_reserving_twice(tmp_p
     assert sleeps == [10]
 
 
+def test_rate_limit_interprocess_coordinates_separate_processes(tmp_path: Path) -> None:
+    context = multiprocessing.get_context("spawn")
+    started = context.Event()
+    results: multiprocessing.Queue[bool] = context.Queue()
+    processes = [
+        context.Process(
+            target=_sqlite_rate_limit_worker,
+            args=(str(tmp_path / "rate-limit.sqlite3"), started, results),
+        )
+        for _ in range(12)
+    ]
+
+    for process in processes:
+        process.start()
+    started.set()
+    for process in processes:
+        process.join(timeout=10)
+
+    try:
+        outcomes = [results.get_nowait() for _ in processes]
+    except queue.Empty as exc:  # pragma: no cover - indicates a crashed child process
+        raise AssertionError("worker process did not report a rate-limit outcome") from exc
+    finally:
+        for process in processes:
+            if process.is_alive():
+                process.kill()
+                process.join(timeout=5)
+
+    assert all(process.exitcode == 0 for process in processes)
+    assert outcomes.count(True) == 3
+    assert outcomes.count(False) == 9
+
+
+def test_rate_limit_distributed_redis_instances_share_storage() -> None:
+    clock = MutableClock()
+    client = FakeRateLimitRedis()
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix="demo:v1",
+        namespace="shared-api",
+    )
+    def first() -> str:
+        return "first"
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix="demo:v1",
+        namespace="shared-api",
+    )
+    def second() -> str:
+        return "second"
+
+    assert first() == "first"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        second()
+
+    assert exc_info.value.retry_after == 10
+
+
+def test_rate_limit_distributed_redis_namespaces_are_isolated() -> None:
+    clock = MutableClock()
+    client = FakeRateLimitRedis()
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix="demo:v1",
+        namespace="api-a",
+    )
+    def api_a() -> str:
+        return "a"
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        clock=clock,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix="demo:v1",
+        namespace="api-b",
+    )
+    def api_b() -> str:
+        return "b"
+
+    assert api_a() == "a"
+    assert api_b() == "b"
+    with pytest.raises(RateLimitExceeded):
+        api_a()
+
+
+def test_rate_limit_distributed_redis_keyed_buckets_are_isolated() -> None:
+    clock = MutableClock()
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        key=lambda tenant: tenant,
+        clock=clock,
+        distributed=True,
+        redis_client=FakeRateLimitRedis(),
+        redis_key_prefix="demo:v1",
+    )
+    def limited(tenant: str) -> str:
+        return tenant
+
+    assert limited("a") == "a"
+    assert limited("b") == "b"
+    with pytest.raises(RateLimitExceeded):
+        limited("a")
+
+
+def test_rate_limit_distributed_redis_block_mode_sleeps_without_reserving_twice() -> None:
+    clock = MutableClock()
+    sleeps: list[float] = []
+
+    def fake_sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        clock.advance(seconds)
+
+    @rate_limit(
+        calls=1,
+        period=10,
+        mode="block",
+        clock=clock,
+        sleep=fake_sleep,
+        distributed=True,
+        redis_client=FakeRateLimitRedis(),
+        redis_key_prefix="demo:v1",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    assert sleeps == [10]
+
+
 @pytest.mark.asyncio
 async def test_rate_limit_supports_async_raise_mode() -> None:
     clock = MutableClock()
@@ -309,12 +509,72 @@ def test_rate_limit_preserves_metadata() -> None:
         ({"calls": 1, "period": 1, "key": object()}, "key must be callable"),
         ({"calls": 1, "period": 1, "mode": "wait"}, "mode must"),
         ({"calls": 1, "period": 1, "interprocess": True}, "storage_path is required"),
+        ({"calls": 1, "period": 1, "storage_path": "x"}, "storage_path is only supported"),
         (
             {"calls": 1, "period": 1, "interprocess": True, "storage_path": "x", "namespace": " "},
             "namespace must not be empty",
+        ),
+        (
+            {
+                "calls": 1,
+                "period": 1,
+                "interprocess": True,
+                "storage_path": "x",
+                "distributed": True,
+            },
+            "mutually exclusive",
+        ),
+        ({"calls": 1, "period": 1, "redis_client": object()}, "Redis options require"),
+        ({"calls": 1, "period": 1, "distributed": True}, "redis_client or redis_url"),
+        (
+            {
+                "calls": 1,
+                "period": 1,
+                "distributed": True,
+                "redis_client": object(),
+                "redis_key_prefix": "demo",
+            },
+            "redis_client must provide an eval method",
+        ),
+        (
+            {
+                "calls": 1,
+                "period": 1,
+                "distributed": True,
+                "redis_client": FakeRateLimitRedis(),
+                "redis_key_prefix": "bad prefix",
+            },
+            "whitespace",
+        ),
+        (
+            {
+                "calls": 1,
+                "period": 1,
+                "distributed": True,
+                "redis_client": FakeRateLimitRedis(),
+            },
+            "redis_key_prefix is required",
         ),
     ],
 )
 def test_rate_limit_validates_configuration(kwargs: dict[str, Any], message: str) -> None:
     with pytest.raises(ConfigurationError, match=message):
         rate_limit(**kwargs)
+
+
+def test_rate_limit_distributed_url_requires_optional_redis_dependency() -> None:
+    if importlib.util.find_spec("redis") is None:
+        with pytest.raises(ConfigurationError, match=r"blakemere-wraptools\[redis\]"):
+            decorator = rate_limit(
+                calls=1,
+                period=1,
+                distributed=True,
+                redis_url="redis://localhost:6379/0",
+                redis_key_prefix="demo:v1",
+            )
+
+            @decorator
+            def limited() -> str:
+                return "ok"
+
+            limited()
