@@ -3,7 +3,7 @@
 `@rate_limit` limits how often a sync or async function may be called. It uses a sliding-window policy so old calls expire continuously rather than only at fixed wall-clock boundaries.
 
 ```python
-from pydecorators import rate_limit
+from pydecorators import RateLimitWindow, rate_limit
 
 
 @rate_limit(calls=10, period=60)
@@ -11,10 +11,25 @@ def call_api(path: str) -> str:
     ...
 ```
 
+Use `windows=` when a dependency has more than one quota that must all be respected:
+
+```python
+@rate_limit(
+    windows=[
+        RateLimitWindow(calls=8, period=60, name="minute"),
+        RateLimitWindow(calls=800, period=24 * 60 * 60, name="day"),
+        RateLimitWindow(calls=4000, period=7 * 24 * 60 * 60, name="week"),
+    ],
+)
+def call_api(path: str) -> str:
+    ...
+```
+
 ## Parameters
 
-- `calls`: number of calls allowed per window. Must be greater than zero.
-- `period`: window length in seconds. Must be greater than zero.
+- `calls`: number of calls allowed per window. Must be greater than zero. Required when `windows` is omitted.
+- `period`: window length in seconds. Must be greater than zero. Required when `windows` is omitted.
+- `windows`: optional sequence of `RateLimitWindow(calls, period, name=None)` objects, or `(calls, period)` tuples, for multi-window limits. Do not combine with `calls`/`period`.
 - `key`: optional callable that receives the wrapped function arguments and returns a hashable bucket key. When omitted, all calls share one global bucket.
 - `mode`: either `"raise"` or `"block"`. Defaults to `"raise"`.
 - `clock`: injectable monotonic clock for tests.
@@ -28,6 +43,31 @@ def call_api(path: str) -> str:
 - `redis_key_prefix`: required Redis key prefix for distributed rate-limit state.
 
 Invalid configuration raises `ConfigurationError` at decoration time.
+
+`calls` and `period` are shorthand for one sliding window. This keeps existing code working while allowing new code to express multiple windows explicitly.
+
+## Multiple windows
+
+When `windows=` is provided, every call must fit inside every configured sliding window. The wrapper reserves capacity in all windows only after all windows pass. That all-or-nothing behavior matters: a call rejected by the daily window must not accidentally consume the minute window.
+
+```python
+@rate_limit(
+    windows=[
+        RateLimitWindow(calls=8, period=60, name="minute"),
+        RateLimitWindow(calls=800, period=24 * 60 * 60, name="day"),
+        RateLimitWindow(calls=4000, period=7 * 24 * 60 * 60, name="week"),
+    ],
+    mode="raise",
+)
+def call_vendor_api(path: str) -> str:
+    ...
+```
+
+For `mode="raise"`, `RateLimitExceeded.retry_after` is the longest wait required by any exceeded window, because that is the earliest time the call can satisfy the full policy. For `mode="block"`, the wrapper sleeps for that same limiting delay and retries.
+
+Window `name` values are optional. They provide stable storage identifiers for interprocess and distributed modes and make configuration easier to read. When omitted, the decorator derives a stable internal identifier from the window index and values. A single-window `windows=[...]` configuration uses the same storage identifier as the legacy `calls=`/`period=` shorthand so existing SQLite state remains compatible.
+
+Multi-window limits are still sliding windows. `period=24 * 60 * 60` means a rolling 24-hour window, not a calendar day reset at midnight.
 
 ## Modes
 
@@ -92,7 +132,7 @@ def call_api(user_id: str) -> str:
     ...
 ```
 
-Redis mode uses an atomic Lua script over sorted-set state, so pruning expired entries, checking capacity, and reserving an admitted call happen as one Redis operation. It does not import `redis-py` unless `redis_url` construction is used; pass `redis_client=` if your application already owns Redis client lifecycle.
+Redis mode uses an atomic Lua script over sorted-set state, so pruning expired entries, checking capacity across every configured window, and reserving an admitted call happen as one Redis operation. It does not import `redis-py` unless `redis_url` construction is used; pass `redis_client=` if your application already owns Redis client lifecycle.
 
 Use a stable, application-specific `redis_key_prefix` so independent services do not share quota state by accident. The prefix must not contain whitespace or Redis glob metacharacters. As with interprocess mode, custom bucket keys must be pickle-serializable as well as hashable because the stored Redis key uses a digest of the bucket key.
 

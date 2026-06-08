@@ -675,6 +675,10 @@
 - [x] Add Redis-backed distributed rate limiting using an atomic Lua script over sorted-set state.
 - [x] Add optional live-Redis integration coverage for distributed rate limiting gated by `PYDECORATORS_REDIS_URL`.
 - [x] Add distributed rate-limit operational examples for Redis outage handling and fallback policy.
+- [x] Add multi-window rate limiting for simultaneous quotas such as per-minute, per-day, and per-week windows.
+- [x] Add all-or-nothing multi-window reservation across local, SQLite interprocess, and Redis distributed rate-limit backends.
+- [x] Document `RateLimitWindow` and `rate_limit(windows=...)` as the public multi-window API while preserving `calls`/`period` as the single-window shorthand.
+- [ ] Evaluate explicit calendar-aligned rate windows, such as midnight-to-midnight daily quotas, as a separate feature from rolling sliding windows.
 
 ## 6. `@timeout`
 

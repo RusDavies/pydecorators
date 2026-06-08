@@ -47,6 +47,7 @@ Current public API:
 - `CircuitBreakerOpen`
 - `retry`
 - `rate_limit`
+- `RateLimitWindow`
 - `timeout`
 - `log_calls`
 - `measure_time`
@@ -156,6 +157,26 @@ By default it uses `PickleCacheSerializer`, so Redis values are trusted cache da
 ### `RedisCacheClient`
 
 `RedisCacheClient` is the small protocol accepted by `RedisCacheBackend(client=...)`, useful for tests and applications that already own Redis client construction.
+
+### `RateLimitWindow`
+
+`RateLimitWindow` is the immutable dataclass accepted by `rate_limit(windows=...)` for multi-window rate limits. It exposes `calls`, `period`, and optional `name` fields. `calls` and `period` have the same meaning as the legacy single-window `rate_limit(calls=..., period=...)` shorthand; `name` provides a stable storage identifier for interprocess and distributed limiter state.
+
+Example:
+
+```python
+from pydecorators import RateLimitWindow, rate_limit
+
+
+@rate_limit(
+    windows=[
+        RateLimitWindow(calls=8, period=60, name="minute"),
+        RateLimitWindow(calls=800, period=24 * 60 * 60, name="day"),
+    ]
+)
+def call_api() -> str:
+    ...
+```
 
 ### `CacheSerializationError`
 

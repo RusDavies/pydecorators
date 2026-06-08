@@ -28,9 +28,13 @@ Build a conventional versioned cache namespace string such as `users:v1` for lon
 
 Retry sync or async callables after configured failures. See [`@retry`](https://github.com/RusDavies/pydecorators/blob/master/docs/retry.md).
 
-### `rate_limit(*, calls, period, key=None, mode="raise", clock=None, sleep=None, interprocess=False, storage_path=None, namespace=None, distributed=False, redis_client=None, redis_url=None, redis_key_prefix=None)`
+### `rate_limit(*, calls=None, period=None, windows=None, key=None, mode="raise", clock=None, sleep=None, interprocess=False, storage_path=None, namespace=None, distributed=False, redis_client=None, redis_url=None, redis_key_prefix=None)`
 
-Apply a process-local sliding-window rate limit to sync or async callables by default. Set `interprocess=True` with a SQLite `storage_path` for same-host multi-process coordination, or `distributed=True` with Redis configuration for multi-host coordination through a shared Redis deployment. See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md).
+Apply one or more process-local sliding-window rate limits to sync or async callables by default. Existing `calls=`/`period=` usage configures one window. Use `windows=[RateLimitWindow(...), ...]` for multiple simultaneous windows that must all pass before a call is admitted. Set `interprocess=True` with a SQLite `storage_path` for same-host multi-process coordination, or `distributed=True` with Redis configuration for multi-host coordination through a shared Redis deployment. See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md).
+
+### `RateLimitWindow(calls, period, name=None)`
+
+Immutable dataclass used by `rate_limit(windows=...)` to describe one sliding window. `calls` is the number of calls admitted during `period` seconds. `name` is optional and provides a stable storage identifier for interprocess/distributed state.
 
 ### `timeout(*, seconds, message=None, exception_type=FunctionTimedOut)`
 
