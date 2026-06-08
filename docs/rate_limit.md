@@ -19,6 +19,9 @@ def call_api(path: str) -> str:
 - `mode`: either `"raise"` or `"block"`. Defaults to `"raise"`.
 - `clock`: injectable monotonic clock for tests.
 - `sleep`: injectable sync or async sleep callable for block mode and tests.
+- `interprocess`: opt-in same-host, multi-process coordination. Defaults to `False`.
+- `storage_path`: SQLite database path required when `interprocess=True`.
+- `namespace`: optional shared bucket namespace. Defaults to the wrapped function's module and qualified name.
 
 Invalid configuration raises `ConfigurationError` at decoration time.
 
@@ -44,9 +47,32 @@ The key function must return a hashable value. Key generation errors propagate t
 
 Async functions use the same sliding-window policy. In block mode, the default async path uses `asyncio.sleep`; callers can inject a custom async sleep function for tests or schedulers.
 
+## Interprocess rate limits
+
+By default, `@rate_limit` is process-local. Set `interprocess=True` and provide a SQLite `storage_path` when multiple local Python processes should share the same sliding-window buckets:
+
+```python
+@rate_limit(
+    calls=100,
+    period=60,
+    key=lambda user_id: user_id,
+    interprocess=True,
+    storage_path="/var/tmp/my-service-rate-limits.sqlite3",
+    namespace="third-party-api:v1",
+)
+def call_api(user_id: str) -> str:
+    ...
+```
+
+Interprocess mode coordinates processes on the same host through SQLite transactions. It does not hold the database lock while sleeping in `"block"` mode. Bucket keys are serialized and hashed before storage, so custom keys used with `interprocess=True` must be pickle-serializable as well as hashable.
+
+Use an explicit `namespace` when multiple decorated functions should intentionally share one allowance. Omit it when each decorated function should have its own bucket namespace.
+
+Interprocess mode is not a multi-host distributed quota system. Containers or services on different hosts need an external shared service such as Redis, Postgres, or the protected API's own quota signals.
+
 ## Idempotency and side effects
 
-`@rate_limit` does not make an operation idempotent. It only controls how often the wrapped function is allowed to start in this process.
+`@rate_limit` does not make an operation idempotent. It only controls how often the wrapped function is allowed to start in the configured process-local or same-host interprocess bucket.
 
 Use rate limiting to protect dependencies, quotas, local tools, and best-effort workloads. For side-effecting operations such as payments, order submission, account creation, or message delivery, keep the operation's own idempotency controls in place. A blocked or rejected call might be retried by the caller, and a distributed system might run the same logical request in another process that has a separate in-memory bucket.
 
@@ -67,12 +93,15 @@ or distributed correctness by itself.
 - In `"raise"` mode, callers need a plan for `RateLimitExceeded.retry_after`. Ignoring
   it usually creates a tight retry loop, which is just a denial-of-service attack with
   better variable names.
-- The limiter is in-process. Multiple processes, containers, or hosts each have their own
-  bucket unless a shared backend is added later.
+- The default limiter is in-process. Multiple processes each have their own bucket unless
+  `interprocess=True` points them at the same SQLite database and namespace.
+- Interprocess mode is same-host coordination, not distributed consensus. Multiple hosts,
+  independent containers without shared storage, or serverless instances still need an
+  external quota mechanism.
 
 ## Notes
 
-This is an in-process rate limiter. It is suitable for scripts, local tools, tests, and single-process services. It is not a distributed quota system. Multiple processes or hosts each have their own counters unless a future shared backend is added.
+The default limiter is in-process. It is suitable for scripts, local tools, tests, and single-process services. Interprocess mode adds same-host SQLite coordination for multiple local workers. Neither mode is a distributed quota system across multiple hosts.
 
 
 ## Executable examples
