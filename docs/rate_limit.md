@@ -22,6 +22,10 @@ def call_api(path: str) -> str:
 - `interprocess`: opt-in same-host, multi-process coordination. Defaults to `False`.
 - `storage_path`: SQLite database path required when `interprocess=True`.
 - `namespace`: optional shared bucket namespace. Defaults to the wrapped function's module and qualified name.
+- `distributed`: opt-in Redis-backed multi-host coordination. Defaults to `False`.
+- `redis_client`: Redis-compatible client with an `eval()` method, used when `distributed=True`.
+- `redis_url`: Redis URL used to construct a client when `distributed=True`. Requires installing `blakemere-wraptools[redis]`.
+- `redis_key_prefix`: required Redis key prefix for distributed rate-limit state.
 
 Invalid configuration raises `ConfigurationError` at decoration time.
 
@@ -68,11 +72,35 @@ Interprocess mode coordinates processes on the same host through SQLite transact
 
 Use an explicit `namespace` when multiple decorated functions should intentionally share one allowance. Omit it when each decorated function should have its own bucket namespace.
 
-Interprocess mode is not a multi-host distributed quota system. Containers or services on different hosts need an external shared service such as Redis, Postgres, or the protected API's own quota signals.
+Interprocess mode is not a multi-host distributed quota system. Containers or services on different hosts need distributed mode, another external shared service, or the protected API's own quota signals.
+
+## Distributed Redis rate limits
+
+Set `distributed=True` and provide either a Redis client or Redis URL when workers on multiple hosts should share a rate-limit bucket:
+
+```python
+@rate_limit(
+    calls=100,
+    period=60,
+    key=lambda user_id: user_id,
+    distributed=True,
+    redis_url="redis://redis.example.internal:6379/0",
+    redis_key_prefix="my-service:v1",
+    namespace="third-party-api:v1",
+)
+def call_api(user_id: str) -> str:
+    ...
+```
+
+Redis mode uses an atomic Lua script over sorted-set state, so pruning expired entries, checking capacity, and reserving an admitted call happen as one Redis operation. It does not import `redis-py` unless `redis_url` construction is used; pass `redis_client=` if your application already owns Redis client lifecycle.
+
+Use a stable, application-specific `redis_key_prefix` so independent services do not share quota state by accident. The prefix must not contain whitespace or Redis glob metacharacters. As with interprocess mode, custom bucket keys must be pickle-serializable as well as hashable because the stored Redis key uses a digest of the bucket key.
+
+Redis-backed limiting coordinates callers that can reach the same Redis deployment. It still is not a complete fairness, identity, billing, or abuse-prevention system by itself.
 
 ## Idempotency and side effects
 
-`@rate_limit` does not make an operation idempotent. It only controls how often the wrapped function is allowed to start in the configured process-local or same-host interprocess bucket.
+`@rate_limit` does not make an operation idempotent. It only controls how often the wrapped function is allowed to start in the configured process-local, same-host interprocess, or Redis-backed distributed bucket.
 
 Use rate limiting to protect dependencies, quotas, local tools, and best-effort workloads. For side-effecting operations such as payments, order submission, account creation, or message delivery, keep the operation's own idempotency controls in place. A blocked or rejected call might be retried by the caller, and a distributed system might run the same logical request in another process that has a separate in-memory bucket.
 
@@ -96,12 +124,15 @@ or distributed correctness by itself.
 - The default limiter is in-process. Multiple processes each have their own bucket unless
   `interprocess=True` points them at the same SQLite database and namespace.
 - Interprocess mode is same-host coordination, not distributed consensus. Multiple hosts,
-  independent containers without shared storage, or serverless instances still need an
-  external quota mechanism.
+  independent containers without shared storage, or serverless instances need distributed
+  mode or another external quota mechanism.
+- Distributed Redis mode depends on Redis availability and correct key-prefix/namespace
+  choices. A shared Redis is a coordination point, not a substitute for upstream quota
+  handling, caller idempotency, or abuse controls.
 
 ## Notes
 
-The default limiter is in-process. It is suitable for scripts, local tools, tests, and single-process services. Interprocess mode adds same-host SQLite coordination for multiple local workers. Neither mode is a distributed quota system across multiple hosts.
+The default limiter is in-process. It is suitable for scripts, local tools, tests, and single-process services. Interprocess mode adds same-host SQLite coordination for multiple local workers. Distributed mode adds Redis-backed coordination for workers that share a Redis deployment.
 
 
 ## Executable examples

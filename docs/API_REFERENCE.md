@@ -28,9 +28,9 @@ Build a conventional versioned cache namespace string such as `users:v1` for lon
 
 Retry sync or async callables after configured failures. See [`@retry`](https://github.com/RusDavies/pydecorators/blob/master/docs/retry.md).
 
-### `rate_limit(*, calls, period, key=None, mode="raise", clock=None, sleep=None, interprocess=False, storage_path=None, namespace=None)`
+### `rate_limit(*, calls, period, key=None, mode="raise", clock=None, sleep=None, interprocess=False, storage_path=None, namespace=None, distributed=False, redis_client=None, redis_url=None, redis_key_prefix=None)`
 
-Apply a process-local sliding-window rate limit to sync or async callables by default. Set `interprocess=True` with a SQLite `storage_path` for same-host multi-process coordination. See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md).
+Apply a process-local sliding-window rate limit to sync or async callables by default. Set `interprocess=True` with a SQLite `storage_path` for same-host multi-process coordination, or `distributed=True` with Redis configuration for multi-host coordination through a shared Redis deployment. See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md).
 
 ### `timeout(*, seconds, message=None, exception_type=FunctionTimedOut)`
 

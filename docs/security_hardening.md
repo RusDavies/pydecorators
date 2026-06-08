@@ -88,11 +88,11 @@ See [`@validate_types`](https://github.com/RusDavies/pydecorators/blob/master/do
 
 ## Local control limits
 
-`@rate_limit` protects one Python process by default. Its opt-in `interprocess=True` mode coordinates multiple local processes that share the same SQLite database path and namespace. It does not coordinate across multiple hosts, independent containers without shared storage, or serverless instances. `@circuit_breaker` remains process-local.
+`@rate_limit` protects one Python process by default. Its opt-in `interprocess=True` mode coordinates multiple local processes that share the same SQLite database path and namespace. Its opt-in `distributed=True` mode coordinates callers that share a Redis deployment. `@circuit_breaker` remains process-local.
 
 For distributed systems:
 
-- enforce cross-host rate limits at a shared gateway, proxy, API-management layer, or distributed store;
+- enforce cross-host rate limits at a shared gateway, proxy, API-management layer, Redis-backed `@rate_limit`, or another distributed store;
 - use service-level circuit breaking, timeouts, and backpressure where available;
 - treat decorator-level controls as local defense-in-depth;
 - test multi-worker behavior explicitly instead of assuming one process tells the whole herd what to do. The herd, naturally, has not read your decorator.
