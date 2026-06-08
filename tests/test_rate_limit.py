@@ -2,7 +2,9 @@ import asyncio
 import importlib.util
 import math
 import multiprocessing
+import os
 import queue
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -455,6 +457,38 @@ def test_rate_limit_distributed_redis_block_mode_sleeps_without_reserving_twice(
     assert limited() == "ok"
     assert limited() == "ok"
     assert sleeps == [10]
+
+
+def test_rate_limit_distributed_live_redis_integration() -> None:
+    redis_url = os.environ.get("PYDECORATORS_REDIS_URL")
+    if not redis_url:
+        pytest.skip("set PYDECORATORS_REDIS_URL to run live Redis rate-limit integration test")
+    redis = pytest.importorskip("redis")
+    client = redis.Redis.from_url(redis_url)
+    key_prefix = f"pydecorators-test:{uuid.uuid4().hex}"
+
+    @rate_limit(
+        calls=2,
+        period=60,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix=key_prefix,
+        namespace="live-redis-integration",
+    )
+    def limited() -> str:
+        return "ok"
+
+    try:
+        assert limited() == "ok"
+        assert limited() == "ok"
+        with pytest.raises(RateLimitExceeded) as exc_info:
+            limited()
+        assert 0 < exc_info.value.retry_after <= 60
+        assert list(client.scan_iter(match=f"{key_prefix}:rate_limit:*"))
+    finally:
+        keys = list(client.scan_iter(match=f"{key_prefix}:rate_limit:*"))
+        if keys:
+            client.delete(*keys)
 
 
 @pytest.mark.asyncio
