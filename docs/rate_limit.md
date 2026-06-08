@@ -98,6 +98,8 @@ Use a stable, application-specific `redis_key_prefix` so independent services do
 
 Redis-backed limiting coordinates callers that can reach the same Redis deployment. It still is not a complete fairness, identity, billing, or abuse-prevention system by itself.
 
+The test suite includes live Redis integration coverage gated by `PYDECORATORS_REDIS_URL`. Leave that environment variable unset for normal local runs. Set it to a disposable Redis database URL when you want the integration test to exercise the real Lua script against Redis; the test uses a unique key prefix and removes matching keys afterward.
+
 ## Idempotency and side effects
 
 `@rate_limit` does not make an operation idempotent. It only controls how often the wrapped function is allowed to start in the configured process-local, same-host interprocess, or Redis-backed distributed bucket.

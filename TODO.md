@@ -673,7 +673,7 @@
 - [x] Add a multiprocessing stress test for SQLite-backed rate limiting if CI proves stable enough for process-level timing tests.
 - [x] Evaluate a Redis/Postgres rate-limit backend if users need multi-host distributed quota enforcement.
 - [x] Add Redis-backed distributed rate limiting using an atomic Lua script over sorted-set state.
-- [ ] Add optional live-Redis integration coverage for distributed rate limiting when CI has an available Redis service.
+- [x] Add optional live-Redis integration coverage for distributed rate limiting gated by `PYDECORATORS_REDIS_URL`.
 - [ ] Add distributed rate-limit operational examples for Redis outage handling and fallback policy.
 
 ## 6. `@timeout`
