@@ -674,7 +674,7 @@
 - [x] Evaluate a Redis/Postgres rate-limit backend if users need multi-host distributed quota enforcement.
 - [x] Add Redis-backed distributed rate limiting using an atomic Lua script over sorted-set state.
 - [x] Add optional live-Redis integration coverage for distributed rate limiting gated by `PYDECORATORS_REDIS_URL`.
-- [ ] Add distributed rate-limit operational examples for Redis outage handling and fallback policy.
+- [x] Add distributed rate-limit operational examples for Redis outage handling and fallback policy.
 
 ## 6. `@timeout`
 
