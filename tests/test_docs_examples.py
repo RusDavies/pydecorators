@@ -246,6 +246,7 @@ def _rate_limit_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.raise_mode_example(), "limited")
     assert_example_result(examples.keyed_bucket_example(), ("called:tenant-a", "called:tenant-b"))
     assert_example_result(examples.block_mode_example(), ("called", [60]))
+    assert_example_result(examples.multiple_windows_example(), "limited")
 
 
 def _timeout_assertions(examples: ModuleType) -> None:

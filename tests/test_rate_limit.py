@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from pydecorators import ConfigurationError, RateLimitExceeded, rate_limit
+from pydecorators import ConfigurationError, RateLimitExceeded, RateLimitWindow, rate_limit
 
 
 class MutableClock:
@@ -32,22 +32,33 @@ class FakeRateLimitRedis:
 
     def eval(self, script: str, numkeys: int, *keys_and_args: object) -> list[int]:
         assert "ZREMRANGEBYSCORE" in script
-        assert numkeys == 2
-        events_key = str(keys_and_args[0])
-        sequence_key = str(keys_and_args[1])
-        now = float(str(keys_and_args[2]))
-        period = float(str(keys_and_args[3]))
-        calls = int(str(keys_and_args[4]))
-        window = [entry for entry in self.zsets.get(events_key, []) if entry[0] > now - period]
-        self.zsets[events_key] = window
-        if len(window) < calls:
-            sequence = self.counters.get(sequence_key, 0) + 1
-            self.counters[sequence_key] = sequence
-            window.append((now, f"{now}:{sequence}"))
+        assert numkeys >= 2
+        sequence_key = str(keys_and_args[0])
+        event_keys = [str(key) for key in keys_and_args[1:numkeys]]
+        args = keys_and_args[numkeys:]
+        now = float(str(args[0]))
+        window_count = int(str(args[1]))
+        assert window_count == len(event_keys)
+        max_wait_ms = 0
+        parsed_windows: list[tuple[str, float, int]] = []
+        for index, events_key in enumerate(event_keys):
+            period = float(str(args[(index * 2) + 2]))
+            calls = int(str(args[(index * 2) + 3]))
+            parsed_windows.append((events_key, period, calls))
+            window = [entry for entry in self.zsets.get(events_key, []) if entry[0] > now - period]
+            self.zsets[events_key] = window
+            if len(window) >= calls:
+                oldest = window[0][0]
+                max_wait_ms = max(max_wait_ms, math.ceil(max(0.0, oldest + period - now) * 1000))
+        if max_wait_ms > 0:
+            return [1, max_wait_ms]
+        sequence = self.counters.get(sequence_key, 0) + 1
+        self.counters[sequence_key] = sequence
+        for index, (events_key, _period, _calls) in enumerate(parsed_windows):
+            window = self.zsets.setdefault(events_key, [])
+            window.append((now, f"{now}:{index}:{sequence}"))
             window.sort()
-            return [0, 0]
-        oldest = window[0][0]
-        return [1, math.ceil(max(0.0, oldest + period - now) * 1000)]
+        return [0, 0]
 
 
 def _sqlite_rate_limit_worker(
@@ -149,10 +160,13 @@ def test_rate_limit_key_isolates_buckets() -> None:
 
 
 def test_rate_limit_cleans_up_idle_keyed_buckets() -> None:
-    from pydecorators.rate_limit import _SlidingWindowLimiter
+    from pydecorators.rate_limit import _normalize_rate_limit_windows, _SlidingWindowLimiter
 
     clock = MutableClock()
-    limiter = _SlidingWindowLimiter(calls=1, period=10, clock=clock)
+    limiter = _SlidingWindowLimiter(
+        windows=_normalize_rate_limit_windows(calls=1, period=10, windows=None),
+        clock=clock,
+    )
 
     assert limiter.reserve_or_delay("a") is None
     assert limiter.reserve_or_delay("b") is None
@@ -160,6 +174,67 @@ def test_rate_limit_cleans_up_idle_keyed_buckets() -> None:
     assert limiter.reserve_or_delay("c") is None
 
     assert list(limiter._windows) == ["c"]
+
+
+def test_rate_limit_multiple_windows_require_all_windows_to_pass() -> None:
+    clock = MutableClock()
+
+    @rate_limit(
+        windows=[
+            RateLimitWindow(calls=2, period=10, name="burst"),
+            RateLimitWindow(calls=3, period=100, name="sustained"),
+        ],
+        clock=clock,
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 90
+
+
+def test_rate_limit_multiple_windows_block_mode_sleeps_for_limiting_window() -> None:
+    clock = MutableClock()
+    sleeps: list[float] = []
+
+    def fake_sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        clock.advance(seconds)
+
+    @rate_limit(
+        windows=[RateLimitWindow(calls=1, period=10), RateLimitWindow(calls=2, period=100)],
+        mode="block",
+        clock=clock,
+        sleep=fake_sleep,
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    assert limited() == "ok"
+    assert sleeps == [10, 90]
+
+
+def test_rate_limit_windows_accepts_tuple_shorthand() -> None:
+    clock = MutableClock()
+
+    @rate_limit(windows=[(1, 10)], clock=clock)
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded):
+        limited()
 
 
 def test_rate_limit_block_mode_sleeps_until_slot_available() -> None:
@@ -308,6 +383,31 @@ def test_rate_limit_interprocess_block_mode_sleeps_without_reserving_twice(tmp_p
     assert limited() == "ok"
     assert limited() == "ok"
     assert sleeps == [10]
+
+
+def test_rate_limit_interprocess_multiple_windows_reserve_atomically(tmp_path: Path) -> None:
+    clock = MutableClock()
+
+    @rate_limit(
+        windows=[RateLimitWindow(calls=2, period=10), RateLimitWindow(calls=3, period=100)],
+        clock=clock,
+        interprocess=True,
+        storage_path=tmp_path / "rate-limit.sqlite3",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 90
 
 
 def test_rate_limit_interprocess_coordinates_separate_processes(tmp_path: Path) -> None:
@@ -459,6 +559,33 @@ def test_rate_limit_distributed_redis_block_mode_sleeps_without_reserving_twice(
     assert sleeps == [10]
 
 
+def test_rate_limit_distributed_redis_multiple_windows_reserve_atomically() -> None:
+    clock = MutableClock()
+    client = FakeRateLimitRedis()
+
+    @rate_limit(
+        windows=[RateLimitWindow(calls=2, period=10), RateLimitWindow(calls=3, period=100)],
+        clock=clock,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix="demo:v1",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 90
+
+
 def test_rate_limit_distributed_live_redis_integration() -> None:
     redis_url = os.environ.get("PYDECORATORS_REDIS_URL")
     if not redis_url:
@@ -540,6 +667,11 @@ def test_rate_limit_preserves_metadata() -> None:
     [
         ({"calls": 0, "period": 1}, "calls must be greater than zero"),
         ({"calls": 1, "period": 0}, "period must be greater than zero"),
+        ({"windows": []}, "windows must contain at least one"),
+        ({"calls": 1, "period": 1, "windows": [(1, 1)]}, "cannot be combined"),
+        ({"windows": [RateLimitWindow(calls=0, period=1)]}, "calls must be greater than zero"),
+        ({"windows": [RateLimitWindow(calls=1, period=0)]}, "period must be greater than zero"),
+        ({"windows": [RateLimitWindow(calls=1, period=1, name=" ")]}, "name must not be empty"),
         ({"calls": 1, "period": 1, "key": object()}, "key must be callable"),
         ({"calls": 1, "period": 1, "mode": "wait"}, "mode must"),
         ({"calls": 1, "period": 1, "interprocess": True}, "storage_path is required"),

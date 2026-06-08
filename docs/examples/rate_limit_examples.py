@@ -1,6 +1,6 @@
 """Executable examples for @rate_limit documentation."""
 
-from pydecorators import RateLimitExceeded, rate_limit
+from pydecorators import RateLimitExceeded, RateLimitWindow, rate_limit
 
 
 class ExampleClock:
@@ -64,3 +64,27 @@ def block_mode_example() -> tuple[str, list[float]]:
     call_api()
     result = call_api()
     return result, sleeps
+
+
+def multiple_windows_example() -> str:
+    """Apply burst and sustained sliding-window limits at the same time."""
+
+    clock = ExampleClock()
+
+    @rate_limit(
+        windows=[
+            RateLimitWindow(calls=2, period=10, name="burst"),
+            RateLimitWindow(calls=3, period=100, name="sustained"),
+        ],
+        clock=clock,
+    )
+    def call_api() -> str:
+        return "called"
+
+    call_api()
+    call_api()
+    try:
+        call_api()
+    except RateLimitExceeded:
+        return "limited"
+    return "allowed"
