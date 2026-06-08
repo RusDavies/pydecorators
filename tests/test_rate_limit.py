@@ -52,8 +52,8 @@ class FakeRateLimitRedis:
 
 def _sqlite_rate_limit_worker(
     storage_path: str,
-    started: multiprocessing.synchronize.Event,
-    results: multiprocessing.Queue[bool],
+    started: Any,
+    results: Any,
 ) -> None:
     @rate_limit(
         calls=3,
