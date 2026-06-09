@@ -6,6 +6,12 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-06-09
+
+### Changed
+
+- Recorded the maintainer decision to keep calendar-aligned rate-limit buckets scoped to minute, hour, day, and week units rather than adding month-specific quota reset semantics.
+
 ## [0.4.0] - 2026-06-08
 
 ### Added
