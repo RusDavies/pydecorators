@@ -681,6 +681,8 @@
 - [x] Add explicit calendar-aligned rate windows, such as midnight-to-midnight daily quotas, as a separate feature from rolling sliding windows.
 - [x] Add tests proving calendar-aligned rate windows work in local, SQLite interprocess, and Redis distributed limiter modes.
 - [x] Document calendar-window clock semantics, time zone handling, and week-start behavior.
+- [x] Add weighted rate-limit reservations so calls can consume a configurable positive integer cost instead of always counting as one call.
+- [x] Add tests proving weighted rate-limit costs work in local, SQLite interprocess, and Redis distributed limiter modes without partial multi-window reservation.
 - [ ] Evaluate whether monthly calendar quota buckets are worth supporting, given varying month lengths and reset semantics.
 
 ## 6. `@timeout`

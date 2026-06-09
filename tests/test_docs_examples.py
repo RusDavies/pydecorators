@@ -248,6 +248,7 @@ def _rate_limit_assertions(examples: ModuleType) -> None:
     assert_example_result(examples.block_mode_example(), ("called", [60]))
     assert_example_result(examples.multiple_windows_example(), "limited")
     assert_example_result(examples.calendar_windows_example(), "limited")
+    assert_example_result(examples.weighted_cost_example(), "limited")
 
 
 def _timeout_assertions(examples: ModuleType) -> None:

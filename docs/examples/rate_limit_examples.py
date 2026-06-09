@@ -113,3 +113,21 @@ def calendar_windows_example() -> str:
     except RateLimitExceeded:
         return "limited"
     return "allowed"
+
+
+def weighted_cost_example() -> str:
+    """Count each call against the quota by its declared operation cost."""
+
+    clock = ExampleClock()
+
+    @rate_limit(calls=8, period=60, cost=lambda args, _kwargs: int(args[0]), clock=clock)
+    def call_api(units: int) -> str:
+        return f"called:{units}"
+
+    call_api(3)
+    call_api(5)
+    try:
+        call_api(1)
+    except RateLimitExceeded:
+        return "limited"
+    return "allowed"
