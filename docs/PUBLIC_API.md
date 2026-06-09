@@ -46,6 +46,7 @@ Current public API:
 - `CircuitState`
 - `CircuitBreakerOpen`
 - `retry`
+- `CalendarRateLimitWindow`
 - `rate_limit`
 - `RateLimitWindow`
 - `timeout`
@@ -172,6 +173,26 @@ from pydecorators import RateLimitWindow, rate_limit
     windows=[
         RateLimitWindow(calls=8, period=60, name="minute"),
         RateLimitWindow(calls=800, period=24 * 60 * 60, name="day"),
+    ]
+)
+def call_api() -> str:
+    ...
+```
+
+### `CalendarRateLimitWindow`
+
+`CalendarRateLimitWindow` is the immutable dataclass accepted by `rate_limit(windows=...)` for fixed wall-clock quota buckets. It exposes `calls`, `unit`, optional `name`, `timezone`, and `week_start` fields. Supported units are `"minute"`, `"hour"`, `"day"`, and `"week"`; `timezone` is an IANA time zone name; and `week_start` may be `"monday"` or `"sunday"`.
+
+Example:
+
+```python
+from pydecorators import CalendarRateLimitWindow, RateLimitWindow, rate_limit
+
+
+@rate_limit(
+    windows=[
+        RateLimitWindow(calls=8, period=60, name="minute"),
+        CalendarRateLimitWindow(calls=800, unit="day", name="day", timezone="UTC"),
     ]
 )
 def call_api() -> str:

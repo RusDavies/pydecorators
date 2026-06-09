@@ -7,12 +7,15 @@ import math
 import os
 import pickle
 import sqlite3
+import time
 from collections import defaultdict, deque
 from collections.abc import Callable, Hashable, Sequence
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from pathlib import Path
 from threading import RLock
 from typing import Any, Literal, Protocol, cast
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydecorators._core import (
     async_sleep,
@@ -26,6 +29,8 @@ from pydecorators.exceptions import ConfigurationError, RateLimitExceeded
 
 RateLimitMode = Literal["raise", "block"]
 RateLimitKey = Callable[..., Hashable]
+CalendarRateLimitUnit = Literal["minute", "hour", "day", "week"]
+CalendarWeekStart = Literal["monday", "sunday"]
 
 _REDIS_GLOB_METACHARACTERS = frozenset("*?[]")
 _REDIS_RATE_LIMIT_SCRIPT = """
@@ -36,14 +41,22 @@ local max_wait_ms = 0
 
 for index = 1, window_count do
     local events_key = KEYS[index + 1]
-    local period = tonumber(ARGV[(index * 2) + 1])
-    local calls = tonumber(ARGV[(index * 2) + 2])
+    local prune_before = tonumber(ARGV[(index * 5) - 2])
+    local calls = tonumber(ARGV[(index * 5) - 1])
+    local period = tonumber(ARGV[index * 5])
+    local reset_at = tonumber(ARGV[(index * 5) + 1])
 
-    redis.call("ZREMRANGEBYSCORE", events_key, "-inf", now - period)
+    redis.call("ZREMRANGEBYSCORE", events_key, "-inf", prune_before)
     local count = redis.call("ZCARD", events_key)
     if count >= calls then
-        local oldest = redis.call("ZRANGE", events_key, 0, 0, "WITHSCORES")[2]
-        local wait_ms = math.max(0, math.ceil((tonumber(oldest) + period - now) * 1000))
+        local wait_seconds = 0
+        if reset_at > 0 then
+            wait_seconds = reset_at - now
+        else
+            local oldest = redis.call("ZRANGE", events_key, 0, 0, "WITHSCORES")[2]
+            wait_seconds = tonumber(oldest) + period - now
+        end
+        local wait_ms = math.max(0, math.ceil(wait_seconds * 1000))
         if wait_ms > max_wait_ms then
             max_wait_ms = wait_ms
         end
@@ -58,8 +71,8 @@ local sequence = redis.call("INCR", sequence_key)
 local max_ttl_ms = 1
 for index = 1, window_count do
     local events_key = KEYS[index + 1]
-    local period = tonumber(ARGV[(index * 2) + 1])
-    local ttl_ms = math.max(1, math.ceil(period * 1000))
+    local ttl = tonumber(ARGV[(index * 5) + 2])
+    local ttl_ms = math.max(1, math.ceil(ttl * 1000))
     local member = tostring(now) .. ":" .. tostring(index) .. ":" .. tostring(sequence)
     redis.call("ZADD", events_key, now, member)
     redis.call("PEXPIRE", events_key, ttl_ms)
@@ -85,10 +98,39 @@ class RateLimitWindow:
 
 
 @dataclass(frozen=True)
+class CalendarRateLimitWindow:
+    """A wall-clock aligned rate-limit window.
+
+    ``unit`` selects the aligned calendar bucket in ``timezone``. Calendar weeks start on
+    Monday by default.
+    """
+
+    calls: int
+    unit: CalendarRateLimitUnit
+    name: str | None = None
+    timezone: str = "UTC"
+    week_start: CalendarWeekStart = "monday"
+
+
+@dataclass(frozen=True)
 class _NormalizedRateLimitWindow:
     calls: int
     period: float
     window_id: str
+    kind: Literal["sliding", "calendar"] = "sliding"
+    unit: CalendarRateLimitUnit | None = None
+    timezone: ZoneInfo | None = None
+    week_start: CalendarWeekStart = "monday"
+
+
+@dataclass(frozen=True)
+class _RuntimeRateLimitWindow:
+    calls: int
+    period: float
+    window_id: str
+    prune_before: float
+    reset_at: float | None
+    ttl: float
 
 
 class _RateLimiter(Protocol):
@@ -105,7 +147,7 @@ def rate_limit(
     *,
     calls: int | None = None,
     period: float | None = None,
-    windows: Sequence[RateLimitWindow | tuple[int, float]] | None = None,
+    windows: Sequence[RateLimitWindow | CalendarRateLimitWindow | tuple[int, float]] | None = None,
     key: RateLimitKey | None = None,
     mode: RateLimitMode = "raise",
     clock: Callable[[], float] | None = None,
@@ -133,7 +175,7 @@ def rate_limit(
         redis_url=redis_url,
         redis_key_prefix=redis_key_prefix,
     )
-    clock_func = clock or monotonic
+    clock_func = clock or (time.time if _has_calendar_windows(normalized_windows) else monotonic)
 
     def decorate(func: Callable[P, R]) -> Callable[P, R]:
         limiter_namespace = namespace or f"{func.__module__}.{func.__qualname__}"
@@ -207,32 +249,35 @@ class _SlidingWindowLimiter:
         now = self._clock()
         with self._lock:
             self._prune_idle_windows(now)
+            runtime_windows = _runtime_windows(self._windows_config, now)
             bucket_windows = self._windows[key]
             wait_seconds = 0.0
-            for window_config in self._windows_config:
+            for window_config in runtime_windows:
                 window = bucket_windows.setdefault(window_config.window_id, deque())
-                self._prune(window, now, window_config.period)
+                self._prune(window, window_config.prune_before)
                 if len(window) >= window_config.calls:
                     oldest = window[0]
-                    wait_seconds = max(wait_seconds, oldest + window_config.period - now)
+                    if window_config.reset_at is not None:
+                        wait_seconds = max(wait_seconds, window_config.reset_at - now)
+                    else:
+                        wait_seconds = max(wait_seconds, oldest + window_config.period - now)
             if wait_seconds > 0:
                 return max(0.0, wait_seconds)
-            for window_config in self._windows_config:
+            for window_config in runtime_windows:
                 bucket_windows.setdefault(window_config.window_id, deque()).append(now)
             return None
 
-    def _prune(self, window: deque[float], now: float, period: float) -> None:
-        cutoff = now - period
-        while window and window[0] <= cutoff:
+    def _prune(self, window: deque[float], prune_before: float) -> None:
+        while window and window[0] <= prune_before:
             window.popleft()
 
     def _prune_idle_windows(self, now: float) -> None:
         empty_keys = []
-        periods_by_id = {window.window_id: window.period for window in self._windows_config}
+        cleanup_before = now - _max_window_cleanup_period(self._windows_config)
         for key, bucket_windows in self._windows.items():
             empty_window_ids = []
             for window_id, window in bucket_windows.items():
-                self._prune(window, now, periods_by_id.get(window_id, 0.0))
+                self._prune(window, cleanup_before)
                 if not window:
                     empty_window_ids.append(window_id)
             for window_id in empty_window_ids:
@@ -262,18 +307,26 @@ class _SQLiteSlidingWindowLimiter:
         """Reserve a cross-process call slot or return seconds to wait."""
 
         now = self._clock()
+        runtime_windows = _runtime_windows(self._windows, now)
         bucket_key = _stored_bucket_key(key)
         connection = self._connect()
         try:
             connection.execute("BEGIN IMMEDIATE")
+            connection.execute(
+                """
+                DELETE FROM rate_limit_events
+                WHERE namespace = ? AND bucket_key = ? AND timestamp <= ?
+                """,
+                (self._namespace, bucket_key, now - _max_window_cleanup_period(self._windows)),
+            )
             wait_seconds = 0.0
-            for window in self._windows:
+            for window in runtime_windows:
                 connection.execute(
                     """
                     DELETE FROM rate_limit_events
                     WHERE namespace = ? AND bucket_key = ? AND window_id = ? AND timestamp <= ?
                     """,
-                    (self._namespace, bucket_key, window.window_id, now - window.period),
+                    (self._namespace, bucket_key, window.window_id, window.prune_before),
                 )
                 row = connection.execute(
                     """
@@ -286,10 +339,14 @@ class _SQLiteSlidingWindowLimiter:
                 count = int(row[0])
                 oldest = cast(float | None, row[1])
                 if count >= window.calls:
-                    wait_seconds = max(wait_seconds, cast(float, oldest) + window.period - now)
+                    if window.reset_at is not None:
+                        wait_seconds = max(wait_seconds, window.reset_at - now)
+                    else:
+                        wait_seconds = max(wait_seconds, cast(float, oldest) + window.period - now)
             if wait_seconds <= 0:
                 rows = [
-                    (self._namespace, bucket_key, window.window_id, now) for window in self._windows
+                    (self._namespace, bucket_key, window.window_id, now)
+                    for window in runtime_windows
                 ]
                 connection.execute(
                     """
@@ -375,10 +432,20 @@ class _RedisSlidingWindowLimiter:
         """Reserve a Redis-backed distributed call slot or return seconds to wait."""
 
         now = self._clock()
-        sequence_key, event_keys = self._redis_keys(key)
-        args: list[str] = [repr(now), str(len(self._windows))]
-        for window in self._windows:
-            args.extend([repr(window.period), str(window.calls)])
+        runtime_windows = _runtime_windows(self._windows, now)
+        sequence_key, event_keys = self._redis_keys(key, runtime_windows)
+        args: list[str] = [repr(now), str(len(runtime_windows))]
+        for window in runtime_windows:
+            reset_at = 0.0 if window.reset_at is None else window.reset_at
+            args.extend(
+                [
+                    repr(window.prune_before),
+                    str(window.calls),
+                    repr(window.period),
+                    repr(reset_at),
+                    repr(window.ttl),
+                ]
+            )
         result = self._client.eval(
             _REDIS_RATE_LIMIT_SCRIPT,
             1 + len(event_keys),
@@ -391,12 +458,14 @@ class _RedisSlidingWindowLimiter:
             return None
         return max(0.0, wait_ms / 1000)
 
-    def _redis_keys(self, key: Hashable) -> tuple[str, list[str]]:
+    def _redis_keys(
+        self, key: Hashable, windows: Sequence[_RuntimeRateLimitWindow]
+    ) -> tuple[str, list[str]]:
         namespace_digest = _digest_text(self._namespace)
         bucket_digest = _stored_bucket_key(key)
         # The hash tag keeps the event and sequence keys in one Redis Cluster slot.
         base_key = f"{self._key_prefix}:rate_limit:{{{namespace_digest}:{bucket_digest}}}"
-        event_keys = [f"{base_key}:window:{window.window_id}" for window in self._windows]
+        event_keys = [f"{base_key}:window:{window.window_id}" for window in windows]
         return f"{base_key}:sequence", event_keys
 
 
@@ -404,7 +473,7 @@ def _normalize_rate_limit_windows(
     *,
     calls: int | None,
     period: float | None,
-    windows: Sequence[RateLimitWindow | tuple[int, float]] | None,
+    windows: Sequence[RateLimitWindow | CalendarRateLimitWindow | tuple[int, float]] | None,
 ) -> tuple[_NormalizedRateLimitWindow, ...]:
     if windows is None:
         if calls is None or period is None:
@@ -421,7 +490,9 @@ def _normalize_rate_limit_windows(
 
 
 def _normalize_rate_limit_window(
-    window: RateLimitWindow | tuple[int, float], index: int, single_window: bool
+    window: RateLimitWindow | CalendarRateLimitWindow | tuple[int, float],
+    index: int,
+    single_window: bool,
 ) -> _NormalizedRateLimitWindow:
     if isinstance(window, tuple):
         if len(window) != 2:
@@ -429,6 +500,8 @@ def _normalize_rate_limit_window(
         public_window = RateLimitWindow(calls=window[0], period=window[1])
     elif isinstance(window, RateLimitWindow):
         public_window = window
+    elif isinstance(window, CalendarRateLimitWindow):
+        return _normalize_calendar_rate_limit_window(window, index, single_window)
     else:
         raise ConfigurationError(
             "windows must contain RateLimitWindow objects or (calls, period) tuples"
@@ -449,10 +522,119 @@ def _normalize_rate_limit_window(
     )
 
 
+def _normalize_calendar_rate_limit_window(
+    window: CalendarRateLimitWindow, index: int, single_window: bool
+) -> _NormalizedRateLimitWindow:
+    if window.calls <= 0:
+        field_name = "calls" if single_window else "calendar window calls"
+        raise ConfigurationError(f"{field_name} must be greater than zero")
+    if window.unit not in {"minute", "hour", "day", "week"}:
+        raise ConfigurationError('calendar window unit must be "minute", "hour", "day", or "week"')
+    if window.name is not None and not window.name.strip():
+        raise ConfigurationError("calendar window name must not be empty when provided")
+    if not window.timezone.strip():
+        raise ConfigurationError("calendar window timezone must not be empty")
+    if window.week_start not in {"monday", "sunday"}:
+        raise ConfigurationError('calendar window week_start must be "monday" or "sunday"')
+    try:
+        timezone = ZoneInfo(window.timezone)
+    except ZoneInfoNotFoundError as exc:
+        raise ConfigurationError(f"unknown calendar window timezone: {window.timezone}") from exc
+    window_id = _window_id(
+        RateLimitWindow(
+            calls=window.calls,
+            period=_calendar_unit_seconds(window.unit),
+            name=window.name,
+        ),
+        index,
+    )
+    return _NormalizedRateLimitWindow(
+        calls=window.calls,
+        period=_calendar_unit_seconds(window.unit),
+        window_id=window_id,
+        kind="calendar",
+        unit=window.unit,
+        timezone=timezone,
+        week_start=window.week_start,
+    )
+
+
 def _window_id(window: RateLimitWindow, index: int) -> str:
     if window.name is not None:
         return _digest_text(window.name.strip())
     return _digest_text(f"{index}:{window.calls}:{float(window.period)!r}")
+
+
+def _has_calendar_windows(windows: Sequence[_NormalizedRateLimitWindow]) -> bool:
+    return any(window.kind == "calendar" for window in windows)
+
+
+def _runtime_windows(
+    windows: Sequence[_NormalizedRateLimitWindow], now: float
+) -> tuple[_RuntimeRateLimitWindow, ...]:
+    runtime_windows = []
+    for window in windows:
+        if window.kind == "sliding":
+            runtime_windows.append(
+                _RuntimeRateLimitWindow(
+                    calls=window.calls,
+                    period=window.period,
+                    window_id=window.window_id,
+                    prune_before=now - window.period,
+                    reset_at=None,
+                    ttl=window.period,
+                )
+            )
+            continue
+        start, end = _calendar_window_bounds(window, now)
+        runtime_windows.append(
+            _RuntimeRateLimitWindow(
+                calls=window.calls,
+                period=end - start,
+                window_id=f"{window.window_id}:calendar:{int(start)}",
+                prune_before=start - 1e-6,
+                reset_at=end,
+                ttl=max(1.0, end - now),
+            )
+        )
+    return tuple(runtime_windows)
+
+
+def _calendar_window_bounds(window: _NormalizedRateLimitWindow, now: float) -> tuple[float, float]:
+    if window.unit is None or window.timezone is None:
+        raise RuntimeError("calendar rate limit window is missing calendar metadata")
+    current = datetime.fromtimestamp(now, tz=window.timezone)
+    if window.unit == "minute":
+        start = current.replace(second=0, microsecond=0)
+        end = start + timedelta(minutes=1)
+    elif window.unit == "hour":
+        start = current.replace(minute=0, second=0, microsecond=0)
+        end = start + timedelta(hours=1)
+    elif window.unit == "day":
+        start = current.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timedelta(days=1)
+    else:
+        week_start_day = 0 if window.week_start == "monday" else 6
+        days_since_start = (current.weekday() - week_start_day) % 7
+        start = (current - timedelta(days=days_since_start)).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        end = start + timedelta(days=7)
+    return start.timestamp(), end.timestamp()
+
+
+def _calendar_unit_seconds(unit: CalendarRateLimitUnit) -> float:
+    if unit == "minute":
+        return 60.0
+    if unit == "hour":
+        return 60.0 * 60.0
+    if unit == "day":
+        return 24.0 * 60.0 * 60.0
+    return 7.0 * 24.0 * 60.0 * 60.0
+
+
+def _max_window_cleanup_period(windows: Sequence[_NormalizedRateLimitWindow]) -> float:
+    return max((window.period for window in windows), default=1.0)
 
 
 def _validate_rate_limit_config(

@@ -678,7 +678,10 @@
 - [x] Add multi-window rate limiting for simultaneous quotas such as per-minute, per-day, and per-week windows.
 - [x] Add all-or-nothing multi-window reservation across local, SQLite interprocess, and Redis distributed rate-limit backends.
 - [x] Document `RateLimitWindow` and `rate_limit(windows=...)` as the public multi-window API while preserving `calls`/`period` as the single-window shorthand.
-- [ ] Evaluate explicit calendar-aligned rate windows, such as midnight-to-midnight daily quotas, as a separate feature from rolling sliding windows.
+- [x] Add explicit calendar-aligned rate windows, such as midnight-to-midnight daily quotas, as a separate feature from rolling sliding windows.
+- [x] Add tests proving calendar-aligned rate windows work in local, SQLite interprocess, and Redis distributed limiter modes.
+- [x] Document calendar-window clock semantics, time zone handling, and week-start behavior.
+- [ ] Evaluate whether monthly calendar quota buckets are worth supporting, given varying month lengths and reset semantics.
 
 ## 6. `@timeout`
 
