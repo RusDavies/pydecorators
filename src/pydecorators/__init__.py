@@ -41,7 +41,7 @@ from pydecorators.exceptions import (
 )
 from pydecorators.log_calls import log_calls
 from pydecorators.measure_time import TimingInfo, measure_time
-from pydecorators.rate_limit import RateLimitWindow, rate_limit
+from pydecorators.rate_limit import CalendarRateLimitWindow, RateLimitWindow, rate_limit
 from pydecorators.redis_backend import RedisCacheBackend, RedisCacheClient
 from pydecorators.require_env import EnvRequirementError, require_env
 from pydecorators.retry import retry
@@ -58,6 +58,7 @@ __all__ = [
     "CacheKeyError",
     "CacheSerializationError",
     "CacheSerializer",
+    "CalendarRateLimitWindow",
     "CircuitBreakerOpen",
     "CircuitState",
     "ConfigurationError",

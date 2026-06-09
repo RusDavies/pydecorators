@@ -1,6 +1,6 @@
 """Executable examples for @rate_limit documentation."""
 
-from pydecorators import RateLimitExceeded, RateLimitWindow, rate_limit
+from pydecorators import CalendarRateLimitWindow, RateLimitExceeded, RateLimitWindow, rate_limit
 
 
 class ExampleClock:
@@ -75,6 +75,31 @@ def multiple_windows_example() -> str:
         windows=[
             RateLimitWindow(calls=2, period=10, name="burst"),
             RateLimitWindow(calls=3, period=100, name="sustained"),
+        ],
+        clock=clock,
+    )
+    def call_api() -> str:
+        return "called"
+
+    call_api()
+    call_api()
+    try:
+        call_api()
+    except RateLimitExceeded:
+        return "limited"
+    return "allowed"
+
+
+def calendar_windows_example() -> str:
+    """Apply a wall-clock daily quota alongside a rolling burst quota."""
+
+    clock = ExampleClock()
+    clock.now = 1_780_876_800.0  # 2026-06-08 00:00:00 UTC
+
+    @rate_limit(
+        windows=[
+            RateLimitWindow(calls=2, period=10, name="burst"),
+            CalendarRateLimitWindow(calls=2, unit="day", name="day", timezone="UTC"),
         ],
         clock=clock,
     )

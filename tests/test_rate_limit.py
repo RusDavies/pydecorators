@@ -6,12 +6,19 @@ import os
 import queue
 import uuid
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
-from pydecorators import ConfigurationError, RateLimitExceeded, RateLimitWindow, rate_limit
+from pydecorators import (
+    CalendarRateLimitWindow,
+    ConfigurationError,
+    RateLimitExceeded,
+    RateLimitWindow,
+    rate_limit,
+)
 
 
 class MutableClock:
@@ -40,21 +47,24 @@ class FakeRateLimitRedis:
         window_count = int(str(args[1]))
         assert window_count == len(event_keys)
         max_wait_ms = 0
-        parsed_windows: list[tuple[str, float, int]] = []
+        parsed_windows: list[tuple[str, float]] = []
         for index, events_key in enumerate(event_keys):
-            period = float(str(args[(index * 2) + 2]))
-            calls = int(str(args[(index * 2) + 3]))
-            parsed_windows.append((events_key, period, calls))
-            window = [entry for entry in self.zsets.get(events_key, []) if entry[0] > now - period]
+            prune_before = float(str(args[(index * 5) + 2]))
+            calls = int(str(args[(index * 5) + 3]))
+            period = float(str(args[(index * 5) + 4]))
+            reset_at = float(str(args[(index * 5) + 5]))
+            ttl = float(str(args[(index * 5) + 6]))
+            parsed_windows.append((events_key, ttl))
+            window = [entry for entry in self.zsets.get(events_key, []) if entry[0] > prune_before]
             self.zsets[events_key] = window
             if len(window) >= calls:
-                oldest = window[0][0]
-                max_wait_ms = max(max_wait_ms, math.ceil(max(0.0, oldest + period - now) * 1000))
+                wait_seconds = reset_at - now if reset_at > 0 else window[0][0] + period - now
+                max_wait_ms = max(max_wait_ms, math.ceil(max(0.0, wait_seconds) * 1000))
         if max_wait_ms > 0:
             return [1, max_wait_ms]
         sequence = self.counters.get(sequence_key, 0) + 1
         self.counters[sequence_key] = sequence
-        for index, (events_key, _period, _calls) in enumerate(parsed_windows):
+        for index, (events_key, _ttl) in enumerate(parsed_windows):
             window = self.zsets.setdefault(events_key, [])
             window.append((now, f"{now}:{index}:{sequence}"))
             window.sort()
@@ -237,6 +247,80 @@ def test_rate_limit_windows_accepts_tuple_shorthand() -> None:
         limited()
 
 
+def test_rate_limit_calendar_day_resets_at_local_midnight() -> None:
+    clock = MutableClock()
+    clock.now = datetime(2026, 6, 8, 23, 59, 50, tzinfo=UTC).timestamp()
+
+    @rate_limit(
+        windows=[CalendarRateLimitWindow(calls=1, unit="day", timezone="UTC")],
+        clock=clock,
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
+
+
+def test_rate_limit_calendar_week_can_start_on_sunday() -> None:
+    clock = MutableClock()
+    clock.now = datetime(2026, 6, 13, 23, 59, 50, tzinfo=UTC).timestamp()
+
+    @rate_limit(
+        windows=[
+            CalendarRateLimitWindow(
+                calls=1,
+                unit="week",
+                timezone="UTC",
+                week_start="sunday",
+            )
+        ],
+        clock=clock,
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
+
+
+def test_rate_limit_mixed_sliding_and_calendar_windows_all_pass() -> None:
+    clock = MutableClock()
+    clock.now = datetime(2026, 6, 8, 0, 0, 0, tzinfo=UTC).timestamp()
+
+    @rate_limit(
+        windows=[
+            RateLimitWindow(calls=2, period=10, name="burst"),
+            CalendarRateLimitWindow(calls=3, unit="day", name="day", timezone="UTC"),
+        ],
+        clock=clock,
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 24 * 60 * 60 - 10
+
+
 def test_rate_limit_block_mode_sleeps_until_slot_available() -> None:
     clock = MutableClock()
     sleeps: list[float] = []
@@ -408,6 +492,28 @@ def test_rate_limit_interprocess_multiple_windows_reserve_atomically(tmp_path: P
     with pytest.raises(RateLimitExceeded) as exc_info:
         limited()
     assert exc_info.value.retry_after == 90
+
+
+def test_rate_limit_interprocess_calendar_day_resets(tmp_path: Path) -> None:
+    clock = MutableClock()
+    clock.now = datetime(2026, 6, 8, 23, 59, 50, tzinfo=UTC).timestamp()
+
+    @rate_limit(
+        windows=[CalendarRateLimitWindow(calls=1, unit="day", timezone="UTC")],
+        clock=clock,
+        interprocess=True,
+        storage_path=tmp_path / "rate-limit.sqlite3",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
 
 
 def test_rate_limit_interprocess_coordinates_separate_processes(tmp_path: Path) -> None:
@@ -586,6 +692,29 @@ def test_rate_limit_distributed_redis_multiple_windows_reserve_atomically() -> N
     assert exc_info.value.retry_after == 90
 
 
+def test_rate_limit_distributed_redis_calendar_day_resets() -> None:
+    clock = MutableClock()
+    clock.now = datetime(2026, 6, 8, 23, 59, 50, tzinfo=UTC).timestamp()
+
+    @rate_limit(
+        windows=[CalendarRateLimitWindow(calls=1, unit="day", timezone="UTC")],
+        clock=clock,
+        distributed=True,
+        redis_client=FakeRateLimitRedis(),
+        redis_key_prefix="demo:v1",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+    assert exc_info.value.retry_after == 10
+
+    clock.advance(10)
+    assert limited() == "ok"
+
+
 def test_rate_limit_distributed_live_redis_integration() -> None:
     redis_url = os.environ.get("PYDECORATORS_REDIS_URL")
     if not redis_url:
@@ -672,6 +801,26 @@ def test_rate_limit_preserves_metadata() -> None:
         ({"windows": [RateLimitWindow(calls=0, period=1)]}, "calls must be greater than zero"),
         ({"windows": [RateLimitWindow(calls=1, period=0)]}, "period must be greater than zero"),
         ({"windows": [RateLimitWindow(calls=1, period=1, name=" ")]}, "name must not be empty"),
+        (
+            {"windows": [CalendarRateLimitWindow(calls=0, unit="day")]},
+            "calls must be greater than zero",
+        ),
+        (
+            {"windows": [CalendarRateLimitWindow(calls=1, unit=cast(Any, "month"))]},
+            "calendar window unit",
+        ),
+        (
+            {"windows": [CalendarRateLimitWindow(calls=1, unit="day", timezone="No/SuchZone")]},
+            "unknown calendar window timezone",
+        ),
+        (
+            {
+                "windows": [
+                    CalendarRateLimitWindow(calls=1, unit="week", week_start=cast(Any, "friday"))
+                ]
+            },
+            "week_start",
+        ),
         ({"calls": 1, "period": 1, "key": object()}, "key must be callable"),
         ({"calls": 1, "period": 1, "mode": "wait"}, "mode must"),
         ({"calls": 1, "period": 1, "interprocess": True}, "storage_path is required"),

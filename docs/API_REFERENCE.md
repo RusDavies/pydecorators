@@ -30,11 +30,15 @@ Retry sync or async callables after configured failures. See [`@retry`](https://
 
 ### `rate_limit(*, calls=None, period=None, windows=None, key=None, mode="raise", clock=None, sleep=None, interprocess=False, storage_path=None, namespace=None, distributed=False, redis_client=None, redis_url=None, redis_key_prefix=None)`
 
-Apply one or more process-local sliding-window rate limits to sync or async callables by default. Existing `calls=`/`period=` usage configures one window. Use `windows=[RateLimitWindow(...), ...]` for multiple simultaneous windows that must all pass before a call is admitted. Set `interprocess=True` with a SQLite `storage_path` for same-host multi-process coordination, or `distributed=True` with Redis configuration for multi-host coordination through a shared Redis deployment. See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md).
+Apply one or more process-local rate limits to sync or async callables by default. Existing `calls=`/`period=` usage configures one sliding window. Use `windows=[RateLimitWindow(...), ...]` for multiple simultaneous rolling windows, or `CalendarRateLimitWindow(...)` for wall-clock-aligned minute/hour/day/week buckets. Every configured window must pass before a call is admitted. Set `interprocess=True` with a SQLite `storage_path` for same-host multi-process coordination, or `distributed=True` with Redis configuration for multi-host coordination through a shared Redis deployment. See [`@rate_limit`](https://github.com/RusDavies/pydecorators/blob/master/docs/rate_limit.md).
 
 ### `RateLimitWindow(calls, period, name=None)`
 
 Immutable dataclass used by `rate_limit(windows=...)` to describe one sliding window. `calls` is the number of calls admitted during `period` seconds. `name` is optional and provides a stable storage identifier for interprocess/distributed state.
+
+### `CalendarRateLimitWindow(calls, unit, name=None, timezone="UTC", week_start="monday")`
+
+Immutable dataclass used by `rate_limit(windows=...)` to describe one wall-clock-aligned fixed window. `unit` is one of `"minute"`, `"hour"`, `"day"`, or `"week"`. `timezone` is an IANA time zone name used to compute reset boundaries. Weekly windows start on Monday unless `week_start="sunday"` is provided.
 
 ### `timeout(*, seconds, message=None, exception_type=FunctionTimedOut)`
 

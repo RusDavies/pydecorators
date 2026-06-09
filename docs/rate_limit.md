@@ -3,7 +3,7 @@
 `@rate_limit` limits how often a sync or async function may be called. It uses a sliding-window policy so old calls expire continuously rather than only at fixed wall-clock boundaries.
 
 ```python
-from pydecorators import RateLimitWindow, rate_limit
+from pydecorators import CalendarRateLimitWindow, RateLimitWindow, rate_limit
 
 
 @rate_limit(calls=10, period=60)
@@ -17,8 +17,8 @@ Use `windows=` when a dependency has more than one quota that must all be respec
 @rate_limit(
     windows=[
         RateLimitWindow(calls=8, period=60, name="minute"),
-        RateLimitWindow(calls=800, period=24 * 60 * 60, name="day"),
-        RateLimitWindow(calls=4000, period=7 * 24 * 60 * 60, name="week"),
+        RateLimitWindow(calls=800, period=24 * 60 * 60, name="rolling-day"),
+        RateLimitWindow(calls=4000, period=7 * 24 * 60 * 60, name="rolling-week"),
     ],
 )
 def call_api(path: str) -> str:
@@ -29,7 +29,7 @@ def call_api(path: str) -> str:
 
 - `calls`: number of calls allowed per window. Must be greater than zero. Required when `windows` is omitted.
 - `period`: window length in seconds. Must be greater than zero. Required when `windows` is omitted.
-- `windows`: optional sequence of `RateLimitWindow(calls, period, name=None)` objects, or `(calls, period)` tuples, for multi-window limits. Do not combine with `calls`/`period`.
+- `windows`: optional sequence of `RateLimitWindow(calls, period, name=None)`, `CalendarRateLimitWindow(calls, unit, name=None, timezone="UTC", week_start="monday")`, or `(calls, period)` tuples, for multi-window limits. Do not combine with `calls`/`period`.
 - `key`: optional callable that receives the wrapped function arguments and returns a hashable bucket key. When omitted, all calls share one global bucket.
 - `mode`: either `"raise"` or `"block"`. Defaults to `"raise"`.
 - `clock`: injectable monotonic clock for tests.
@@ -67,7 +67,31 @@ For `mode="raise"`, `RateLimitExceeded.retry_after` is the longest wait required
 
 Window `name` values are optional. They provide stable storage identifiers for interprocess and distributed modes and make configuration easier to read. When omitted, the decorator derives a stable internal identifier from the window index and values. A single-window `windows=[...]` configuration uses the same storage identifier as the legacy `calls=`/`period=` shorthand so existing SQLite state remains compatible.
 
-Multi-window limits are still sliding windows. `period=24 * 60 * 60` means a rolling 24-hour window, not a calendar day reset at midnight.
+`RateLimitWindow` limits are sliding windows. `period=24 * 60 * 60` means a rolling 24-hour window, not a calendar day reset at midnight.
+
+## Calendar-aligned windows
+
+Use `CalendarRateLimitWindow` when the quota resets on a wall-clock boundary such as the start of a day or week:
+
+```python
+@rate_limit(
+    windows=[
+        RateLimitWindow(calls=8, period=60, name="minute"),
+        CalendarRateLimitWindow(calls=800, unit="day", name="day", timezone="UTC"),
+        CalendarRateLimitWindow(calls=4000, unit="week", name="week", timezone="UTC"),
+    ],
+)
+def call_vendor_api(path: str) -> str:
+    ...
+```
+
+Supported calendar units are `"minute"`, `"hour"`, `"day"`, and `"week"`. Calendar weeks start on Monday by default. Use `week_start="sunday"` for Sunday-start weeks.
+
+Calendar windows use IANA time zone names through Python's standard `zoneinfo` module. The default is `"UTC"`. Pick the time zone that matches the upstream quota contract, not necessarily the server's local time zone.
+
+When any calendar window is configured and `clock` is omitted, `@rate_limit` uses wall-clock Unix time so it can compute calendar boundaries. Pure sliding-window configurations continue to use a monotonic clock by default. Tests for calendar windows should inject a clock that returns Unix timestamps.
+
+Calendar windows are fixed wall-clock buckets. A daily calendar window with `timezone="America/Toronto"` resets at Toronto midnight, including daylight-saving transitions. It is deliberately separate from a rolling 24-hour `RateLimitWindow` because those are different quota contracts and lying about time is how software summons demons.
 
 ## Modes
 
