@@ -683,7 +683,7 @@
 - [x] Document calendar-window clock semantics, time zone handling, and week-start behavior.
 - [x] Add weighted rate-limit reservations so calls can consume a configurable positive integer cost instead of always counting as one call.
 - [x] Add tests proving weighted rate-limit costs work in local, SQLite interprocess, and Redis distributed limiter modes without partial multi-window reservation.
-- [ ] Evaluate whether monthly calendar quota buckets are worth supporting, given varying month lengths and reset semantics.
+- [x] Evaluate whether monthly calendar quota buckets are worth supporting, given varying month lengths and reset semantics. Decision: no real need; keep calendar buckets at minute/hour/day/week rather than adding month-specific reset semantics.
 
 ## 6. `@timeout`
 
