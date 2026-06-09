@@ -6,6 +6,8 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-08
+
 ### Added
 
 - Added `RateLimitWindow` and `rate_limit(windows=...)` for multi-window sliding rate limits such as per-minute, per-day, and per-week quotas.
