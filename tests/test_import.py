@@ -2,4 +2,4 @@ import pydecorators
 
 
 def test_package_exports_version() -> None:
-    assert pydecorators.__version__ == "0.3.0"
+    assert pydecorators.__version__ == "0.4.0"
