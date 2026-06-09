@@ -296,7 +296,7 @@ def test_readme_python_code_blocks_parse() -> None:
 
     code_blocks = readme_python_code_blocks()
 
-    assert len(code_blocks) == 13
+    assert len(code_blocks) == 14
     for code_block in code_blocks:
         ast.parse(code_block)
 
@@ -312,6 +312,10 @@ def test_readme_python_code_blocks_stay_synced_with_documented_examples() -> Non
         "@retry(attempts=3, delay=0.25, backoff=2, exceptions=ConnectionError)",
         "from pydecorators import rate_limit",
         "@rate_limit(calls=10, period=60, key=lambda user_id: user_id)",
+        "from pydecorators import CalendarRateLimitWindow, RateLimitWindow, rate_limit",
+        'RateLimitWindow(calls=100, period=60, name="minute")',
+        'CalendarRateLimitWindow(calls=10_000, unit="day", name="daily", timezone="UTC")',
+        'cost=lambda args, kwargs: kwargs.get("units", 1)',
         "from pydecorators import timeout",
         "@timeout(seconds=2)",
         "from pydecorators import log_calls",

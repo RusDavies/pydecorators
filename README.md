@@ -6,12 +6,12 @@ The goal is to provide small, typed, well-tested decorators that work in scripts
 
 ## What is included
 
-`v0.1.4` includes the same public API as `v0.1.0`, with cleaned post-release documentation, PyPI-safe documentation links, and security hardening for development/release tooling:
+`v0.4.0` includes typed, tested decorators for:
 
 - `@deprecated` for compatibility warnings.
-- `@cache_result` with in-memory and disk-backed caching.
+- `@cache_result` with in-memory, disk-backed, and optional Redis-backed caching.
 - `@retry` for transient failures.
-- `@rate_limit` for simple in-process throttling.
+- `@rate_limit` for rolling, calendar-aligned, multi-window, weighted-cost, interprocess, and Redis-backed distributed throttling.
 - `@timeout` for async timeout boundaries.
 - `@log_calls` and `@measure_time` for lightweight observability.
 - `@validate_types` for runtime argument checks.
@@ -55,7 +55,7 @@ Then read the per-decorator docs and [decorator stacking guidance](https://githu
 
 ## Development status
 
-Released as `blakemere-wraptools` `0.1.4`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
+Released as `blakemere-wraptools` `0.4.0`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See [deprecation decorator docs](https://github.com/RusDavies/pydecorators/blob/master/docs/deprecated.md) for details.
 
@@ -134,7 +134,7 @@ PyPI renders these as normal outbound links, not local Markdown file references:
 - `@deprecated`: warn when old APIs are used.
 - `@cache_result`: cache expensive sync results in memory or trusted local disk storage.
 - `@retry`: retry transient failures with explicit policy.
-- `@rate_limit`: enforce in-process sliding-window call limits.
+- `@rate_limit`: enforce rolling or calendar-aligned rate limits with optional multi-window, weighted-cost, interprocess, and Redis-backed distributed coordination.
 - `@timeout`: apply async deadlines using `asyncio.wait_for`.
 - `@log_calls`: log calls, durations, exceptions, and optional summaries.
 - `@measure_time`: emit timing data to callbacks, loggers, or metrics hooks.
@@ -151,7 +151,8 @@ See [security hardening checklist](https://github.com/RusDavies/pydecorators/blo
 - Keep cache values disposable; use namespaces or clear caches when semantics change.
 - Argument/result logging is opt-in because logs preserve secrets with the enthusiasm of a museum curator.
 - `@validate_types` is not a schema validator or security boundary.
-- `@rate_limit` and `@circuit_breaker` are in-process only; they do not coordinate across workers, containers, or hosts.
+- `@rate_limit` is process-local by default. Use `interprocess=True` with SQLite for same-host multi-process coordination, or `distributed=True` with Redis for multi-host coordination. Redis/SQLite outages are operational failure modes; design your fail-open/fail-closed policy deliberately.
+- `@circuit_breaker` is in-process only; it does not coordinate across workers, containers, or hosts.
 - Environment checks protect configuration mistakes, not secret storage. Use proper secret-management systems for real secrets.
 
 ## Async support notes
@@ -195,7 +196,27 @@ def call_user_api(user_id: str) -> str:
     return "ok"
 ```
 
-`@rate_limit` uses an in-process sliding window and supports global or keyed buckets, raise or block mode, async functions, and injectable clocks/sleep functions for tests.
+`@rate_limit` defaults to a process-local sliding window and supports global or keyed buckets, raise or block mode, async functions, and injectable clocks/sleep functions for tests.
+
+For larger quota policies, combine multiple windows and weighted cost consumption:
+
+```python
+from pydecorators import CalendarRateLimitWindow, RateLimitWindow, rate_limit
+
+
+@rate_limit(
+    windows=[
+        RateLimitWindow(calls=100, period=60, name="minute"),
+        CalendarRateLimitWindow(calls=10_000, unit="day", name="daily", timezone="UTC"),
+    ],
+    cost=lambda args, kwargs: kwargs.get("units", 1),
+    key=lambda tenant_id, **_: tenant_id,
+)
+def generate_for_tenant(tenant_id: str, *, units: int = 1) -> str:
+    return "ok"
+```
+
+Use `RateLimitWindow` for multiple rolling windows, `CalendarRateLimitWindow` for minute/hour/day/week wall-clock reset boundaries, `cost=` for weighted quota consumption, `interprocess=True` with SQLite for same-host coordination, and `distributed=True` with Redis for multi-host coordination.
 
 ### Timeout example
 
