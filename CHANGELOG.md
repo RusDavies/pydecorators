@@ -6,6 +6,10 @@ The format is inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ## [Unreleased]
 
+### Added
+
+- Added weighted `@rate_limit(cost=...)` reservations so calls can consume more than one quota unit while preserving all-or-nothing behavior across process-local, SQLite interprocess, and Redis distributed windows.
+
 ## [0.3.0] - 2026-06-08
 
 ### Added

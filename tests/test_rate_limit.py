@@ -4,6 +4,7 @@ import math
 import multiprocessing
 import os
 import queue
+import sqlite3
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
@@ -44,21 +45,32 @@ class FakeRateLimitRedis:
         event_keys = [str(key) for key in keys_and_args[1:numkeys]]
         args = keys_and_args[numkeys:]
         now = float(str(args[0]))
-        window_count = int(str(args[1]))
+        cost = int(str(args[1]))
+        window_count = int(str(args[2]))
         assert window_count == len(event_keys)
         max_wait_ms = 0
         parsed_windows: list[tuple[str, float]] = []
         for index, events_key in enumerate(event_keys):
-            prune_before = float(str(args[(index * 5) + 2]))
-            calls = int(str(args[(index * 5) + 3]))
-            period = float(str(args[(index * 5) + 4]))
-            reset_at = float(str(args[(index * 5) + 5]))
-            ttl = float(str(args[(index * 5) + 6]))
+            prune_before = float(str(args[(index * 5) + 3]))
+            calls = int(str(args[(index * 5) + 4]))
+            period = float(str(args[(index * 5) + 5]))
+            reset_at = float(str(args[(index * 5) + 6]))
+            ttl = float(str(args[(index * 5) + 7]))
             parsed_windows.append((events_key, ttl))
             window = [entry for entry in self.zsets.get(events_key, []) if entry[0] > prune_before]
             self.zsets[events_key] = window
-            if len(window) >= calls:
-                wait_seconds = reset_at - now if reset_at > 0 else window[0][0] + period - now
+            used = sum(self._event_cost(member) for _timestamp, member in window)
+            if used + cost > calls:
+                if reset_at > 0:
+                    wait_seconds = reset_at - now
+                else:
+                    freed = 0
+                    wait_seconds = period
+                    for timestamp, member in window:
+                        freed += self._event_cost(member)
+                        if used - freed + cost <= calls:
+                            wait_seconds = timestamp + period - now
+                            break
                 max_wait_ms = max(max_wait_ms, math.ceil(max(0.0, wait_seconds) * 1000))
         if max_wait_ms > 0:
             return [1, max_wait_ms]
@@ -66,9 +78,18 @@ class FakeRateLimitRedis:
         self.counters[sequence_key] = sequence
         for index, (events_key, _ttl) in enumerate(parsed_windows):
             window = self.zsets.setdefault(events_key, [])
-            window.append((now, f"{now}:{index}:{sequence}"))
+            window.append((now, f"{cost}:{now}:{index}:{sequence}"))
             window.sort()
         return [0, 0]
+
+    def _event_cost(self, member: str) -> int:
+        parts = member.split(":")
+        if len(parts) < 4:
+            return 1
+        try:
+            return int(parts[0])
+        except ValueError:
+            return 1
 
 
 def _sqlite_rate_limit_worker(
@@ -120,6 +141,77 @@ def test_rate_limit_raise_mode_rejects_exceeded_calls() -> None:
         limited()
 
     assert exc_info.value.retry_after == 10
+
+
+def test_rate_limit_static_cost_consumes_multiple_units() -> None:
+    clock = MutableClock()
+
+    @rate_limit(calls=5, period=10, cost=2, clock=clock)
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited()
+
+    assert exc_info.value.retry_after == 10
+
+
+def test_rate_limit_dynamic_cost_uses_call_arguments() -> None:
+    clock = MutableClock()
+
+    @rate_limit(
+        calls=8, period=10, cost=lambda args, kwargs: cast(int, kwargs["units"]), clock=clock
+    )
+    def limited(*, units: int) -> str:
+        return "ok"
+
+    assert limited(units=3) == "ok"
+    assert limited(units=5) == "ok"
+    with pytest.raises(RateLimitExceeded):
+        limited(units=1)
+
+
+def test_rate_limit_cost_callable_error_does_not_consume_quota() -> None:
+    clock = MutableClock()
+    should_fail = True
+
+    def cost(_args: tuple[object, ...], _kwargs: dict[str, object]) -> int:
+        if should_fail:
+            raise RuntimeError("cost failed")
+        return 1
+
+    @rate_limit(calls=1, period=10, cost=cost, clock=clock)
+    def limited() -> str:
+        return "ok"
+
+    with pytest.raises(RuntimeError, match="cost failed"):
+        limited()
+    should_fail = False
+    assert limited() == "ok"
+
+
+def test_rate_limit_dynamic_cost_must_resolve_to_positive_integer() -> None:
+    @rate_limit(calls=1, period=10, cost=lambda _args, _kwargs: 0)
+    def limited() -> str:
+        return "ok"
+
+    with pytest.raises(ConfigurationError, match="cost must be greater than zero"):
+        limited()
+
+
+def test_rate_limit_cost_larger_than_window_capacity_is_rejected_without_reserving() -> None:
+    clock = MutableClock()
+
+    @rate_limit(calls=3, period=10, cost=lambda args, _kwargs: cast(int, args[0]), clock=clock)
+    def limited(units: int) -> str:
+        return "ok"
+
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited(4)
+    assert math.isinf(exc_info.value.retry_after)
+    assert limited(3) == "ok"
 
 
 def test_rate_limit_sliding_window_resets_after_period() -> None:
@@ -178,10 +270,10 @@ def test_rate_limit_cleans_up_idle_keyed_buckets() -> None:
         clock=clock,
     )
 
-    assert limiter.reserve_or_delay("a") is None
-    assert limiter.reserve_or_delay("b") is None
+    assert limiter.reserve_or_delay("a", 1) is None
+    assert limiter.reserve_or_delay("b", 1) is None
     clock.advance(10)
-    assert limiter.reserve_or_delay("c") is None
+    assert limiter.reserve_or_delay("c", 1) is None
 
     assert list(limiter._windows) == ["c"]
 
@@ -210,6 +302,30 @@ def test_rate_limit_multiple_windows_require_all_windows_to_pass() -> None:
     with pytest.raises(RateLimitExceeded) as exc_info:
         limited()
     assert exc_info.value.retry_after == 90
+
+
+def test_rate_limit_weighted_multiple_windows_are_all_or_nothing() -> None:
+    clock = MutableClock()
+
+    @rate_limit(
+        windows=[
+            RateLimitWindow(calls=10, period=10, name="burst"),
+            RateLimitWindow(calls=6, period=100, name="sustained"),
+        ],
+        cost=lambda args, _kwargs: cast(int, args[0]),
+        clock=clock,
+    )
+    def limited(units: int) -> str:
+        return "ok"
+
+    assert limited(5) == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited(2)
+    assert exc_info.value.retry_after == 100
+    assert limited(1) == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited(1)
+    assert exc_info.value.retry_after == 100
 
 
 def test_rate_limit_multiple_windows_block_mode_sleeps_for_limiting_window() -> None:
@@ -494,6 +610,97 @@ def test_rate_limit_interprocess_multiple_windows_reserve_atomically(tmp_path: P
     assert exc_info.value.retry_after == 90
 
 
+def test_rate_limit_interprocess_weighted_costs_share_storage(tmp_path: Path) -> None:
+    clock = MutableClock()
+    storage_path = tmp_path / "rate-limit.sqlite3"
+
+    @rate_limit(
+        calls=5,
+        period=10,
+        cost=3,
+        clock=clock,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="weighted-api",
+    )
+    def expensive() -> str:
+        return "expensive"
+
+    @rate_limit(
+        calls=5,
+        period=10,
+        cost=2,
+        clock=clock,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="weighted-api",
+    )
+    def cheap() -> str:
+        return "cheap"
+
+    assert expensive() == "expensive"
+    assert cheap() == "cheap"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        cheap()
+    assert exc_info.value.retry_after == 10
+
+
+def test_rate_limit_interprocess_legacy_rows_without_cost_count_as_one(tmp_path: Path) -> None:
+    clock = MutableClock()
+    storage_path = tmp_path / "rate-limit.sqlite3"
+
+    connection = sqlite3.connect(storage_path)
+    try:
+        connection.execute(
+            """
+            CREATE TABLE rate_limit_events (
+                namespace TEXT NOT NULL,
+                bucket_key TEXT NOT NULL,
+                window_id TEXT NOT NULL DEFAULT 'default',
+                timestamp REAL NOT NULL
+            )
+            """
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+    @rate_limit(
+        calls=2,
+        period=10,
+        cost=1,
+        clock=clock,
+        interprocess=True,
+        storage_path=storage_path,
+        namespace="legacy-sqlite-rows",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+
+    connection = sqlite3.connect(storage_path)
+    try:
+        bucket_key = str(
+            connection.execute("SELECT bucket_key FROM rate_limit_events").fetchone()[0]
+        )
+        connection.execute("DELETE FROM rate_limit_events")
+        connection.execute(
+            """
+            INSERT INTO rate_limit_events(namespace, bucket_key, window_id, timestamp)
+            VALUES (?, ?, ?, ?)
+            """,
+            ("legacy-sqlite-rows", bucket_key, "default", clock.now),
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded):
+        limited()
+
+
 def test_rate_limit_interprocess_calendar_day_resets(tmp_path: Path) -> None:
     clock = MutableClock()
     clock.now = datetime(2026, 6, 8, 23, 59, 50, tzinfo=UTC).timestamp()
@@ -692,6 +899,54 @@ def test_rate_limit_distributed_redis_multiple_windows_reserve_atomically() -> N
     assert exc_info.value.retry_after == 90
 
 
+def test_rate_limit_distributed_redis_weighted_costs_reserve_atomically() -> None:
+    clock = MutableClock()
+    client = FakeRateLimitRedis()
+
+    @rate_limit(
+        windows=[RateLimitWindow(calls=10, period=10), RateLimitWindow(calls=6, period=100)],
+        cost=lambda args, _kwargs: cast(int, args[0]),
+        clock=clock,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix="demo:v1",
+    )
+    def limited(units: int) -> str:
+        return "ok"
+
+    assert limited(5) == "ok"
+    with pytest.raises(RateLimitExceeded) as exc_info:
+        limited(2)
+    assert exc_info.value.retry_after == 100
+    assert limited(1) == "ok"
+
+
+def test_rate_limit_distributed_redis_legacy_unweighted_members_count_as_one() -> None:
+    clock = MutableClock()
+    client = FakeRateLimitRedis()
+
+    @rate_limit(
+        calls=2,
+        period=10,
+        cost=1,
+        clock=clock,
+        distributed=True,
+        redis_client=client,
+        redis_key_prefix="demo:v1",
+        namespace="legacy-redis-members",
+    )
+    def limited() -> str:
+        return "ok"
+
+    assert limited() == "ok"
+    event_key = next(key for key in client.zsets if ":window:" in key)
+    client.zsets[event_key] = [(clock.now, f"{clock.now}:0:legacy-sequence")]
+
+    assert limited() == "ok"
+    with pytest.raises(RateLimitExceeded):
+        limited()
+
+
 def test_rate_limit_distributed_redis_calendar_day_resets() -> None:
     clock = MutableClock()
     clock.now = datetime(2026, 6, 8, 23, 59, 50, tzinfo=UTC).timestamp()
@@ -822,6 +1077,9 @@ def test_rate_limit_preserves_metadata() -> None:
             "week_start",
         ),
         ({"calls": 1, "period": 1, "key": object()}, "key must be callable"),
+        ({"calls": 1, "period": 1, "cost": 0}, "cost must be greater than zero"),
+        ({"calls": 1, "period": 1, "cost": -1}, "cost must be greater than zero"),
+        ({"calls": 1, "period": 1, "cost": 1.5}, "cost must be a positive integer"),
         ({"calls": 1, "period": 1, "mode": "wait"}, "mode must"),
         ({"calls": 1, "period": 1, "interprocess": True}, "storage_path is required"),
         ({"calls": 1, "period": 1, "storage_path": "x"}, "storage_path is only supported"),

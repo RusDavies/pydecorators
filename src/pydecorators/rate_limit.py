@@ -29,6 +29,7 @@ from pydecorators.exceptions import ConfigurationError, RateLimitExceeded
 
 RateLimitMode = Literal["raise", "block"]
 RateLimitKey = Callable[..., Hashable]
+RateLimitCost = int | Callable[[tuple[object, ...], dict[str, object]], int]
 CalendarRateLimitUnit = Literal["minute", "hour", "day", "week"]
 CalendarWeekStart = Literal["monday", "sunday"]
 
@@ -36,25 +37,50 @@ _REDIS_GLOB_METACHARACTERS = frozenset("*?[]")
 _REDIS_RATE_LIMIT_SCRIPT = """
 local sequence_key = KEYS[1]
 local now = tonumber(ARGV[1])
-local window_count = tonumber(ARGV[2])
+local cost = tonumber(ARGV[2])
+local window_count = tonumber(ARGV[3])
 local max_wait_ms = 0
 
 for index = 1, window_count do
     local events_key = KEYS[index + 1]
-    local prune_before = tonumber(ARGV[(index * 5) - 2])
-    local calls = tonumber(ARGV[(index * 5) - 1])
-    local period = tonumber(ARGV[index * 5])
-    local reset_at = tonumber(ARGV[(index * 5) + 1])
+    local prune_before = tonumber(ARGV[(index * 5) - 1])
+    local calls = tonumber(ARGV[index * 5])
+    local period = tonumber(ARGV[(index * 5) + 1])
+    local reset_at = tonumber(ARGV[(index * 5) + 2])
 
     redis.call("ZREMRANGEBYSCORE", events_key, "-inf", prune_before)
-    local count = redis.call("ZCARD", events_key)
-    if count >= calls then
+    local events = redis.call("ZRANGE", events_key, 0, -1, "WITHSCORES")
+    local used = 0
+    for event_index = 1, #events, 2 do
+        local member = tostring(events[event_index])
+        local event_cost = 1
+        if string.match(member, "^[^:]+:[^:]+:[^:]+:") then
+            event_cost = tonumber(string.match(member, "^([^:]+):")) or 1
+        end
+        used = used + event_cost
+    end
+    if used + cost > calls then
         local wait_seconds = 0
         if reset_at > 0 then
             wait_seconds = reset_at - now
         else
-            local oldest = redis.call("ZRANGE", events_key, 0, 0, "WITHSCORES")[2]
-            wait_seconds = tonumber(oldest) + period - now
+            local freed = 0
+            for event_index = 1, #events, 2 do
+                local member = tostring(events[event_index])
+                local score = tonumber(events[event_index + 1])
+                local event_cost = 1
+                if string.match(member, "^[^:]+:[^:]+:[^:]+:") then
+                    event_cost = tonumber(string.match(member, "^([^:]+):")) or 1
+                end
+                freed = freed + event_cost
+                if used - freed + cost <= calls then
+                    wait_seconds = score + period - now
+                    break
+                end
+            end
+            if wait_seconds == 0 then
+                wait_seconds = period
+            end
         end
         local wait_ms = math.max(0, math.ceil(wait_seconds * 1000))
         if wait_ms > max_wait_ms then
@@ -71,9 +97,10 @@ local sequence = redis.call("INCR", sequence_key)
 local max_ttl_ms = 1
 for index = 1, window_count do
     local events_key = KEYS[index + 1]
-    local ttl = tonumber(ARGV[(index * 5) + 2])
+    local ttl = tonumber(ARGV[(index * 5) + 3])
     local ttl_ms = math.max(1, math.ceil(ttl * 1000))
-    local member = tostring(now) .. ":" .. tostring(index) .. ":" .. tostring(sequence)
+    local member = tostring(cost) .. ":" .. tostring(now) .. ":" .. tostring(index)
+    member = member .. ":" .. tostring(sequence)
     redis.call("ZADD", events_key, now, member)
     redis.call("PEXPIRE", events_key, ttl_ms)
     if ttl_ms > max_ttl_ms then
@@ -133,8 +160,14 @@ class _RuntimeRateLimitWindow:
     ttl: float
 
 
+@dataclass(frozen=True)
+class _RateLimitEvent:
+    timestamp: float
+    cost: int
+
+
 class _RateLimiter(Protocol):
-    def reserve_or_delay(self, key: Hashable) -> float | None:
+    def reserve_or_delay(self, key: Hashable, cost: int) -> float | None:
         """Reserve a call slot or return seconds to wait before retrying."""
 
 
@@ -152,6 +185,7 @@ def rate_limit(
     mode: RateLimitMode = "raise",
     clock: Callable[[], float] | None = None,
     sleep: Callable[[float], object] | None = None,
+    cost: RateLimitCost = 1,
     interprocess: bool = False,
     storage_path: str | os.PathLike[str] | None = None,
     namespace: str | None = None,
@@ -167,6 +201,7 @@ def rate_limit(
         windows=normalized_windows,
         key=key,
         mode=mode,
+        cost=cost,
         interprocess=interprocess,
         storage_path=storage_path,
         namespace=namespace,
@@ -203,9 +238,12 @@ def rate_limit(
             async_sleep_func = cast(Callable[[float], Any], sleep or async_sleep)
 
             async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> object:
+                call_cost = _resolve_rate_limit_cost(cost, args, kwargs)
+                if _cost_exceeds_capacity(call_cost, normalized_windows):
+                    raise RateLimitExceeded(retry_after=math.inf)
                 bucket_key = _bucket_key(key, args, kwargs)
                 while True:
-                    wait_seconds = limiter.reserve_or_delay(bucket_key)
+                    wait_seconds = limiter.reserve_or_delay(bucket_key, call_cost)
                     if wait_seconds is None:
                         result = async_func(*args, **kwargs)
                         if hasattr(result, "__await__"):
@@ -220,9 +258,12 @@ def rate_limit(
         sync_sleep_func = sleep or sync_sleep
 
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            call_cost = _resolve_rate_limit_cost(cost, args, kwargs)
+            if _cost_exceeds_capacity(call_cost, normalized_windows):
+                raise RateLimitExceeded(retry_after=math.inf)
             bucket_key = _bucket_key(key, args, kwargs)
             while True:
-                wait_seconds = limiter.reserve_or_delay(bucket_key)
+                wait_seconds = limiter.reserve_or_delay(bucket_key, call_cost)
                 if wait_seconds is None:
                     return func(*args, **kwargs)
                 if mode == "raise":
@@ -241,9 +282,9 @@ class _SlidingWindowLimiter:
         self._windows_config = tuple(windows)
         self._clock = clock
         self._lock = RLock()
-        self._windows: defaultdict[Hashable, dict[str, deque[float]]] = defaultdict(dict)
+        self._windows: defaultdict[Hashable, dict[str, deque[_RateLimitEvent]]] = defaultdict(dict)
 
-    def reserve_or_delay(self, key: Hashable) -> float | None:
+    def reserve_or_delay(self, key: Hashable, cost: int) -> float | None:
         """Reserve a call slot or return seconds to wait before retrying."""
 
         now = self._clock()
@@ -255,20 +296,20 @@ class _SlidingWindowLimiter:
             for window_config in runtime_windows:
                 window = bucket_windows.setdefault(window_config.window_id, deque())
                 self._prune(window, window_config.prune_before)
-                if len(window) >= window_config.calls:
-                    oldest = window[0]
-                    if window_config.reset_at is not None:
-                        wait_seconds = max(wait_seconds, window_config.reset_at - now)
-                    else:
-                        wait_seconds = max(wait_seconds, oldest + window_config.period - now)
+                wait_seconds = max(
+                    wait_seconds,
+                    _window_wait_seconds(window, window_config, now=now, cost=cost),
+                )
             if wait_seconds > 0:
                 return max(0.0, wait_seconds)
             for window_config in runtime_windows:
-                bucket_windows.setdefault(window_config.window_id, deque()).append(now)
+                bucket_windows.setdefault(window_config.window_id, deque()).append(
+                    _RateLimitEvent(timestamp=now, cost=cost)
+                )
             return None
 
-    def _prune(self, window: deque[float], prune_before: float) -> None:
-        while window and window[0] <= prune_before:
+    def _prune(self, window: deque[_RateLimitEvent], prune_before: float) -> None:
+        while window and window[0].timestamp <= prune_before:
             window.popleft()
 
     def _prune_idle_windows(self, now: float) -> None:
@@ -288,6 +329,26 @@ class _SlidingWindowLimiter:
             self._windows.pop(key, None)
 
 
+def _window_wait_seconds(
+    events: Sequence[_RateLimitEvent],
+    window: _RuntimeRateLimitWindow,
+    *,
+    now: float,
+    cost: int,
+) -> float:
+    used = sum(event.cost for event in events)
+    if used + cost <= window.calls:
+        return 0.0
+    if window.reset_at is not None:
+        return max(0.0, window.reset_at - now)
+    freed = 0
+    for event in events:
+        freed += event.cost
+        if used - freed + cost <= window.calls:
+            return max(0.0, event.timestamp + window.period - now)
+    return max(0.0, window.period)
+
+
 class _SQLiteSlidingWindowLimiter:
     def __init__(
         self,
@@ -303,7 +364,7 @@ class _SQLiteSlidingWindowLimiter:
         self._namespace = namespace
         self._initialize_database()
 
-    def reserve_or_delay(self, key: Hashable) -> float | None:
+    def reserve_or_delay(self, key: Hashable, cost: int) -> float | None:
         """Reserve a cross-process call slot or return seconds to wait."""
 
         now = self._clock()
@@ -328,38 +389,41 @@ class _SQLiteSlidingWindowLimiter:
                     """,
                     (self._namespace, bucket_key, window.window_id, window.prune_before),
                 )
-                row = connection.execute(
+                rows = connection.execute(
                     """
-                    SELECT COUNT(*), MIN(timestamp)
+                    SELECT timestamp, cost
                     FROM rate_limit_events
                     WHERE namespace = ? AND bucket_key = ? AND window_id = ?
+                    ORDER BY timestamp ASC
                     """,
                     (self._namespace, bucket_key, window.window_id),
-                ).fetchone()
-                count = int(row[0])
-                oldest = cast(float | None, row[1])
-                if count >= window.calls:
-                    if window.reset_at is not None:
-                        wait_seconds = max(wait_seconds, window.reset_at - now)
-                    else:
-                        wait_seconds = max(wait_seconds, cast(float, oldest) + window.period - now)
+                ).fetchall()
+                events = [
+                    _RateLimitEvent(timestamp=float(row[0]), cost=int(row[1])) for row in rows
+                ]
+                wait_seconds = max(
+                    wait_seconds,
+                    _window_wait_seconds(events, window, now=now, cost=cost),
+                )
             if wait_seconds <= 0:
                 rows = [
-                    (self._namespace, bucket_key, window.window_id, now)
+                    (self._namespace, bucket_key, window.window_id, now, cost)
                     for window in runtime_windows
                 ]
                 connection.execute(
                     """
-                    INSERT INTO rate_limit_events(namespace, bucket_key, window_id, timestamp)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO rate_limit_events(namespace, bucket_key, window_id, timestamp, cost)
+                    VALUES (?, ?, ?, ?, ?)
                     """,
                     rows[0],
                 )
                 if len(rows) > 1:
                     connection.executemany(
                         """
-                        INSERT INTO rate_limit_events(namespace, bucket_key, window_id, timestamp)
-                        VALUES (?, ?, ?, ?)
+                        INSERT INTO rate_limit_events(
+                            namespace, bucket_key, window_id, timestamp, cost
+                        )
+                        VALUES (?, ?, ?, ?, ?)
                         """,
                         rows[1:],
                     )
@@ -382,7 +446,8 @@ class _SQLiteSlidingWindowLimiter:
                     namespace TEXT NOT NULL,
                     bucket_key TEXT NOT NULL,
                     window_id TEXT NOT NULL DEFAULT 'default',
-                    timestamp REAL NOT NULL
+                    timestamp REAL NOT NULL,
+                    cost INTEGER NOT NULL DEFAULT 1
                 )
                 """
             )
@@ -394,6 +459,13 @@ class _SQLiteSlidingWindowLimiter:
                     """
                     ALTER TABLE rate_limit_events
                     ADD COLUMN window_id TEXT NOT NULL DEFAULT 'default'
+                    """
+                )
+            if "cost" not in columns:
+                connection.execute(
+                    """
+                    ALTER TABLE rate_limit_events
+                    ADD COLUMN cost INTEGER NOT NULL DEFAULT 1
                     """
                 )
             connection.execute(
@@ -428,13 +500,13 @@ class _RedisSlidingWindowLimiter:
         self._key_prefix = key_prefix.strip().rstrip(":")
         self._namespace = namespace
 
-    def reserve_or_delay(self, key: Hashable) -> float | None:
+    def reserve_or_delay(self, key: Hashable, cost: int) -> float | None:
         """Reserve a Redis-backed distributed call slot or return seconds to wait."""
 
         now = self._clock()
         runtime_windows = _runtime_windows(self._windows, now)
         sequence_key, event_keys = self._redis_keys(key, runtime_windows)
-        args: list[str] = [repr(now), str(len(runtime_windows))]
+        args: list[str] = [repr(now), str(cost), str(len(runtime_windows))]
         for window in runtime_windows:
             reset_at = 0.0 if window.reset_at is None else window.reset_at
             args.extend(
@@ -642,6 +714,7 @@ def _validate_rate_limit_config(
     windows: Sequence[_NormalizedRateLimitWindow],
     key: RateLimitKey | None,
     mode: RateLimitMode,
+    cost: RateLimitCost,
     interprocess: bool,
     storage_path: str | os.PathLike[str] | None,
     namespace: str | None,
@@ -654,6 +727,10 @@ def _validate_rate_limit_config(
         raise ConfigurationError("at least one rate limit window is required")
     if key is not None and not callable(key):
         raise ConfigurationError("key must be callable when provided")
+    if not isinstance(cost, int) and not callable(cost):
+        raise ConfigurationError("cost must be a positive integer or callable")
+    if isinstance(cost, bool) or (isinstance(cost, int) and cost <= 0):
+        raise ConfigurationError("cost must be greater than zero")
     if mode not in {"raise", "block"}:
         raise ConfigurationError('mode must be "raise" or "block"')
     if not isinstance(interprocess, bool):
@@ -679,6 +756,23 @@ def _validate_rate_limit_config(
     if redis_client is not None and not callable(getattr(redis_client, "eval", None)):
         raise ConfigurationError("redis_client must provide an eval method")
     _validate_redis_key_prefix(redis_key_prefix)
+
+
+def _resolve_rate_limit_cost(
+    cost: RateLimitCost,
+    args: tuple[object, ...],
+    kwargs: dict[str, object],
+) -> int:
+    resolved = cost(args, kwargs) if callable(cost) else cost
+    if isinstance(resolved, bool) or not isinstance(resolved, int):
+        raise ConfigurationError("rate limit cost must resolve to a positive integer")
+    if resolved <= 0:
+        raise ConfigurationError("rate limit cost must be greater than zero")
+    return resolved
+
+
+def _cost_exceeds_capacity(cost: int, windows: Sequence[_NormalizedRateLimitWindow]) -> bool:
+    return any(cost > window.calls for window in windows)
 
 
 def _bucket_key(

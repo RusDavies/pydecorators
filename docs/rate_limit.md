@@ -34,6 +34,7 @@ def call_api(path: str) -> str:
 - `mode`: either `"raise"` or `"block"`. Defaults to `"raise"`.
 - `clock`: injectable monotonic clock for tests.
 - `sleep`: injectable sync or async sleep callable for block mode and tests.
+- `cost`: optional positive integer or callable that resolves the cost of each admitted call. Defaults to `1`.
 - `interprocess`: opt-in same-host, multi-process coordination. Defaults to `False`.
 - `storage_path`: SQLite database path required when `interprocess=True`.
 - `namespace`: optional shared bucket namespace. Defaults to the wrapped function's module and qualified name.
@@ -68,6 +69,44 @@ For `mode="raise"`, `RateLimitExceeded.retry_after` is the longest wait required
 Window `name` values are optional. They provide stable storage identifiers for interprocess and distributed modes and make configuration easier to read. When omitted, the decorator derives a stable internal identifier from the window index and values. A single-window `windows=[...]` configuration uses the same storage identifier as the legacy `calls=`/`period=` shorthand so existing SQLite state remains compatible.
 
 `RateLimitWindow` limits are sliding windows. `period=24 * 60 * 60` means a rolling 24-hour window, not a calendar day reset at midnight.
+
+## Weighted call costs
+
+By default, every admitted call consumes one unit from every configured window. Use `cost=` when some calls should consume more than one unit:
+
+```python
+@rate_limit(calls=8, period=60, cost=2)
+def expensive_vendor_call(path: str) -> str:
+    ...
+```
+
+This admits at most four calls per minute because each call consumes two units from the eight-unit window.
+
+For per-call weights, pass a callable. The callable receives `(args, kwargs)` from the wrapped function and must return a positive integer:
+
+```python
+@rate_limit(calls=8, period=60, cost=lambda args, kwargs: kwargs.get("units", 1))
+def call_vendor_batch(path: str, *, units: int = 1) -> str:
+    ...
+```
+
+A call with `units=5` consumes five units. If the cost callable raises, the exception propagates and no rate-limit state is reserved. If the resolved cost is larger than any configured window capacity, the call raises `RateLimitExceeded` with an infinite `retry_after` because that exact call can never fit the configured policy.
+
+Weighted costs work with `windows=`, calendar windows, SQLite interprocess limits, and Redis distributed limits. The same cost is applied to every configured window, and reservation remains all-or-nothing: if any window lacks enough remaining units, no window consumes the call.
+
+```python
+@rate_limit(
+    windows=[
+        RateLimitWindow(calls=8, period=60, name="minute"),
+        CalendarRateLimitWindow(calls=800, unit="day", name="day", timezone="UTC"),
+    ],
+    cost=lambda args, kwargs: kwargs["units"],
+)
+def call_vendor_api(path: str, *, units: int) -> str:
+    ...
+```
+
+`cost` describes the operation being admitted, not an individual window. If a future API needs one call to cost different amounts against different windows, that should be a separate explicit feature rather than a surprise hidden inside this one.
 
 ## Calendar-aligned windows
 
