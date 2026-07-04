@@ -55,7 +55,7 @@ Then read the per-decorator docs and [decorator stacking guidance](https://githu
 
 ## Development status
 
-Released as `blakemere-wraptools` `0.4.0`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
+Released as `blakemere-wraptools` `0.4.1`. The public API is still pre-1.0: useful, tested, and documented, but compatibility can change when the library needs to get less weird.
 
 Warnings use `DeprecationWarning` by default, which Python may hide depending on warning filters. See [deprecation decorator docs](https://github.com/RusDavies/pydecorators/blob/master/docs/deprecated.md) for details.
 
