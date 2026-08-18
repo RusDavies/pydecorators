@@ -40,12 +40,13 @@ dev = [
   "build>=1.2",
   "defusedxml>=0.7.1",
   "mypy>=1.14",
+  "packaging>=26.3",
   "pytest>=8.3",
   "pytest-asyncio>=0.25",
   "pre-commit>=4.0",
   "pytest-cov>=6.0",
-  "ruff>=0.9",
-  "twine>=5.1",
+  "ruff>=0.9,<0.16",
+  "twine>=7.0",
 ]
 
 [project.urls]

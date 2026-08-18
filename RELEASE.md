@@ -215,7 +215,7 @@ Use API tokens only if trusted publishing is unavailable. If tokens are used:
 4. Use Twine for token publishing:
 
    ```bash
-   python -m pip install --upgrade build twine
+   python -m pip install --upgrade build 'packaging>=26.3' 'twine>=7'
    python -m build
    python -m twine check dist/*
    python -m twine upload --repository testpypi dist/*
